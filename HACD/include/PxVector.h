@@ -17,15 +17,16 @@ namespace physx
 	  case where the allocator contains some inline storage space
 	*/
 	template<class T>
-	class Array
+	class vector
 	{
 
 	public:
 
-		typedef T*			Iterator;
-		typedef const T*	ConstIterator;
+		typedef T*			iterator;
+		typedef const T*	const_iterator;
 
-		explicit  Array(const PxEmpty& v)
+
+		explicit  vector(const PxEmpty& v)
 		{
 			if(mData)
 				mCapacity |= PX_SIGN_BITMASK;
@@ -34,14 +35,14 @@ namespace physx
 		/*!
 		Default array constructor. Initialize an empty array
 		*/
-		PX_INLINE explicit Array(void)
+		PX_INLINE explicit vector(void)
 			: mData(0), mSize(0), mCapacity(0) 
 		{}
 
 		/*!
 		Initialize array with given capacity
 		*/
-		PX_INLINE explicit Array(PxU32 size, const T& a = T())
+		PX_INLINE explicit vector(PxU32 size, const T& a = T())
 		: mData(0), mSize(0), mCapacity(0) 
 		{
 			resize(size, a);
@@ -53,7 +54,7 @@ namespace physx
 		// Also never make a copy constructor explicit, or copy-initialization* will no longer work. This is because
 		// 'binding an rvalue to a const reference requires an accessible copy constructor' (http://gcc.gnu.org/bugs/)
 		// *http://stackoverflow.com/questions/1051379/is-there-a-difference-in-c-between-copy-initialization-and-assignment-initializ
-		PX_INLINE Array(const Array& other)
+		PX_INLINE vector(const vector& other)
 			{
 			copy(other);
 			}
@@ -61,7 +62,7 @@ namespace physx
 		/*!
 		Initialize array with given length
 		*/
-		PX_INLINE explicit Array(const T* first, const T* last)
+		PX_INLINE explicit vector(const T* first, const T* last)
 			: mSize(last<first?0:(PxU32)(last-first)), mCapacity(mSize)
 		{
 			mData = allocate(mSize);
@@ -71,7 +72,7 @@ namespace physx
 		/*!
 		Destructor
 		*/
-		PX_INLINE ~Array()
+		PX_INLINE ~vector()
 		{
 			destroy(mData, mData + mSize);
 
@@ -82,7 +83,7 @@ namespace physx
 		/*!
 		Assignment operator. Copy content (deep-copy)
 		*/
-		PX_INLINE Array& operator= (const Array<T>& rhs)
+		PX_INLINE vector& operator= (const vector<T>& rhs)
 		{
 			if(&rhs == this)
 				return *this;
@@ -96,7 +97,7 @@ namespace physx
 		}
 
 		/*!
-		Array indexing operator.
+		vector indexing operator.
 		\param i
 		The index of the element that will be returned.
 		\return
@@ -109,7 +110,7 @@ namespace physx
 		}
 
 		/*!
-		Array indexing operator.
+		vector indexing operator.
 		\param i
 		The index of the element that will be returned.
 		\return
@@ -126,12 +127,12 @@ namespace physx
 		\return
 		a pointer to the initial element of the array.
 		*/
-		PX_FORCE_INLINE ConstIterator begin() const 
+		PX_FORCE_INLINE const_iterator begin() const 
 		{
 			return mData;
 		}
 
-		PX_FORCE_INLINE Iterator begin()
+		PX_FORCE_INLINE iterator begin()
 		{
 			return mData;
 		}
@@ -142,12 +143,12 @@ namespace physx
 		a pointer to the element beyond the last element of the array.
 		*/
 
-		PX_FORCE_INLINE ConstIterator end() const 
+		PX_FORCE_INLINE const_iterator end() const 
 		{
 			return mData+mSize;
 		}
 
-		PX_FORCE_INLINE Iterator end()
+		PX_FORCE_INLINE iterator end()
 		{
 			return mData+mSize;
 		}
@@ -224,7 +225,7 @@ namespace physx
 		*/
 
 
-		PX_INLINE Iterator find(const T& a)
+		PX_INLINE iterator find(const T& a)
 		{
 			PxU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
@@ -232,7 +233,7 @@ namespace physx
 			return mData+index;
 		}
 
-		PX_INLINE ConstIterator find(const T& a) const
+		PX_INLINE const_iterator find(const T& a) const
 		{
 			PxU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
@@ -249,7 +250,7 @@ namespace physx
 		*/
 		/////////////////////////////////////////////////////////////////////////
 
-		PX_FORCE_INLINE T& pushBack(const T& a)
+		PX_FORCE_INLINE T& push_back(const T& a)
 		{
 			if(capacity()<=mSize) 
 				grow(capacityIncrement());
@@ -264,14 +265,13 @@ namespace physx
 		Returns the element at the end of the array. Only legal if the array is non-empty.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE T popBack() 
+		PX_INLINE T pop_back() 
 		{
 			PX_ASSERT(mSize);
 			T t = mData[mSize-1];
 			mData[--mSize].~T();
 			return t;
 		}
-
 
 		/////////////////////////////////////////////////////////////////////////
 		/*!
@@ -304,7 +304,7 @@ namespace physx
 			mData[mSize].~T();
 		}
 
-		PX_INLINE void replaceWithLast(Iterator i) 
+		PX_INLINE void replaceWithLast(iterator i) 
 		{
 			replaceWithLast(static_cast<PxU32>(i-mData));
 		}
@@ -434,7 +434,7 @@ namespace physx
 
 	protected:
 
-		PX_NOINLINE void copy(const Array<T>& other)
+		PX_NOINLINE void copy(const vector<T>& other)
 		{
 			if(!other.empty())
 			{
@@ -503,7 +503,7 @@ namespace physx
 		*/
 		PX_NOINLINE void recreate(PxU32 capacity);
 
-		// The idea here is to prevent accidental brain-damage with pushBack or insert. Unfortunately
+		// The idea here is to prevent accidental brain-damage with push_back or insert. Unfortunately
 		// it interacts badly with InlineArrays with smaller inline allocations.
 		// TODO(dsequeira): policy template arg, this is exactly what they're for.
 		PX_INLINE PxU32 capacityIncrement()	const
@@ -530,7 +530,7 @@ namespace physx
 	};
 
 	template<class T>
-	PX_NOINLINE void Array<T>::resize(const PxU32 size, const T& a)
+	PX_NOINLINE void vector<T>::resize(const PxU32 size, const T& a)
 	{
 		reserve(size);
 		create(mData + mSize, mData + size, a);
@@ -539,7 +539,7 @@ namespace physx
 	}
 
 	template<class T>
-	PX_NOINLINE void Array<T>::recreate(PxU32 capacity)
+	PX_NOINLINE void vector<T>::recreate(PxU32 capacity)
 	{
 		T* newData = allocate(capacity);
 		PX_ASSERT(!capacity || newData && newData != mData);

@@ -25,7 +25,7 @@ namespace HACD
     const physx::PxF64                                    sc_pi = 3.14159265;
 	class HACD;
 
-	typedef physx::set< GraphEdgePQ > GraphEdgePQSet;
+	typedef STDNAME::set< GraphEdgePQ > GraphEdgePQSet;
 
 	// just to be able to set the capcity of the container
 	class ReservablePriorityQueue

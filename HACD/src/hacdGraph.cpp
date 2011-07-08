@@ -81,7 +81,7 @@ namespace HACD
 
     physx::PxI32 Graph::AddVertex()
     {
-		physx::PxU32 name = m_vertices.size();
+		physx::PxU32 name = (physx::PxU32)m_vertices.size();
 		m_vertices.resize(name+1);
         m_vertices[name].m_name = name;
         m_nV++;
@@ -90,8 +90,8 @@ namespace HACD
     
     physx::PxI32 Graph::AddEdge(physx::PxI32 v1, physx::PxI32 v2)
     {
-		physx::PxU32 name = m_edges.size();
-		m_edges.pushBack(GraphEdge());
+		physx::PxU32 name =(physx::PxU32) m_edges.size();
+		m_edges.push_back(GraphEdge());
         m_edges[name].m_name = name;
         m_edges[name].m_v1 = v1;
         m_edges[name].m_v2 = v2;
@@ -143,7 +143,7 @@ namespace HACD
 			// delete the edge (v1, v2)
 			DeleteEdge(edgeToDelete);
 			// add v2 to v1 ancestors
-            m_vertices[v1].m_ancestors.pushBack(v2);
+            m_vertices[v1].m_ancestors.push_back(v2);
 			// add v2's ancestors to v1's ancestors
 			PxU32Vector newArray;
 			PxU32Vector	&oldArray = m_vertices[v1].m_ancestors;
@@ -151,11 +151,11 @@ namespace HACD
 			newArray.reserve( insertArray.size() + oldArray.size() );
 			for (physx::PxU32 i=0; i<insertArray.size(); i++)
 			{
-				newArray.pushBack( insertArray[i] );
+				newArray.push_back( insertArray[i] );
 			}
 			for (physx::PxU32 i=0; i<oldArray.size(); i++)
 			{
-				newArray.pushBack( oldArray[i] );
+				newArray.push_back( oldArray[i] );
 			}
 			m_vertices[v1].m_ancestors = newArray;
 
@@ -233,11 +233,11 @@ namespace HACD
 			{
                 m_vertices[v].m_cc = m_nCCs;
                 temp.clear();
-                temp.pushBack(m_vertices[v].m_name);
+                temp.push_back(m_vertices[v].m_name);
                 while (temp.size()) 
 				{
                     physx::PxI32 vertex = temp[temp.size()-1];
-                    temp.popBack();                    
+                    temp.pop_back();                    
 					PxI32Set::const_iterator ed(m_vertices[vertex].m_edges.begin());
 					PxI32Set::const_iterator itEnd(m_vertices[vertex].m_edges.end());
 					for(; ed != itEnd; ++ed) 
@@ -253,7 +253,7 @@ namespace HACD
                         if ( !m_vertices[v2].m_deleted && m_vertices[v2].m_cc == -1) 
 						{
                             m_vertices[v2].m_cc = m_nCCs;
-                            temp.pushBack(v2);
+                            temp.push_back(v2);
                         }
                     }
                 }

@@ -629,7 +629,7 @@ static void set_symmetric_difference (const PxU64Set &a,
 					m_callBack->progressUpdate(msg, 0.0, 0.0, m_nClusters);
 					p++;
 				}
-				m_cVertices.pushBack(v);			
+				m_cVertices.push_back(v);			
 			}
 		}
 		if (m_callBack)

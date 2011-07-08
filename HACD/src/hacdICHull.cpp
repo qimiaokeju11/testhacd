@@ -146,7 +146,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
                    currentTriangle.m_vertices[1]->GetData().m_name == sc_dummyIndex ||
                    currentTriangle.m_vertices[2]->GetData().m_name == sc_dummyIndex )
 				{
-					m_trianglesToDelete.pushBack(m_mesh.m_triangles.GetHead());
+					m_trianglesToDelete.push_back(m_mesh.m_triangles.GetHead());
                     for(int k = 0; k < 3; k++)
                     {
                         for(int h = 0; h < 2; h++)
@@ -161,7 +161,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 				}
 				else
 				{
-					trianglesToDuplicate.pushBack(m_mesh.m_triangles.GetHead());
+					trianglesToDuplicate.push_back(m_mesh.m_triangles.GetHead());
 				}
 				m_mesh.m_triangles.Next();
 			}
@@ -171,7 +171,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 				TMMEdge & currentEdge = m_mesh.m_edges.GetHead()->GetData();
 				if( currentEdge.m_triangles[0] == 0 && currentEdge.m_triangles[1] == 0) 
 				{
-					m_edgesToDelete.pushBack(m_mesh.m_edges.GetHead());
+					m_edgesToDelete.push_back(m_mesh.m_edges.GetHead());
 				}
 				m_mesh.m_edges.Next();
 			}
@@ -281,7 +281,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
                    currentTriangle.m_vertices[1]->GetData().m_name == sc_dummyIndex ||
                    currentTriangle.m_vertices[2]->GetData().m_name == sc_dummyIndex )
 				{
-					m_trianglesToDelete.pushBack(m_mesh.m_triangles.GetHead());
+					m_trianglesToDelete.push_back(m_mesh.m_triangles.GetHead());
                     for(int k = 0; k < 3; k++)
                     {
                         for(int h = 0; h < 2; h++)
@@ -296,7 +296,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 				}
 				else
 				{
-					trianglesToDuplicate.pushBack(m_mesh.m_triangles.GetHead());
+					trianglesToDuplicate.push_back(m_mesh.m_triangles.GetHead());
 				}
 				m_mesh.m_triangles.Next();
 			}
@@ -306,7 +306,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 				TMMEdge & currentEdge = m_mesh.m_edges.GetHead()->GetData();
 				if( currentEdge.m_triangles[0] == 0 && currentEdge.m_triangles[1] == 0) 
 				{
-					m_edgesToDelete.pushBack(m_mesh.m_edges.GetHead());
+					m_edgesToDelete.push_back(m_mesh.m_edges.GetHead());
 				}
 				m_mesh.m_edges.Next();
 			}
@@ -538,7 +538,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 				if (markVisibleFaces)
 				{
 					f->GetData().m_visible = true;
-					m_trianglesToDelete.pushBack(f);
+					m_trianglesToDelete.push_back(f);
 				}
 				visible = true;
 			}
@@ -592,12 +592,12 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
             }
             if ( nvisible == 2)
             {
-                m_edgesToDelete.pushBack(e);
+                m_edgesToDelete.push_back(e);
             }
             else if ( nvisible == 1)
             {
                 e->GetData().m_newFace = MakeConeFace(e, v0);
-                m_edgesToUpdate.pushBack(e);
+                m_edgesToUpdate.push_back(e);
             }
             e = tmp;
         }
@@ -653,8 +653,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
     {
         // integrate the new faces into the data structure
         CircularListElement<TMMEdge> * e;
-        const CircularListElementTMMEdgeVector::Iterator itEndUpdate = m_edgesToUpdate.end();
-        for(CircularListElementTMMEdgeVector::Iterator it = m_edgesToUpdate.begin(); it != itEndUpdate; ++it)
+        const CircularListElementTMMEdgeVector::iterator itEndUpdate = m_edgesToUpdate.end();
+        for(CircularListElementTMMEdgeVector::iterator it = m_edgesToUpdate.begin(); it != itEndUpdate; ++it)
         {
             e = *it;
             if ( e->GetData().m_newFace )
@@ -672,8 +672,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         }
         // delete edges maked for deletion
         CircularList<TMMEdge> & edges = m_mesh.GetEdges();
-        const CircularListElementTMMEdgeVector::Iterator itEndDelete = m_edgesToDelete.end();
-        for(CircularListElementTMMEdgeVector::Iterator it = m_edgesToDelete.begin(); it != itEndDelete; ++it)
+        const CircularListElementTMMEdgeVector::iterator itEndDelete = m_edgesToDelete.end();
+        for(CircularListElementTMMEdgeVector::iterator it = m_edgesToDelete.begin(); it != itEndDelete; ++it)
         {
             edges.Delete(*it);         
         }
@@ -684,8 +684,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
     bool ICHull::CleanTriangles()
     {
         CircularList<TMMTriangle> & triangles = m_mesh.GetTriangles();
-        const CircularListElementTMMTriangleVector::Iterator itEndDelete = m_trianglesToDelete.end();
-        for(CircularListElementTMMTriangleVector::Iterator it = m_trianglesToDelete.begin(); it != itEndDelete; ++it)
+        const CircularListElementTMMTriangleVector::iterator itEndDelete = m_trianglesToDelete.end();
+        for(CircularListElementTMMTriangleVector::iterator it = m_trianglesToDelete.begin(); it != itEndDelete; ++it)
         {
 			if (m_distPoints)
 			{
