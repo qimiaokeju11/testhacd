@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../PxFoundation;../PxReviewed"
+				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,6 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="..\$(ProjectName)DEBUG.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -117,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../PxFoundation;../PxReviewed"
+				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -138,6 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="..\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -275,6 +277,82 @@
 				</File>
 				<File
 					RelativePath="..\HACD\public\PxSimpleTypes.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="ConstraintBuilder"
+			>
+			<Filter
+				Name="include"
+				>
+				<File
+					RelativePath="..\ConstraintBuilder\include\TriTri.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="public"
+				>
+				<File
+					RelativePath="..\ConstraintBuilder\public\ConstraintBuilder.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="src"
+				>
+				<File
+					RelativePath="..\ConstraintBuilder\src\ConstraintBuilder.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\ConstraintBuilder\src\TriTri.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="MeshImport"
+			>
+			<Filter
+				Name="include"
+				>
+				<File
+					RelativePath="..\MeshImport\include\MeshImport.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="src"
+				>
+				<File
+					RelativePath="..\MeshImport\src\MeshImport.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="FloatMath"
+			>
+			<Filter
+				Name="include"
+				>
+				<File
+					RelativePath="..\FloatMath\include\FloatMath.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="src"
+				>
+				<File
+					RelativePath="..\FloatMath\src\FloatMath.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\FloatMath\src\FloatMath.inl"
 					>
 				</File>
 			</Filter>
