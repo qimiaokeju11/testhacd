@@ -1,6 +1,6 @@
 This project contains source code and a sample program to perform
 Hierarchical approximate convex decomposition (HACD) based on the
-work of Khaled Wajih.
+work of Khaled Mamou
 
 Released: July 7, 2011
 
