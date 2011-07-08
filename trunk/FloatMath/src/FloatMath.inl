@@ -44,8 +44,6 @@
 
 #pragma warning(disable:4996)
 
-#include "PsArray.h"
-
 namespace physx
 {
 	namespace general_floatmath2
@@ -2253,7 +2251,7 @@ namespace VERTEX_INDEX
 
 class KdTreeNode;
 
-typedef Array< KdTreeNode * > KdTreeNodeVector;
+typedef STDNAME::vector< KdTreeNode * > KdTreeNodeVector;
 
 enum Axes
 {
@@ -2746,8 +2744,8 @@ public:
 };
 
 
-typedef Array< PxF64 > DoubleVector;
-typedef Array< PxF32 >  FloatVector;
+typedef STDNAME::vector< PxF64 > DoubleVector;
+typedef STDNAME::vector< PxF32 >  FloatVector;
 
 class KdTree : public KdTreeInterface, public UserAllocated
 {
@@ -2817,9 +2815,9 @@ public:
   {
     assert(mUseDouble);
     PxU32 ret = mVcount;
-    mVerticesDouble.pushBack(x);
-    mVerticesDouble.pushBack(y);
-    mVerticesDouble.pushBack(z);
+    mVerticesDouble.push_back(x);
+    mVerticesDouble.push_back(y);
+    mVerticesDouble.push_back(z);
     mVcount++;
     KdTreeNode *node = getNewNode(ret);
     if ( mRoot )
@@ -2837,9 +2835,9 @@ public:
   {
     assert(!mUseDouble);
     PxU32 ret = mVcount;
-    mVerticesFloat.pushBack(x);
-    mVerticesFloat.pushBack(y);
-    mVerticesFloat.pushBack(z);
+    mVerticesFloat.push_back(x);
+    mVerticesFloat.push_back(y);
+    mVerticesFloat.push_back(z);
     mVcount++;
     KdTreeNode *node = getNewNode(ret);
     if ( mRoot )
@@ -3324,7 +3322,7 @@ nextone:
 }
 
 
-typedef Array< fm_LineSegment > LineSegmentVector;
+typedef STDNAME::vector< fm_LineSegment > LineSegmentVector;
 
 static inline void setMinMax(PxF64 &vmin,PxF64 &vmax,PxF64 v1,PxF64 v2)
 {
@@ -3365,7 +3363,7 @@ public:
 };
 
 
-typedef Array< Intersection > IntersectionList;
+typedef STDNAME::vector< Intersection > IntersectionList;
 
 class MyLineSegment : public fm_LineSegment, public UserAllocated
 {
@@ -3479,11 +3477,11 @@ public:
     {
       if ( mIntersections.empty() )
       {
-        mIntersections.pushBack(intersect);
+        mIntersections.push_back(intersect);
       }
       else
       {
-        IntersectionList::Iterator i;
+        IntersectionList::iterator i;
         for (i=mIntersections.begin(); i!=mIntersections.end(); ++i)
         {
           Intersection &it = (*i);
@@ -3503,7 +3501,7 @@ public:
         }
         if ( i==mIntersections.end() )
         {
-          mIntersections.pushBack(intersect);
+          mIntersections.push_back(intersect);
         }
       }
     }
@@ -3518,12 +3516,12 @@ public:
       {
         swap(seg.mE1,seg.mE2);
       }
-      results.pushBack(seg);
+      results.push_back(seg);
     }
     else
     {
       PxU32 prev = mE1;
-      IntersectionList::Iterator i;
+      IntersectionList::iterator i;
       for (i=mIntersections.begin(); i!=mIntersections.end(); ++i)
       {
         Intersection &it = (*i);
@@ -3532,7 +3530,7 @@ public:
         {
           swap(seg.mE1,seg.mE2);
         }
-        results.pushBack(seg);
+        results.push_back(seg);
         prev = it.mIndex;
       }
       fm_LineSegment seg(prev,mE2);
@@ -3540,7 +3538,7 @@ public:
       {
         swap(seg.mE1,seg.mE2);
       }
-      results.pushBack(seg);
+      results.push_back(seg);
     }
   }
 
@@ -3559,7 +3557,7 @@ public:
   IntersectionList mIntersections;
 };
 
-typedef Array< MyLineSegment > MyLineSegmentVector;
+typedef STDNAME::vector< MyLineSegment > MyLineSegmentVector;
 
 class MyLineSweep : public fm_LineSweep, public fm_quickSort, public UserAllocated
 {
@@ -4379,7 +4377,7 @@ void  fm_initMinMax(REAL bmin[3],REAL bmax[3])
 
 #define TESSELATE_H
 
-typedef Array< PxU32 > UintVector;
+typedef STDNAME::vector< PxU32 > UintVector;
 
 class Myfm_Tesselate : public fm_Tesselate, public UserAllocated
 {
@@ -4513,9 +4511,9 @@ public:
       PxU32 i2 = mVertices->getIndex(p2,newp);
       PxU32 i3 = mVertices->getIndex(p3,newp);
 
-      mIndices.pushBack(i1);
-      mIndices.pushBack(i2);
-      mIndices.pushBack(i3);
+      mIndices.push_back(i1);
+      mIndices.push_back(i2);
+      mIndices.push_back(i3);
     }
 
   }
@@ -4584,9 +4582,9 @@ public:
       PxU32 i2 = mVertices->getIndex(p2,newp);
       PxU32 i3 = mVertices->getIndex(p3,newp);
 
-      mIndices.pushBack(i1);
-      mIndices.pushBack(i2);
-      mIndices.pushBack(i3);
+      mIndices.push_back(i1);
+      mIndices.push_back(i2);
+      mIndices.push_back(i3);
     }
 
   }
@@ -5080,8 +5078,8 @@ public:
   PxF64 z;
 };
 
-typedef Array< TVec >  TVecVector;
-typedef Array< TU32 >  TU32Vector;
+typedef STDNAME::vector< TVec >  TVecVector;
+typedef STDNAME::vector< TU32 >  TU32Vector;
 
 class CTriangulator
 {
@@ -5124,7 +5122,7 @@ public:
             if ( y > mMax.y ) mMax.y = y;
             if ( z > mMax.z ) mMax.z = z;
         }
-        mInputPoints.pushBack(v);
+        mInputPoints.push_back(v);
     }
 
     // Triangulation happens in 2d.  We could inverse transform the polygon around the normal direction, or we just use the two most signficant axes
@@ -5193,7 +5191,7 @@ public:
           for (PxU32 i=0; i<pcount; i++)
           {
             TVec v( points[i1], points[i2], points[i3] );
-            mPoints.pushBack(v);
+            mPoints.push_back(v);
             points+=3;
           }
 
@@ -5298,15 +5296,15 @@ void CTriangulator::_process(TU32Vector &indices)
             c = V[w];
 			if ( flipped )
 			{
-				indices.pushBack(a);
-				indices.pushBack(b);
-				indices.pushBack(c);
+				indices.push_back(a);
+				indices.push_back(b);
+				indices.push_back(c);
 			}
 			else
 			{
-				indices.pushBack(c);
-				indices.pushBack(b);
-				indices.pushBack(a);
+				indices.push_back(c);
+				indices.push_back(b);
+				indices.push_back(a);
 			}
             m++;
             for (s = v, t = v + 1; t < nv; s++, t++)

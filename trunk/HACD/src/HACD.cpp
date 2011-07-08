@@ -1,6 +1,7 @@
 #include "HACD.h"
 
 #include "hacdHACD.h"
+#include "MergeHulls.h"
 
 #pragma warning(disable:4100 4996)
 
@@ -14,8 +15,6 @@ public:
 	MyHACD_API(void)
 	{
 		mHACD = NULL;
-		mHull.mIndices = NULL;
-		mHull.mVertices = NULL;
 		mUserCallback = NULL;
 	}
 	virtual ~MyHACD_API(void)
@@ -38,7 +37,7 @@ public:
 				p.X() = desc.mVertices[i*3+0];
 				p.Y() = desc.mVertices[i*3+1];
 				p.Z() = desc.mVertices[i*3+2];
-				mPoints.pushBack(p);
+				mPoints.push_back(p);
 			}
 			for (physx::PxU32 i=0; i<desc.mTriangleCount; i++)
 			{
@@ -46,7 +45,7 @@ public:
 				t.X() = desc.mIndices[i*3+0];
 				t.Y() = desc.mIndices[i*3+1];
 				t.Z() = desc.mIndices[i*3+2];
-				mTriangles.pushBack(t);
+				mTriangles.push_back(t);
 			}
 
 			mHACD->SetPoints(&mPoints[0]);
@@ -65,41 +64,55 @@ public:
 			mHACD->Compute();
 
 			ret = (physx::PxU32)mHACD->GetNClusters();
+			for (physx::PxU32 i=0; i<ret; i++)
+			{
+				Hull h;
+				getHull(i,h);
+				mHulls.push_back(h);
+			}
 		}
 
 		return ret;
 	}
 
-	void releaseHull(void)
+	void releaseHull(Hull &h)
 	{
-		PX_FREE((void *)mHull.mIndices);
-		PX_FREE((void *)mHull.mVertices);
-		mHull.mIndices = NULL;
-		mHull.mVertices = NULL;
+		PX_FREE((void *)h.mIndices);
+		PX_FREE((void *)h.mVertices);
+		h.mIndices = NULL;
+		h.mVertices = NULL;
 	}
 
-	virtual const Hull *getHull(physx::PxU32 index)
+	virtual const Hull		*getHull(physx::PxU32 index) 
 	{
-		releaseHull();
+		const Hull *ret = NULL;
+		if ( index < mHulls.size() )
+		{
+			ret = &mHulls[index];
+		}
+		return ret;
+	}
 
-		mHull.mVertexCount = (physx::PxU32)mHACD->GetNPointsCH(index);
-		mHull.mTriangleCount = (physx::PxU32)mHACD->GetNTrianglesCH(index);
-		mHull.mVertices = (physx::PxF32 *)PX_ALLOC(sizeof(physx::PxF32)*3*mHull.mVertexCount);
-		mHull.mIndices = (physx::PxU32 *)PX_ALLOC(sizeof(physx::PxU32)*3*mHull.mTriangleCount);
+	virtual void getHull(physx::PxU32 index,Hull &h)
+	{
+		h.mVertexCount = (physx::PxU32)mHACD->GetNPointsCH(index);
+		h.mTriangleCount = (physx::PxU32)mHACD->GetNTrianglesCH(index);
+		h.mVertices = (physx::PxF32 *)PX_ALLOC(sizeof(physx::PxF32)*3*h.mVertexCount);
+		h.mIndices = (physx::PxU32 *)PX_ALLOC(sizeof(physx::PxU32)*3*h.mTriangleCount);
 
-		Vec3<physx::PxF64> * pointsCH = (Vec3<physx::PxF64> *)PX_ALLOC(sizeof(Vec3<physx::PxF64>)*mHull.mVertexCount);
-		Vec3<physx::PxI32> * trianglesCH = (Vec3<physx::PxI32> *)PX_ALLOC(sizeof(Vec3<physx::PxI32>)*mHull.mTriangleCount);
+		Vec3<physx::PxF64> * pointsCH = (Vec3<physx::PxF64> *)PX_ALLOC(sizeof(Vec3<physx::PxF64>)*h.mVertexCount);
+		Vec3<physx::PxI32> * trianglesCH = (Vec3<physx::PxI32> *)PX_ALLOC(sizeof(Vec3<physx::PxI32>)*h.mTriangleCount);
 
 		mHACD->GetCH(index, pointsCH, trianglesCH);
-		physx::PxF32 *hullVertices = (physx::PxF32 *)mHull.mVertices;
-		for (physx::PxU32 i=0; i<mHull.mVertexCount; i++)
+		physx::PxF32 *hullVertices = (physx::PxF32 *)h.mVertices;
+		for (physx::PxU32 i=0; i<h.mVertexCount; i++)
 		{
 			hullVertices[i*3+0] = (physx::PxF32)pointsCH[i].X();
 			hullVertices[i*3+1] = (physx::PxF32)pointsCH[i].Y();
 			hullVertices[i*3+2] = (physx::PxF32)pointsCH[i].Z();
 		}
-		physx::PxU32 *hullIndices = (physx::PxU32 *)mHull.mIndices;
-		for (physx::PxU32 i=0; i<mHull.mTriangleCount; i++)
+		physx::PxU32 *hullIndices = (physx::PxU32 *)h.mIndices;
+		for (physx::PxU32 i=0; i<h.mTriangleCount; i++)
 		{
 			hullIndices[i*3+0] = trianglesCH[i].X();
 			hullIndices[i*3+1] = trianglesCH[i].Y();
@@ -107,7 +120,6 @@ public:
 		}
 		PX_FREE(pointsCH);
 		PX_FREE(trianglesCH);
-		return &mHull;
 	}
 
 	virtual void	releaseHACD(void) // release memory associated with the last HACD request
@@ -119,7 +131,11 @@ public:
 		}
 		mPoints.clear();
 		mTriangles.clear();
-		releaseHull();
+		for (physx::PxU32 i=0; i<mHulls.size(); i++)
+		{
+			releaseHull(mHulls[i]);
+		}
+		mHulls.clear();
 		mUserCallback = NULL;
 	}
 
@@ -144,11 +160,11 @@ public:
 	}
 
 
-	Hull		mHull; // temporary result information..
-	HACD		*mHACD;
-	Vec3Vector	mPoints;
-	TriVector	mTriangles;
-	UserCallback	*mUserCallback;
+	HACD					*mHACD;
+	Vec3Vector				mPoints;
+	TriVector				mTriangles;
+	UserCallback			*mUserCallback;
+	STDNAME::vector< Hull >	mHulls;
 
 };
 

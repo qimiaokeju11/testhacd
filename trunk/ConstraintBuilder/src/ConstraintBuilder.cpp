@@ -41,11 +41,10 @@
 
 
 
-#include "PsArray.h"
 #include "ConstraintBuilder.h"
 #include "TriTri.h"
 
-typedef physx::Array< Constraint * > ConstraintVector;
+typedef STDNAME::vector< Constraint * > ConstraintVector;
 
 /* a = b - c */
 #define rayvector(a,b,c) \
@@ -436,7 +435,7 @@ public:
   physx::PxF32        *mPlanes;
 };
 
-typedef physx::Array< ConstrainedHull * > ConstrainedHullVector;
+typedef STDNAME::vector< ConstrainedHull * > ConstrainedHullVector;
 
 class ConstraintBuilder : public physx::UserAllocated
 {
@@ -447,14 +446,14 @@ public:
 
   ~ConstraintBuilder(void)
   {
-    ConstrainedHullVector::Iterator i;
+    ConstrainedHullVector::iterator i;
     for (i=mHulls.begin(); i!=mHulls.end(); ++i)
     {
       ConstrainedHull *ch = (*i);
       delete ch;
     }
     {
-      ConstraintVector::Iterator i;
+      ConstraintVector::iterator i;
       for (i=mConstraints.begin(); i!=mConstraints.end(); ++i)
       {
         Constraint *c = (*i);
@@ -466,7 +465,7 @@ public:
   ConstrainedHull * addConvexHull(physx::PxU32 vcount,const physx::PxF32 *vertices,physx::PxU32 tcount,const physx::PxU32 *indices,physx::PxF32 volume,physx::PxU32 userData)
   {
     ConstrainedHull *ch = PX_NEW(ConstrainedHull)(vcount,vertices,tcount,indices,volume,userData);
-    mHulls.pushBack(ch);
+    mHulls.push_back(ch);
     return ch;
   }
 
@@ -488,7 +487,7 @@ public:
     ConstrainedHull *ret = 0;
     physx::PxF32 maxV = 0;
 
-    ConstrainedHullVector::Iterator i;
+    ConstrainedHullVector::iterator i;
     for (i=mHulls.begin(); i!=mHulls.end(); ++i)
     {
       ConstrainedHull *ch = (*i);
@@ -511,7 +510,7 @@ public:
 
     // ok..we now have the largest hull.
     // now we find all hulls not yet 'used' that share a surface.
-    ConstrainedHullVector::Iterator i;
+    ConstrainedHullVector::iterator i;
     for (i=mHulls.begin(); i!=mHulls.end(); i++)
     {
       ConstrainedHull *child = (*i);
@@ -523,8 +522,8 @@ public:
 
         Constraint *c = PX_NEW(Constraint)(ch,child,sect);
 
-        children.pushBack(child);
-        mConstraints.pushBack(c);
+        children.push_back(child);
+        mConstraints.push_back(c);
       }
     }
     for (i=children.begin(); i!=children.end(); i++)
@@ -566,8 +565,8 @@ public:
             if ( node->mParent == root )
             {
                 used[i] = 1;
-                mConstraints.pushBack(node);
-                nextlist.pushBack(node);
+                mConstraints.push_back(node);
+                nextlist.push_back(node);
             }
         }
 
@@ -585,8 +584,8 @@ public:
                     Constraint *child = slist[j];
                   if ( child->mParent == parent->mChild )
                   {
-                    mConstraints.pushBack(child);
-                    newlist.pushBack(child); // becomes the new parent next time around...
+                    mConstraints.push_back(child);
+                    newlist.push_back(child); // becomes the new parent next time around...
                     used[j] = 1;
                   }
                 }

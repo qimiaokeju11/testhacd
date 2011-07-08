@@ -28,13 +28,15 @@ public:
 		UserCallback		*mCallback;
 		physx::PxU32		mTriangleCount;
 		physx::PxU32		mVertexCount;
-		const physx::PxF32		*mVertices;
-		const physx::PxU32		*mIndices;
+		const physx::PxF32	*mVertices;
+		const physx::PxU32	*mIndices;
 		physx::PxU32		mMinHullCount;
 		physx::PxF32		mConcavity;
 		physx::PxU32		mMaxHullVertices;
+		physx::PxF32		mMergePercentage;
 		void init(void)
 		{
+			mMergePercentage = 0;
 			mCallback = NULL;
 			mTriangleCount = 0;
 			mVertexCount = 0;
@@ -45,22 +47,27 @@ public:
 			mMaxHullVertices = 64;
 		}
 	};
+
 	class Hull
 	{
 	public:
-		physx::PxU32		mTriangleCount;
-		physx::PxU32		mVertexCount;
+		physx::PxU32			mTriangleCount;
+		physx::PxU32			mVertexCount;
 		const physx::PxF32		*mVertices;
 		const physx::PxU32		*mIndices;
 	};
 
 	virtual physx::PxU32	performHACD(const Desc &desc) = 0;
-	virtual const Hull *getHull(physx::PxU32 index) = 0;
-	virtual void	releaseHACD(void) = 0; // release memory associated with the last HACD request
+	virtual const Hull		*getHull(physx::PxU32 index) = 0;
+	virtual void			releaseHACD(void) = 0; // release memory associated with the last HACD request
 
 
 	virtual void release(void) = 0; // release the HACD_API interface
+protected:
+	virtual ~HACD_API(void)
+	{
 
+	}
 };
 
 HACD_API * createHACD_API(void);

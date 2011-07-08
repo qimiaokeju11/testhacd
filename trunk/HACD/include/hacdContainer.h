@@ -2,10 +2,9 @@
 
 #define HACD_CONTAINER_H
 
-#include "PxSimpleTypes.h"
+#include "PlatformConfig.h"
 #include "hacdVector.h"
-#include "PsArray.h"
-#include "PxMapSet.h"
+
 
 namespace HACD
 {
@@ -49,15 +48,15 @@ namespace HACD
 namespace HACD
 {
 
-typedef physx::set<physx::PxI32> PxI32Set;
-typedef physx::set<physx::PxU64> PxU64Set;
+typedef STDNAME::set<physx::PxI32> PxI32Set;
+typedef STDNAME::set<physx::PxU64> PxU64Set;
 
-typedef physx::Array< physx::PxU32 > PxU32Vector;
-typedef physx::Array< Vec3<physx::PxF64> > Vec3Vector;
-typedef physx::Array< Vec3<physx::PxI32> > TriVector;
-typedef physx::Array< physx::PxI32 > PxI32Vector;
-typedef physx::Array< PxI32Set > PxI32SetVector;
-typedef physx::Array<GraphEdgePQ> GraphEdgePQVector;
+typedef STDNAME::vector< physx::PxU32 > PxU32Vector;
+typedef STDNAME::vector< Vec3<physx::PxF64> > Vec3Vector;
+typedef STDNAME::vector< Vec3<physx::PxI32> > TriVector;
+typedef STDNAME::vector< physx::PxI32 > PxI32Vector;
+typedef STDNAME::vector< PxI32Set > PxI32SetVector;
+typedef STDNAME::vector<GraphEdgePQ> GraphEdgePQVector;
 
 
 
@@ -226,9 +225,9 @@ namespace HACD
 		ICHullErrorInconsistent,
 		ICHullErrorNotEnoughPoints
 	};
-	typedef physx::map<physx::PxI32, DPoint> DPointMap;
-	typedef physx::Array<CircularListElement<TMMEdge> *> CircularListElementTMMEdgeVector;
-	typedef physx::Array<CircularListElement<TMMTriangle> *> CircularListElementTMMTriangleVector;
+	typedef STDNAME::map<physx::PxI32, DPoint> DPointMap;
+	typedef STDNAME::vector<CircularListElement<TMMEdge> *> CircularListElementTMMEdgeVector;
+	typedef STDNAME::vector<CircularListElement<TMMTriangle> *> CircularListElementTMMTriangleVector;
 	class ICHull : public physx::UserAllocated
 	{
 	public:
@@ -393,8 +392,8 @@ namespace HACD
 		friend class HACD;
 	};
 
-	typedef physx::Array<GraphEdge> GraphEdgeVector;
-	typedef physx::Array<GraphVertex> GraphVertexVector;
+	typedef STDNAME::vector<GraphEdge> GraphEdgeVector;
+	typedef STDNAME::vector<GraphVertex> GraphVertexVector;
 
 }; // end of HACD namespace
 

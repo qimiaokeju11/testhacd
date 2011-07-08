@@ -18,7 +18,6 @@
 
 #if USE_MESH_IMPORT
 #include "MeshImport.h"
-#include "PsArray.h"
 #include "windows.h"
 #endif
 
@@ -81,6 +80,7 @@ void main(int argc,const char ** argv)
 		printf("-v		: Max Hull Vertices (default 64)\r\n");
 		printf("-c		: Concavity (default 100)\r\n");
 		printf("-m		: Mimimum number of hulls (default 2)\r\n");
+		printf("-merge	: Specifies the merge percentage.  Default is zero.\r\n");
 		printf("\r\n");
 		printf("Example: TestHACD hornbug.obj -c 500 -m 5\r\n");
 		printf("\r\n");
@@ -108,7 +108,11 @@ void main(int argc,const char ** argv)
 				desc.mMinHullCount = getIntArg(scan+1,argc,argv);
 				scan+=2;
 			}
-
+			else if ( strcmp(option,"-merge") == 0 )
+			{
+				desc.mMergePercentage = getFloatArg(scan+1,argc,argv);
+				scan+=2;
+			}
 		}
 
 		HACD::gHACD = HACD::createHACD_API();
@@ -126,7 +130,7 @@ void main(int argc,const char ** argv)
 			printf("Loading MeshImporter DLL's from directory '%s'\r\n", path);
 			physx::MeshImport *meshImport = physx::loadMeshImporters(path);
 			physx::MeshSystemContainer *msc = NULL;
-			physx::Array< physx::PxU32 > indices;
+			STDNAME::vector< physx::PxU32 > indices;
 			physx::fm_VertexIndex *vertices = NULL;
 			if ( meshImport )
 			{
@@ -166,9 +170,9 @@ void main(int argc,const char ** argv)
 										i1 = vertices->getIndex(v1.mPos,newPos);
 										i2 = vertices->getIndex(v2.mPos,newPos);
 										i3 = vertices->getIndex(v3.mPos,newPos);
-										indices.pushBack(i1);
-										indices.pushBack(i2);
-										indices.pushBack(i3);
+										indices.push_back(i1);
+										indices.push_back(i2);
+										indices.push_back(i3);
 									}
 								}
 							}
@@ -185,7 +189,7 @@ void main(int argc,const char ** argv)
 					}
 					if ( indices.size() )
 					{
-						desc.mTriangleCount = indices.size()/3;
+						desc.mTriangleCount = (physx::PxU32)(indices.size()/3);
 						desc.mIndices = &indices[0];
 						desc.mVertexCount = vertices->getVcount();
 						desc.mVertices = vertices->getVerticesFloat();

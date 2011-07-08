@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include"
+				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include"
+				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -256,15 +256,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\HACD\include\PsArray.h"
-					>
-				</File>
-				<File
 					RelativePath="..\HACD\include\PxMapSet.h"
 					>
 				</File>
 				<File
 					RelativePath="..\HACD\include\PxMapSetInternal.h"
+					>
+				</File>
+				<File
+					RelativePath="..\HACD\include\PxVector.h"
 					>
 				</File>
 			</Filter>
@@ -273,6 +273,10 @@
 				>
 				<File
 					RelativePath="..\HACD\public\HACD.h"
+					>
+				</File>
+				<File
+					RelativePath="..\HACD\public\PlatformConfig.h"
 					>
 				</File>
 				<File
@@ -353,6 +357,26 @@
 				</File>
 				<File
 					RelativePath="..\FloatMath\src\FloatMath.inl"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="MergeHulls"
+			>
+			<Filter
+				Name="include"
+				>
+				<File
+					RelativePath="..\MergeHulls\include\MergeHulls.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="src"
+				>
+				<File
+					RelativePath="..\MergeHulls\src\MergeHulls.cpp"
 					>
 				</File>
 			</Filter>
