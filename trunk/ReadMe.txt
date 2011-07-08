@@ -29,7 +29,7 @@ The source code for HACD is located in:
 
 To run the sample; from the command line just type:
 
-TestHACD hornbug.obj -c 500 -m 5
+TestHACD hornbug.obj -c 500 -m 5 -merge 5
 
 You can experiment with different concavity levels.
 

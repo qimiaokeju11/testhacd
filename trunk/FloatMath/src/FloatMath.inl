@@ -46,8 +46,6 @@
 
 namespace physx
 {
-	namespace general_floatmath2
-	{
 
 void fm_inverseRT(const REAL matrix[16],const REAL pos[3],REAL t[3]) // inverse rotate translate the point.
 {
@@ -5675,6 +5673,4 @@ void fm_transformAABB(const REAL bmin[3],const REAL bmax[3],const REAL matrix[16
 	}
 }
 
-}; // end of namespace
-using namespace general_floatmath2;
 };

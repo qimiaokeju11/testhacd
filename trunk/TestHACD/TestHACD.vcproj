@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include"
+				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include;../MergeHulls/public"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include"
+				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include;../MergeHulls/public"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -368,7 +368,7 @@
 				Name="include"
 				>
 				<File
-					RelativePath="..\MergeHulls\include\MergeHulls.h"
+					RelativePath="..\MergeHulls\include\StanHull.h"
 					>
 				</File>
 			</Filter>
@@ -377,6 +377,18 @@
 				>
 				<File
 					RelativePath="..\MergeHulls\src\MergeHulls.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\MergeHulls\src\StanHull.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="public"
+				>
+				<File
+					RelativePath="..\MergeHulls\public\MergeHulls.h"
 					>
 				</File>
 			</Filter>

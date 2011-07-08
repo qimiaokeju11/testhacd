@@ -1,7 +1,8 @@
 #include "HACD.h"
-
 #include "hacdHACD.h"
 #include "MergeHulls.h"
+#include <stdlib.h>
+#include <string.h>
 
 #pragma warning(disable:4100 4996)
 
@@ -69,6 +70,45 @@ public:
 				Hull h;
 				getHull(i,h);
 				mHulls.push_back(h);
+			}
+
+			if ( desc.mMergePercentage > 0 )
+			{
+				printf("Attempting to merge %d convex hulls with a merge threshold of %0.2f%%\r\n", ret, desc.mMergePercentage );
+				MergeConvexHulls *m = createMergeConvexHulls();
+				for (physx::PxU32 i=0; i<ret; i++)
+				{
+					Hull &h = mHulls[i];
+					MergeConvexHulls::Hull hull;
+					hull.mVertexCount = h.mVertexCount;
+					hull.mTriangleCount = h.mTriangleCount;
+					hull.mVertices = h.mVertices;
+					hull.mIndices = h.mIndices;
+					m->addConvexHull(hull);
+				}
+				physx::PxU32 mergeCount =  m->performMerge(desc.mMergePercentage,desc.mMaxHullVertices);
+				if ( mergeCount && mergeCount != ret )
+				{
+					printf("Merged %d convex hulls, output is now only %d\r\n", ret-mergeCount, mergeCount );
+					releaseHACD();
+					for (physx::PxU32 i=0; i<ret; i++)
+					{
+						const MergeConvexHulls::Hull *h = m->getMergedHull(i);
+						if( h )
+						{
+							Hull hull;
+							hull.mVertexCount = h->mVertexCount;
+							hull.mTriangleCount = h->mTriangleCount;
+							hull.mVertices = (physx::PxF32 *)PX_ALLOC(sizeof(physx::PxF32)*3*hull.mVertexCount);
+							hull.mIndices = (physx::PxU32 *)PX_ALLOC(sizeof(physx::PxU32)*3*hull.mTriangleCount);
+							memcpy((void *)hull.mVertices,h->mVertices,sizeof(physx::PxF32)*3*hull.mVertexCount);
+							memcpy((void *)hull.mIndices,h->mIndices,sizeof(physx::PxU32)*3*hull.mTriangleCount);
+							mHulls.push_back(hull);
+						}
+					}
+					ret = (physx::PxU32)mHulls.size();
+				}
+				m->release();
 			}
 		}
 
