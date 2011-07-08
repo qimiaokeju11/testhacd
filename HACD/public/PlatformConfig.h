@@ -4,7 +4,7 @@
 
 #include "PxSimpleTypes.h"
 
-#define USE_STL 0
+#define USE_STL 1 // set to 1 to use the standard template library for all code; if off it uses high performance custom containers which trap all memory allocations.
 
 #if USE_STL
 #include <map>

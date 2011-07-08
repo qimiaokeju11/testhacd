@@ -54,9 +54,6 @@
 
 namespace physx
 {
-	namespace general_floatmath2
-	{
-
 enum FM_ClipState
 {
   FMCS_XMIN       = (1<<0),
@@ -584,8 +581,6 @@ void fm_computeMeanNormals(PxU32 vcount,       // the number of vertices
 bool fm_isValidTriangle(const PxF32 *p1,const PxF32 *p2,const PxF32 *p3,PxF32 epsilon=0.00001f);
 bool fm_isValidTriangle(const PxF64 *p1,const PxF64 *p2,const PxF64 *p3,PxF64 epsilon=0.00001f);
 
-}; // end of namespace
-using namespace general_floatmath2;
 };
 
 #endif
