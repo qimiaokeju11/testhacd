@@ -19,27 +19,27 @@
 namespace HACD
 {   
 
-static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
+static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 {
 	return v1 > v2 ? v1 : v2;
 }
 
 
-    const physx::PxI32 ICHull::sc_dummyIndex = -1;
+    const hacd::HaI32 ICHull::sc_dummyIndex = -1;
 	ICHull::ICHull(void)
     {
 		m_distPoints = 0;
 		m_isFlat = false;
 		m_dummyVertex = 0;
     }
-	bool ICHull::AddPoints(const Vec3<physx::PxF64> * points, physx::PxU32 nPoints)
+	bool ICHull::AddPoints(const Vec3<hacd::HaF64> * points, hacd::HaU32 nPoints)
 	{
 		if (!points)
 		{
 			return false;
 		}
 		CircularListElement<TMMVertex> * vertex = NULL;
-		for (physx::PxU32 i = 0; i < nPoints; i++)
+		for (hacd::HaU32 i = 0; i < nPoints; i++)
 		{
 			vertex = m_mesh.AddVertex();
 			vertex->GetData().m_pos = points[i];
@@ -50,7 +50,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 	bool ICHull::AddPoints(Vec3Vector points)
 	{
 		CircularListElement<TMMVertex> * vertex = NULL;
-		for (physx::PxI32 i = 0; i < (physx::PxI32)points.size(); i++)
+		for (hacd::HaI32 i = 0; i < (hacd::HaI32)points.size(); i++)
 		{
 			vertex = m_mesh.AddVertex();
 			vertex->GetData().m_pos = points[i];
@@ -58,7 +58,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 		return true;
 	}
 
-    bool ICHull::AddPoint(const Vec3<physx::PxF64> & point, physx::PxI32 id)
+    bool ICHull::AddPoint(const Vec3<hacd::HaF64> & point, hacd::HaI32 id)
 	{
 		if (AddPoints(&point, 1))
 		{
@@ -70,7 +70,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 
 	ICHullError ICHull::Process()
 	{
-        physx::PxU32 addedPoints = 0;	
+        hacd::HaU32 addedPoints = 0;	
 		if (m_mesh.GetNVertices() < 3)
 		{
 			return ICHullErrorNotEnoughPoints;
@@ -84,9 +84,9 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 	        CircularListElement<TMMVertex> * v1 = v0->GetNext();
 	        CircularListElement<TMMVertex> * v2 = v1->GetNext();
 			// Compute the normal to the plane
-            Vec3<physx::PxF64> p0 = v0->GetData().m_pos;
-            Vec3<physx::PxF64> p1 = v1->GetData().m_pos;            
-            Vec3<physx::PxF64> p2 = v2->GetData().m_pos;			
+            Vec3<hacd::HaF64> p0 = v0->GetData().m_pos;
+            Vec3<hacd::HaF64> p1 = v1->GetData().m_pos;            
+            Vec3<hacd::HaF64> p2 = v2->GetData().m_pos;			
             m_normal = (p1-p0) ^ (p2-p0);
             m_normal.Normalize();
 			t1->GetData().m_vertices[0] = v0;
@@ -138,8 +138,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 		if (m_isFlat)
 		{
 			CircularListElementTMMTriangleVector trianglesToDuplicate;
-			physx::PxU32 nT = m_mesh.GetNTriangles();
-			for(physx::PxU32 f = 0; f < nT; f++)
+			hacd::HaU32 nT = m_mesh.GetNTriangles();
+			for(hacd::HaU32 f = 0; f < nT; f++)
 			{
 				TMMTriangle & currentTriangle = m_mesh.m_triangles.GetHead()->GetData();
 				if( currentTriangle.m_vertices[0]->GetData().m_name == sc_dummyIndex ||
@@ -165,8 +165,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 				}
 				m_mesh.m_triangles.Next();
 			}
-            physx::PxU32 nE = m_mesh.GetNEdges();
-            for(physx::PxU32 e = 0; e < nE; e++)
+            hacd::HaU32 nE = m_mesh.GetNEdges();
+            for(hacd::HaU32 e = 0; e < nE; e++)
 			{
 				TMMEdge & currentEdge = m_mesh.m_edges.GetHead()->GetData();
 				if( currentEdge.m_triangles[0] == 0 && currentEdge.m_triangles[1] == 0) 
@@ -177,9 +177,9 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 			}
 			m_mesh.m_vertices.Delete(m_dummyVertex);
 			m_dummyVertex = 0;
-            physx::PxU32 nV = m_mesh.GetNVertices();
+            hacd::HaU32 nV = m_mesh.GetNVertices();
             CircularList<TMMVertex> & vertices = m_mesh.GetVertices();
-			for(physx::PxU32 v = 0; v < nV; ++v)
+			for(hacd::HaU32 v = 0; v < nV; ++v)
 			{
                 vertices.GetData().m_tag = false;
                 vertices.Next();
@@ -187,7 +187,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
             CleanEdges();
 			CleanTriangles();
 			CircularListElement<TMMTriangle> * newTriangle;
-			for(physx::PxU32 t = 0; t < (physx::PxU32)trianglesToDuplicate.size(); t++)
+			for(hacd::HaU32 t = 0; t < (hacd::HaU32)trianglesToDuplicate.size(); t++)
 			{
 				newTriangle = m_mesh.AddTriangle();
 				newTriangle->GetData().m_vertices[0] = trianglesToDuplicate[t]->GetData().m_vertices[1];
@@ -197,9 +197,9 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 		}
 		return ICHullErrorOK;
 	}
-    ICHullError ICHull::Process(physx::PxU32 nPointsCH)
+    ICHullError ICHull::Process(hacd::HaU32 nPointsCH)
 	{
-        physx::PxU32 addedPoints = 0;  
+        hacd::HaU32 addedPoints = 0;  
         if (nPointsCH < 3 || m_mesh.GetNVertices() < 3)
 		{
 			return ICHullErrorNotEnoughPoints;
@@ -213,9 +213,9 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 	        CircularListElement<TMMVertex> * v1 = v0->GetNext();
 	        CircularListElement<TMMVertex> * v2 = v1->GetNext();
 			// Compute the normal to the plane
-            Vec3<physx::PxF64> p0 = v0->GetData().m_pos;
-            Vec3<physx::PxF64> p1 = v1->GetData().m_pos;            
-            Vec3<physx::PxF64> p2 = v2->GetData().m_pos;			
+            Vec3<hacd::HaF64> p0 = v0->GetData().m_pos;
+            Vec3<hacd::HaF64> p1 = v1->GetData().m_pos;            
+            Vec3<hacd::HaF64> p2 = v2->GetData().m_pos;			
             m_normal = (p1-p0) ^ (p2-p0);
             m_normal.Normalize();
 			t1->GetData().m_vertices[0] = v0;
@@ -273,8 +273,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 		if (m_isFlat)
 		{
 			CircularListElementTMMTriangleVector trianglesToDuplicate;
-			physx::PxU32 nT = m_mesh.GetNTriangles();
-			for(physx::PxU32 f = 0; f < nT; f++)
+			hacd::HaU32 nT = m_mesh.GetNTriangles();
+			for(hacd::HaU32 f = 0; f < nT; f++)
 			{
 				TMMTriangle & currentTriangle = m_mesh.m_triangles.GetHead()->GetData();
 				if( currentTriangle.m_vertices[0]->GetData().m_name == sc_dummyIndex ||
@@ -300,8 +300,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 				}
 				m_mesh.m_triangles.Next();
 			}
-            physx::PxU32 nE = m_mesh.GetNEdges();
-            for(physx::PxU32 e = 0; e < nE; e++)
+            hacd::HaU32 nE = m_mesh.GetNEdges();
+            for(hacd::HaU32 e = 0; e < nE; e++)
 			{
 				TMMEdge & currentEdge = m_mesh.m_edges.GetHead()->GetData();
 				if( currentEdge.m_triangles[0] == 0 && currentEdge.m_triangles[1] == 0) 
@@ -312,9 +312,9 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 			}
 			m_mesh.m_vertices.Delete(m_dummyVertex);
 			m_dummyVertex = 0;
-            physx::PxU32 nV = m_mesh.GetNVertices();
+            hacd::HaU32 nV = m_mesh.GetNVertices();
             CircularList<TMMVertex> & vertices = m_mesh.GetVertices();
-			for(physx::PxU32 v = 0; v < nV; ++v)
+			for(hacd::HaU32 v = 0; v < nV; ++v)
 			{
                 vertices.GetData().m_tag = false;
                 vertices.Next();
@@ -322,7 +322,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
             CleanEdges();
 			CleanTriangles();
 			CircularListElement<TMMTriangle> * newTriangle;
-			for(physx::PxU32 t = 0; t < (physx::PxU32)trianglesToDuplicate.size(); t++)
+			for(hacd::HaU32 t = 0; t < (hacd::HaU32)trianglesToDuplicate.size(); t++)
 			{
 				newTriangle = m_mesh.AddTriangle();
 				newTriangle->GetData().m_vertices[0] = trianglesToDuplicate[t]->GetData().m_vertices[1];
@@ -338,8 +338,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         CircularListElement<TMMVertex> * vMaxVolume = 0;
         CircularListElement<TMMVertex> * vHeadPrev = vertices.GetHead()->GetPrev();
         
-        physx::PxF64 maxVolume = 0.0;
-        physx::PxF64 volume = 0.0;
+        hacd::HaF64 maxVolume = 0.0;
+        hacd::HaF64 volume = 0.0;
         
         while (!vertices.GetData().m_tag) // not processed
         {
@@ -363,8 +363,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         
         if (vMaxVolume != vHead)
         {
-            Vec3<physx::PxF64> pos = vHead->GetData().m_pos;
-            physx::PxI32 id = vHead->GetData().m_name;
+            Vec3<hacd::HaF64> pos = vHead->GetData().m_pos;
+            hacd::HaI32 id = vHead->GetData().m_name;
             vHead->GetData().m_pos = vMaxVolume->GetData().m_pos;
             vHead->GetData().m_name = vMaxVolume->GetData().m_name;
             vMaxVolume->GetData().m_pos = pos;
@@ -402,7 +402,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         CircularListElement<TMMVertex> * v3 = v2->GetNext();
         vertices.GetHead() = v3;
 
-		physx::PxF64 vol = Volume(v0->GetData().m_pos, v1->GetData().m_pos, v2->GetData().m_pos, v3->GetData().m_pos);
+		hacd::HaF64 vol = Volume(v0->GetData().m_pos, v1->GetData().m_pos, v2->GetData().m_pos, v3->GetData().m_pos);
 		while (vol == 0.0 && !v3->GetNext()->GetData().m_tag)
 		{
 			v3 = v3->GetNext();
@@ -411,19 +411,19 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 		if (vol == 0.0)
 		{
 			// compute the barycenter
-			Vec3<physx::PxF64> bary(0.0,0.0,0.0);
+			Vec3<hacd::HaF64> bary(0.0,0.0,0.0);
 			CircularListElement<TMMVertex> * vBary = v0;
 			do
 			{
 				bary += vBary->GetData().m_pos;
 			}
 			while ( (vBary = vBary->GetNext()) != v0);
-			bary /= (physx::PxF64)vertices.GetSize();
+			bary /= (hacd::HaF64)vertices.GetSize();
 
 			// Compute the normal to the plane
-            Vec3<physx::PxF64> p0 = v0->GetData().m_pos;
-            Vec3<physx::PxF64> p1 = v1->GetData().m_pos;            
-            Vec3<physx::PxF64> p2 = v2->GetData().m_pos;			
+            Vec3<hacd::HaF64> p0 = v0->GetData().m_pos;
+            Vec3<hacd::HaF64> p1 = v1->GetData().m_pos;            
+            Vec3<hacd::HaF64> p2 = v2->GetData().m_pos;			
             m_normal = (p1-p0) ^ (p2-p0);
             m_normal.Normalize();
 			// add dummy vertex placed at (bary + normal)
@@ -455,7 +455,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         CircularListElement<TMMEdge> * e0;
         CircularListElement<TMMEdge> * e1;
         CircularListElement<TMMEdge> * e2;
-        physx::PxI32 index = 0;
+        hacd::HaI32 index = 0;
         if (!fold) // if first face to be created
         {
             e0 = m_mesh.AddEdge(); // create the three edges
@@ -513,7 +513,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         }
 		return newFace;
 	}
-    bool ICHull::ComputePointVolume(physx::PxF64 &totalVolume, bool markVisibleFaces)
+    bool ICHull::ComputePointVolume(hacd::HaF64 &totalVolume, bool markVisibleFaces)
     {
         // mark visible faces
         CircularListElement<TMMTriangle> * fHead = m_mesh.GetTriangles().GetHead();
@@ -521,10 +521,10 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         CircularList<TMMVertex> & vertices = m_mesh.GetVertices();
         CircularListElement<TMMVertex> * vertex0 = vertices.GetHead();
         bool visible = false;
-        Vec3<physx::PxF64> pos0 = vertex0->GetData().m_pos;
-        physx::PxF64 vol = 0.0;
+        Vec3<hacd::HaF64> pos0 = vertex0->GetData().m_pos;
+        hacd::HaF64 vol = 0.0;
         totalVolume = 0.0;
-		Vec3<physx::PxF64> ver0, ver1, ver2;
+		Vec3<hacd::HaF64> ver0, ver1, ver2;
         do 
         {
 			ver0 = f->GetData().m_vertices[0]->GetData().m_pos;
@@ -548,7 +548,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 
 		if (m_trianglesToDelete.size() == m_mesh.m_triangles.GetSize())
 		{
-			for(physx::PxU32 i = 0; i < (physx::PxU32)m_trianglesToDelete.size(); i++)
+			for(hacd::HaU32 i = 0; i < (hacd::HaU32)m_trianglesToDelete.size(); i++)
 			{
 				m_trianglesToDelete[i]->GetData().m_visible = false;
 			}
@@ -565,7 +565,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
     }
 	bool ICHull::ProcessPoint()
 	{
-        physx::PxF64 totalVolume = 0.0;
+        hacd::HaF64 totalVolume = 0.0;
         if (!ComputePointVolume(totalVolume, true))
         {
             return false;
@@ -576,7 +576,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         CircularListElement<TMMEdge> * eHead = m_mesh.GetEdges().GetHead();
         CircularListElement<TMMEdge> * e = eHead;    
         CircularListElement<TMMEdge> * tmp = 0;
-        physx::PxI32 nvisible = 0;
+        hacd::HaI32 nvisible = 0;
         m_edgesToDelete.clear();
         m_edgesToUpdate.clear();
         do 
@@ -620,7 +620,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         }
         
         //  set vertex[0] and vertex[1] to have the same orientation as the corresponding vertices of fv.
-        physx::PxI32 i;                                 // index of e->m_vertices[0] in fv
+        hacd::HaI32 i;                                 // index of e->m_vertices[0] in fv
         CircularListElement<TMMVertex> * v0 = e->GetData().m_vertices[0];
         CircularListElement<TMMVertex> * v1 = e->GetData().m_vertices[1];
         for(i = 0; fv->GetData().m_vertices[i] !=  v0; i++);
@@ -642,7 +642,7 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         f->GetData().m_vertices[2] = v;
         return true;
     }
-    bool ICHull::CleanUp(physx::PxU32 & addedPoints)
+    bool ICHull::CleanUp(hacd::HaU32 & addedPoints)
     {
         bool r0 = CleanEdges();
         bool r1 = CleanTriangles();
@@ -695,8 +695,8 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 				}
 				else
 				{
-					PxI32Set::const_iterator itPEnd((*it)->GetData().m_incidentPoints.end());
-					PxI32Set::const_iterator itP((*it)->GetData().m_incidentPoints.begin());
+					HaI32Set::const_iterator itPEnd((*it)->GetData().m_incidentPoints.end());
+					HaI32Set::const_iterator itP((*it)->GetData().m_incidentPoints.begin());
 					DPointMap::iterator itPoint;
 					for(; itP != itPEnd; ++itP) 
 					{
@@ -713,13 +713,13 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 		m_trianglesToDelete.clear();
         return true;
     }
-    bool ICHull::CleanVertices(physx::PxU32 & addedPoints)
+    bool ICHull::CleanVertices(hacd::HaU32 & addedPoints)
     {
         // mark all vertices incident to some undeleted edge as on the hull
         CircularList<TMMEdge> & edges = m_mesh.GetEdges();
         CircularListElement<TMMEdge> * e = edges.GetHead();
-        physx::PxU32 nE = edges.GetSize();
-        for(physx::PxU32 i = 0; i < nE; i++)
+        hacd::HaU32 nE = edges.GetSize();
+        for(hacd::HaU32 i = 0; i < nE; i++)
         {
             e->GetData().m_vertices[0]->GetData().m_onHull = true;
             e->GetData().m_vertices[1]->GetData().m_onHull = true;
@@ -769,26 +769,26 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         }
         return (*this);
     }   
-    physx::PxF64 ICHull::ComputeVolume()
+    hacd::HaF64 ICHull::ComputeVolume()
     {
-        physx::PxU32 nV = m_mesh.m_vertices.GetSize();
+        hacd::HaU32 nV = m_mesh.m_vertices.GetSize();
 		if (nV == 0 || m_isFlat)
 		{
 			return 0.0;
 		}       
-        Vec3<physx::PxF64> bary(0.0, 0.0, 0.0);
+        Vec3<hacd::HaF64> bary(0.0, 0.0, 0.0);
 
-        for(physx::PxU32 v = 0; v < nV; v++)
+        for(hacd::HaU32 v = 0; v < nV; v++)
         {
 			bary +=  m_mesh.m_vertices.GetHead()->GetData().m_pos;
 			m_mesh.m_vertices.Next();
         }
-		bary /= (physx::PxF64)nV;
+		bary /= (hacd::HaF64)nV;
         
-        physx::PxU32 nT = m_mesh.m_triangles.GetSize();
-        Vec3<physx::PxF64> ver0, ver1, ver2;
-        physx::PxF64 totalVolume = 0.0;
-        for(physx::PxU32 t = 0; t < nT; t++)
+        hacd::HaU32 nT = m_mesh.m_triangles.GetSize();
+        Vec3<hacd::HaF64> ver0, ver1, ver2;
+        hacd::HaF64 totalVolume = 0.0;
+        for(hacd::HaU32 t = 0; t < nT; t++)
         {
             ver0 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[0]->GetData().m_pos;
 			ver1 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[1]->GetData().m_pos;
@@ -798,14 +798,14 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
         }
         return totalVolume;
     }
-    bool ICHull::IsInside(const Vec3<physx::PxF64> pt)
+    bool ICHull::IsInside(const Vec3<hacd::HaF64> pt)
     {
 		if (m_isFlat)
 		{
-			physx::PxU32 nT = m_mesh.m_triangles.GetSize();
-			Vec3<physx::PxF64> ver0, ver1, ver2, a, b, c;
-			physx::PxF64 u,v;
-			for(physx::PxU32 t = 0; t < nT; t++)
+			hacd::HaU32 nT = m_mesh.m_triangles.GetSize();
+			Vec3<hacd::HaF64> ver0, ver1, ver2, a, b, c;
+			hacd::HaF64 u,v;
+			for(hacd::HaU32 t = 0; t < nT; t++)
 			{
 				ver0 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[0]->GetData().m_pos;
 				ver1 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[1]->GetData().m_pos;
@@ -825,9 +825,9 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 		}
 		else
 		{
-			physx::PxU32 nT = m_mesh.m_triangles.GetSize();
-			Vec3<physx::PxF64> ver0, ver1, ver2;
-			for(physx::PxU32 t = 0; t < nT; t++)
+			hacd::HaU32 nT = m_mesh.m_triangles.GetSize();
+			Vec3<hacd::HaF64> ver0, ver1, ver2;
+			for(hacd::HaU32 t = 0; t < nT; t++)
 			{
 				ver0 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[0]->GetData().m_pos;
 				ver1 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[1]->GetData().m_pos;
@@ -841,26 +841,26 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 			return true;
 		}
     }
-	physx::PxF64 ICHull::ComputeDistance(physx::PxI32 name, const Vec3<physx::PxF64> & pt, const Vec3<physx::PxF64> & normal, bool & insideHull, bool updateIncidentPoints)
+	hacd::HaF64 ICHull::ComputeDistance(hacd::HaI32 name, const Vec3<hacd::HaF64> & pt, const Vec3<hacd::HaF64> & normal, bool & insideHull, bool updateIncidentPoints)
 	{
 		if (m_isFlat)
 		{
-			physx::PxF64 distance = 0.0;
-			Vec3<physx::PxF64> ptNormal = normal;
+			hacd::HaF64 distance = 0.0;
+			Vec3<hacd::HaF64> ptNormal = normal;
 			ptNormal -= (ptNormal * m_normal) * m_normal;
 			if (ptNormal.GetNorm() > 0.0)
 			{
 				ptNormal.Normalize();
-				physx::PxI32 nameVE1;
-				physx::PxI32 nameVE2;
-				Vec3<physx::PxF64> pa, pb, d0, d1, d2, d3;
-				Vec3<physx::PxF64> p0 = pt;
-				Vec3<physx::PxF64> p1 = p0 + ptNormal;
-				Vec3<physx::PxF64> p2, p3;
-				physx::PxF64 mua, mub, s;
-				const physx::PxF64 EPS = 0.00000000001;
-				physx::PxU32 nE = m_mesh.GetNEdges();
-				for(physx::PxU32 e = 0; e < nE; e++)
+				hacd::HaI32 nameVE1;
+				hacd::HaI32 nameVE2;
+				Vec3<hacd::HaF64> pa, pb, d0, d1, d2, d3;
+				Vec3<hacd::HaF64> p0 = pt;
+				Vec3<hacd::HaF64> p1 = p0 + ptNormal;
+				Vec3<hacd::HaF64> p2, p3;
+				hacd::HaF64 mua, mub, s;
+				const hacd::HaF64 EPS = 0.00000000001;
+				hacd::HaU32 nE = m_mesh.GetNEdges();
+				for(hacd::HaU32 e = 0; e < nE; e++)
 				{
 					TMMEdge & currentEdge = m_mesh.m_edges.GetHead()->GetData();
                     nameVE1 = currentEdge.m_vertices[0]->GetData().m_name;
@@ -903,14 +903,14 @@ static physx::PxF64 max(physx::PxF64 v1,physx::PxF64 v2)
 		}
 		else
 		{
-			Vec3<physx::PxF64> impact;
-			physx::PxI32 nhit;
-			physx::PxF64 dist;
-			physx::PxF64 distance = 0.0; 
-			physx::PxU32 nT = m_mesh.GetNTriangles();
+			Vec3<hacd::HaF64> impact;
+			hacd::HaI32 nhit;
+			hacd::HaF64 dist;
+			hacd::HaF64 distance = 0.0; 
+			hacd::HaU32 nT = m_mesh.GetNTriangles();
 			insideHull = false;
 			CircularListElement<TMMTriangle> * face = 0;
-			for(physx::PxU32 f = 0; f < nT; f++)
+			for(hacd::HaU32 f = 0; f < nT; f++)
 			{
 				TMMTriangle & currentTriangle = m_mesh.m_triangles.GetHead()->GetData();
 	/*

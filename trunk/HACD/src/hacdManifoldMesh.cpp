@@ -69,30 +69,30 @@ namespace HACD
 	}
 	TMMesh::TMMesh(void)
 	{
-		m_barycenter = Vec3<physx::PxF64>(0.0,0.0,0.0);
+		m_barycenter = Vec3<hacd::HaF64>(0.0,0.0,0.0);
 		m_diag = 1.0;
 	}
 	TMMesh::~TMMesh(void)
 	{
 	}
 
-    void TMMesh::GetIFS(Vec3<physx::PxF64> * const points, Vec3<physx::PxI32> * const triangles)
+    void TMMesh::GetIFS(Vec3<hacd::HaF64> * const points, Vec3<hacd::HaI32> * const triangles)
     {
-        physx::PxU32 nV = m_vertices.GetSize();
-        physx::PxU32 nT = m_triangles.GetSize(); 
+        hacd::HaU32 nV = m_vertices.GetSize();
+        hacd::HaU32 nT = m_triangles.GetSize(); 
 
-        for(physx::PxU32 v = 0; v < nV; v++)
+        for(hacd::HaU32 v = 0; v < nV; v++)
         {
             points[v] = m_vertices.GetData().m_pos;
             m_vertices.GetData().m_id = v;
             m_vertices.Next();
         }
-        for(physx::PxU32 f = 0; f < nT; f++)
+        for(hacd::HaU32 f = 0; f < nT; f++)
         {
             TMMTriangle & currentTriangle = m_triangles.GetData();
-			triangles[f].X() = (physx::PxI32)currentTriangle.m_vertices[0]->GetData().m_id;
-            triangles[f].Y() = (physx::PxI32)currentTriangle.m_vertices[1]->GetData().m_id;
-            triangles[f].Z() = (physx::PxI32)currentTriangle.m_vertices[2]->GetData().m_id;
+			triangles[f].X() = (hacd::HaI32)currentTriangle.m_vertices[0]->GetData().m_id;
+            triangles[f].Y() = (hacd::HaI32)currentTriangle.m_vertices[1]->GetData().m_id;
+            triangles[f].Z() = (hacd::HaI32)currentTriangle.m_vertices[2]->GetData().m_id;
             m_triangles.Next();
         }
     }
@@ -106,21 +106,21 @@ namespace HACD
     {
         Clear();
         // updating the id's
-        physx::PxU32 nV = mesh.m_vertices.GetSize();
-        physx::PxU32 nE = mesh. m_edges.GetSize();
-        physx::PxU32 nT = mesh.m_triangles.GetSize();
-        for(physx::PxU32 v = 0; v < nV; v++)
+        hacd::HaU32 nV = mesh.m_vertices.GetSize();
+        hacd::HaU32 nE = mesh. m_edges.GetSize();
+        hacd::HaU32 nT = mesh.m_triangles.GetSize();
+        for(hacd::HaU32 v = 0; v < nV; v++)
         {
             mesh.m_vertices.GetData().m_id = v;
             mesh.m_vertices.Next();            
         }
-        for(physx::PxU32 e = 0; e < nE; e++)
+        for(hacd::HaU32 e = 0; e < nE; e++)
         {
             mesh.m_edges.GetData().m_id = e;
             mesh.m_edges.Next();
             
         }        
-        for(physx::PxU32 f = 0; f < nT; f++)
+        for(hacd::HaU32 f = 0; f < nT; f++)
         {
             mesh.m_triangles.GetData().m_id = f;
             mesh.m_triangles.Next();
@@ -134,31 +134,31 @@ namespace HACD
         CircularListElement<TMMVertex> ** vertexMap     = (CircularListElement<TMMVertex> **) PX_ALLOC(sizeof(CircularListElement<TMMVertex> *)*nV);
         CircularListElement<TMMEdge> ** edgeMap         = (CircularListElement<TMMEdge> **)PX_ALLOC(sizeof(CircularListElement<TMMEdge> *)*nE);
         CircularListElement<TMMTriangle> ** triangleMap = (CircularListElement<TMMTriangle> **) PX_ALLOC(sizeof(CircularListElement<TMMTriangle> *)*nT);
-        for(physx::PxU32 v = 0; v < nV; v++)
+        for(hacd::HaU32 v = 0; v < nV; v++)
         {
             vertexMap[v] = m_vertices.GetHead();
             m_vertices.Next();            
         }
-        for(physx::PxU32 e = 0; e < nE; e++)
+        for(hacd::HaU32 e = 0; e < nE; e++)
         {
             edgeMap[e] = m_edges.GetHead();
             m_edges.Next();            
         }        
-        for(physx::PxU32 f = 0; f < nT; f++)
+        for(hacd::HaU32 f = 0; f < nT; f++)
         {
             triangleMap[f] = m_triangles.GetHead();
             m_triangles.Next();
         }
         
         // updating pointers
-        for(physx::PxU32 v = 0; v < nV; v++)
+        for(hacd::HaU32 v = 0; v < nV; v++)
         {
             if (vertexMap[v]->GetData().m_duplicate)
             {
                 vertexMap[v]->GetData().m_duplicate = edgeMap[vertexMap[v]->GetData().m_duplicate->GetData().m_id];
             }
         }
-        for(physx::PxU32 e = 0; e < nE; e++)
+        for(hacd::HaU32 e = 0; e < nE; e++)
         {
             if (edgeMap[e]->GetData().m_newFace)
             {
@@ -182,7 +182,7 @@ namespace HACD
                 }
             }
         }        
-        for(physx::PxU32 f = 0; f < nT; f++)
+        for(hacd::HaU32 f = 0; f < nT; f++)
         {
 			if (nE > 0)
 			{
@@ -207,31 +207,31 @@ namespace HACD
         PX_FREE(triangleMap);
         
     }
-	physx::PxI32  IntersectRayTriangle(const Vec3<physx::PxF64> & P0, const Vec3<physx::PxF64> & dir, 
-							   const Vec3<physx::PxF64> & V0, const Vec3<physx::PxF64> & V1, 
-							   const Vec3<physx::PxF64> & V2, physx::PxF64 &t)
+	hacd::HaI32  IntersectRayTriangle(const Vec3<hacd::HaF64> & P0, const Vec3<hacd::HaF64> & dir, 
+							   const Vec3<hacd::HaF64> & V0, const Vec3<hacd::HaF64> & V1, 
+							   const Vec3<hacd::HaF64> & V2, hacd::HaF64 &t)
 	{
-		Vec3<physx::PxF64> edge1, edge2, edge3;
-		physx::PxF64 det, invDet;
+		Vec3<hacd::HaF64> edge1, edge2, edge3;
+		hacd::HaF64 det, invDet;
 		edge1 = V1 - V2;
 		edge2 = V2 - V0;
-		Vec3<physx::PxF64> pvec = dir ^ edge2;
+		Vec3<hacd::HaF64> pvec = dir ^ edge2;
 		det = edge1 * pvec;
 		if (det == 0.0)
 			return 0;
 		invDet = 1.0/det;
-		Vec3<physx::PxF64> tvec = P0 - V0;
-		Vec3<physx::PxF64> qvec = tvec ^ edge1;
+		Vec3<hacd::HaF64> tvec = P0 - V0;
+		Vec3<hacd::HaF64> qvec = tvec ^ edge1;
 		t = (edge2 * qvec) * invDet;
         if (t < 0.0)
         {
             return 0;
         }
 		edge3 = V0 - V1;
-		Vec3<physx::PxF64> I(P0 + t * dir);
-		Vec3<physx::PxF64> s0 = (I-V0) ^ edge3;
-		Vec3<physx::PxF64> s1 = (I-V1) ^ edge1;
-		Vec3<physx::PxF64> s2 = (I-V2) ^ edge2;
+		Vec3<hacd::HaF64> I(P0 + t * dir);
+		Vec3<hacd::HaF64> s0 = (I-V0) ^ edge3;
+		Vec3<hacd::HaF64> s1 = (I-V1) ^ edge1;
+		Vec3<hacd::HaF64> s2 = (I-V2) ^ edge2;
 		if (s0*s1 >= 0.0 && s2*s1 >= 0.0)
 		{
 			return 1;
@@ -239,14 +239,14 @@ namespace HACD
 		return 0;
 	}
 
-    bool IntersectLineLine(const Vec3<physx::PxF64> & p1, const Vec3<physx::PxF64> & p2, 
-                          const Vec3<physx::PxF64> & p3, const Vec3<physx::PxF64> & p4,
-                          Vec3<physx::PxF64> & pa, Vec3<physx::PxF64> & pb, 
-                          physx::PxF64 & mua, physx::PxF64 & mub)
+    bool IntersectLineLine(const Vec3<hacd::HaF64> & p1, const Vec3<hacd::HaF64> & p2, 
+                          const Vec3<hacd::HaF64> & p3, const Vec3<hacd::HaF64> & p4,
+                          Vec3<hacd::HaF64> & pa, Vec3<hacd::HaF64> & pb, 
+                          hacd::HaF64 & mua, hacd::HaF64 & mub)
     {
-        Vec3<physx::PxF64> p13,p43,p21;
-        physx::PxF64 d1343,d4321,d1321,d4343,d2121;
-        physx::PxF64 numer,denom;
+        Vec3<hacd::HaF64> p13,p43,p21;
+        hacd::HaF64 d1343,d4321,d1321,d4343,d2121;
+        hacd::HaF64 numer,denom;
         
         p13.X() = p1.X() - p3.X();
         p13.Y() = p1.Y() - p3.Y();
@@ -286,13 +286,13 @@ namespace HACD
         return true;
     }
 
-	physx::PxI32  IntersectRayTriangle2(const Vec3<physx::PxF64> & P0, const Vec3<physx::PxF64> & dir, 
-							   const Vec3<physx::PxF64> & V0, const Vec3<physx::PxF64> & V1, 
-							   const Vec3<physx::PxF64> & V2, physx::PxF64 &r)
+	hacd::HaI32  IntersectRayTriangle2(const Vec3<hacd::HaF64> & P0, const Vec3<hacd::HaF64> & dir, 
+							   const Vec3<hacd::HaF64> & V0, const Vec3<hacd::HaF64> & V1, 
+							   const Vec3<hacd::HaF64> & V2, hacd::HaF64 &r)
 	{
-		Vec3<physx::PxF64> u, v, n;          // triangle vectors
-		Vec3<physx::PxF64> w0, w;          // ray vectors
-		physx::PxF64     a, b;             // params to calc ray-plane intersect
+		Vec3<hacd::HaF64> u, v, n;          // triangle vectors
+		Vec3<hacd::HaF64> w0, w;          // ray vectors
+		hacd::HaF64     a, b;             // params to calc ray-plane intersect
 
 		// get triangle edge vectors and plane normal
 		u = V1 - V0;
@@ -316,10 +316,10 @@ namespace HACD
 			return 0;                  // => no intersect
 		// for a segment, also test if (r > 1.0) => no intersect
 
-		Vec3<physx::PxF64> I = P0 + r * dir;           // intersect point of ray and plane
+		Vec3<hacd::HaF64> I = P0 + r * dir;           // intersect point of ray and plane
 
 		// is I inside T?
-		physx::PxF64 uu, uv, vv, wu, wv, D;
+		hacd::HaF64 uu, uv, vv, wu, wv, D;
 		uu = u * u;
 		uv = u * v;
 		vv = v * v;
@@ -329,7 +329,7 @@ namespace HACD
 		D = uv * uv - uu * vv;
 
 		// get and test parametric coords
-		physx::PxF64 s, t;
+		hacd::HaF64 s, t;
 		s = (uv * wv - vv * wu) / D;
 		if (s < 0.0 || s > 1.0)        // I is outside T
 			return 0;
@@ -342,9 +342,9 @@ namespace HACD
     
 	bool TMMesh::CheckConsistancy()
     {
-        physx::PxU32 nE = m_edges.GetSize();
-        physx::PxU32 nT = m_triangles.GetSize();
-        for(physx::PxU32 e = 0; e < nE; e++)
+        hacd::HaU32 nE = m_edges.GetSize();
+        hacd::HaU32 nT = m_triangles.GetSize();
+        for(hacd::HaU32 e = 0; e < nE; e++)
         {
             for(int f = 0; f < 2; f++)
             {
@@ -356,7 +356,7 @@ namespace HACD
 			m_edges.Next();
         }        
 
-        for(physx::PxU32 f = 0; f < nT; f++)
+        for(hacd::HaU32 f = 0; f < nT; f++)
         {
             for(int e = 0; e < 3; e++)
             {
@@ -380,16 +380,16 @@ namespace HACD
     }
 	bool TMMesh::Normalize()
     {
-        physx::PxU32 nV = m_vertices.GetSize();
+        hacd::HaU32 nV = m_vertices.GetSize();
 		if (nV == 0)
 		{
 			return false;
 		}
         m_barycenter = m_vertices.GetHead()->GetData().m_pos;
-		Vec3<physx::PxF64> min = m_barycenter;
-		Vec3<physx::PxF64> max = m_barycenter;
-		physx::PxF64 x, y, z;
-        for(physx::PxU32 v = 1; v < nV; v++)
+		Vec3<hacd::HaF64> min = m_barycenter;
+		Vec3<hacd::HaF64> max = m_barycenter;
+		hacd::HaF64 x, y, z;
+        for(hacd::HaU32 v = 1; v < nV; v++)
         {
 			m_barycenter +=  m_vertices.GetHead()->GetData().m_pos;
             x = m_vertices.GetHead()->GetData().m_pos.X();
@@ -403,12 +403,12 @@ namespace HACD
 			else if ( z > max.Z()) max.Z() = z;
 			m_vertices.Next();
         }
-		m_barycenter /= (physx::PxF64)nV;
+		m_barycenter /= (hacd::HaF64)nV;
         m_diag = 0.001 * (max-min).GetNorm();
-        physx::PxF64 invDiag = 1.0 / m_diag;
+        hacd::HaF64 invDiag = 1.0 / m_diag;
 		if (m_diag != 0.0)
 		{
-	        for(physx::PxU32 v = 0; v < nV; v++)
+	        for(hacd::HaU32 v = 0; v < nV; v++)
 		    {
 				m_vertices.GetHead()->GetData().m_pos = (m_vertices.GetHead()->GetData().m_pos - m_barycenter) * invDiag;
 				m_vertices.Next();
@@ -418,14 +418,14 @@ namespace HACD
 	}
 	bool TMMesh::Denormalize()
 	{
-        physx::PxU32 nV = m_vertices.GetSize();
+        hacd::HaU32 nV = m_vertices.GetSize();
 		if (nV == 0)
 		{
 			return false;
 		}
 		if (m_diag != 0.0)
 		{
-	        for(physx::PxU32 v = 0; v < nV; v++)
+	        for(hacd::HaU32 v = 0; v < nV; v++)
 		    {
 				m_vertices.GetHead()->GetData().m_pos = m_vertices.GetHead()->GetData().m_pos * m_diag + m_barycenter;
 				m_vertices.Next();

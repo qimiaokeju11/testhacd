@@ -39,7 +39,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-#include "PxSimpleTypes.h"
+#include "PlatformConfig.h"
 #include <limits.h>
 #include <stddef.h>
 #include <new>
@@ -55,7 +55,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
 /// EA Standard Template Library
-namespace physx
+namespace hacd
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,7 +284,7 @@ namespace physx
 
 #ifndef EASTL_FAIL_MSG
     #if EASTL_ASSERT_ENABLED
-        #define EASTL_FAIL_MSG(message) (physx::AssertionFailure(message))
+        #define EASTL_FAIL_MSG(message) (hacd::AssertionFailure(message))
     #else
         #define EASTL_FAIL_MSG(message)
     #endif
@@ -301,7 +301,7 @@ namespace physx
 // is that errors are caught at compile time instead of runtime.
 //
 // Example usage:
-//     EASTL_CT_ASSERT(sizeof(physx::PxU32 == 4));
+//     EASTL_CT_ASSERT(sizeof(hacd::HaU32 == 4));
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -535,7 +535,7 @@ namespace physx
 #endif
 #endif
 
-#define EASTL_ITC_NS physx
+#define EASTL_ITC_NS hacd
 
 ///////////////////////////////////////////////////////////////////////////////
 // EASTL_VALIDATION_ENABLED
@@ -624,10 +624,10 @@ namespace physx
 // aliasing rules; EASTL_MAY_ALIAS is for cases with no alternative.
 //
 // Example usage:
-//    physx::PxU32 value EASTL_MAY_ALIAS;
+//    hacd::HaU32 value EASTL_MAY_ALIAS;
 //
 // Example usage:
-//    typedef physx::PxU32 EASTL_MAY_ALIAS value_type;
+//    typedef hacd::HaU32 EASTL_MAY_ALIAS value_type;
 //    value_type value;
 //
 #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 303)
@@ -785,7 +785,7 @@ namespace physx
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// namespace physx
+// namespace hacd
 // {
 //     class allocator
 //     {
@@ -819,7 +819,7 @@ namespace physx
 #endif
 
 #ifndef EASTLAllocatorType
-#define EASTLAllocatorType physx::allocator
+#define EASTLAllocatorType hacd::allocator
 #endif
 
 #ifndef EASTLAllocatorDefault
@@ -828,7 +828,7 @@ namespace physx
 // used when EASTL needs to allocate memory internally. There are very few cases where 
 // EASTL allocates memory internally, and in each of these it is for a sensible reason 
 // that is documented to behave as such.
-#define EASTLAllocatorDefault physx::GetDefaultAllocator
+#define EASTLAllocatorDefault hacd::GetDefaultAllocator
 #endif
 
 
@@ -1218,11 +1218,11 @@ namespace physx
 #if (defined(__WCHAR_MAX__) && (__WCHAR_MAX__ == 2147483647)) // If wchar_t is a 32 bit signed value...
 	template<>
 	struct add_unsigned<wchar_t>
-	{ typedef physx::PxU32 type; };
+	{ typedef hacd::HaU32 type; };
 #elif (defined(__WCHAR_MAX__) && (__WCHAR_MAX__ == 32767)) // If wchar_t is a 16 bit signed value...
 	template<>
 	struct add_unsigned<wchar_t>
-	{ typedef physx::PxU16 type; };
+	{ typedef HaU16 type; };
 #endif
 #endif
 
@@ -1374,7 +1374,7 @@ namespace physx
 #endif
 #endif
 
-#define EASTL_DECLARE_SIGNED(T) namespace physx{ template <> struct is_signed<T> : public true_type{}; template <> struct is_signed<const T> : public true_type{}; }
+#define EASTL_DECLARE_SIGNED(T) namespace hacd{ template <> struct is_signed<T> : public true_type{}; template <> struct is_signed<const T> : public true_type{}; }
 
 
 
@@ -1418,7 +1418,7 @@ namespace physx
 #endif
 #endif
 
-#define EASTL_DECLARE_UNSIGNED(T) namespace physx{ template <> struct is_unsigned<T> : public true_type{}; template <> struct is_unsigned<const T> : public true_type{}; }
+#define EASTL_DECLARE_UNSIGNED(T) namespace hacd{ template <> struct is_unsigned<T> : public true_type{}; template <> struct is_unsigned<const T> : public true_type{}; }
 
 
 
@@ -1717,7 +1717,7 @@ namespace physx
 	///////////////////////////////////////////////////////////////////////
 	template <typename T> struct is_union : public false_type{};
 
-#define EASTL_DECLARE_UNION(T) namespace physx{ template <> struct is_union<T> : public true_type{}; template <> struct is_union<const T> : public true_type{}; }
+#define EASTL_DECLARE_UNION(T) namespace hacd{ template <> struct is_union<T> : public true_type{}; template <> struct is_union<const T> : public true_type{}; }
 
 
 
@@ -1783,7 +1783,7 @@ namespace physx
 	template <> struct is_enum<void volatile> : public false_type {};
 	template <> struct is_enum<void const volatile> : public false_type {};
 
-#define EASTL_DECLARE_ENUM(T) namespace physx{ template <> struct is_enum<T> : public true_type{}; template <> struct is_enum<const T> : public true_type{}; }
+#define EASTL_DECLARE_ENUM(T) namespace hacd{ template <> struct is_enum<T> : public true_type{}; template <> struct is_enum<const T> : public true_type{}; }
 
 
 	///////////////////////////////////////////////////////////////////////
@@ -2013,7 +2013,7 @@ namespace physx
 	template <typename T>
 	struct is_POD : public is_pod<T>{};
 
-#define EASTL_DECLARE_POD(T) namespace physx{ template <> struct is_pod<T> : public true_type{}; template <> struct is_pod<const T> : public true_type{}; }
+#define EASTL_DECLARE_POD(T) namespace hacd{ template <> struct is_pod<T> : public true_type{}; template <> struct is_pod<const T> : public true_type{}; }
 
 
 
@@ -2046,7 +2046,7 @@ namespace physx
 	template <typename T> 
 	struct has_trivial_constructor : public is_pod<T> {};
 
-#define EASTL_DECLARE_TRIVIAL_CONSTRUCTOR(T) namespace physx{ template <> struct has_trivial_constructor<T> : public true_type{}; template <> struct has_trivial_constructor<const T> : public true_type{}; }
+#define EASTL_DECLARE_TRIVIAL_CONSTRUCTOR(T) namespace hacd{ template <> struct has_trivial_constructor<T> : public true_type{}; template <> struct has_trivial_constructor<const T> : public true_type{}; }
 
 
 
@@ -2085,7 +2085,7 @@ namespace physx
 	template <typename T> 
 	struct has_trivial_copy : public integral_constant<bool, is_pod<T>::value && !is_volatile<T>::value>{};
 
-#define EASTL_DECLARE_TRIVIAL_COPY(T) namespace physx{ template <> struct has_trivial_copy<T> : public true_type{}; template <> struct has_trivial_copy<const T> : public true_type{}; }
+#define EASTL_DECLARE_TRIVIAL_COPY(T) namespace hacd{ template <> struct has_trivial_copy<T> : public true_type{}; template <> struct has_trivial_copy<const T> : public true_type{}; }
 
 
 	///////////////////////////////////////////////////////////////////////
@@ -2115,7 +2115,7 @@ namespace physx
 		is_pod<T>::value && !is_const<T>::value && !is_volatile<T>::value
 	>{};
 
-#define EASTL_DECLARE_TRIVIAL_ASSIGN(T) namespace physx{ template <> struct has_trivial_assign<T> : public true_type{}; template <> struct has_trivial_assign<const T> : public true_type{}; }
+#define EASTL_DECLARE_TRIVIAL_ASSIGN(T) namespace hacd{ template <> struct has_trivial_assign<T> : public true_type{}; template <> struct has_trivial_assign<const T> : public true_type{}; }
 
 
 
@@ -2143,7 +2143,7 @@ namespace physx
 	template <typename T> 
 	struct has_trivial_destructor : public is_pod<T>{};
 
-#define EASTL_DECLARE_TRIVIAL_DESTRUCTOR(T) namespace physx{ template <> struct has_trivial_destructor<T> : public true_type{}; template <> struct has_trivial_destructor<const T> : public true_type{}; }
+#define EASTL_DECLARE_TRIVIAL_DESTRUCTOR(T) namespace hacd{ template <> struct has_trivial_destructor<T> : public true_type{}; template <> struct has_trivial_destructor<const T> : public true_type{}; }
 
 
 	///////////////////////////////////////////////////////////////////////
@@ -2166,7 +2166,7 @@ namespace physx
 	template <typename T> 
 	struct has_trivial_relocate : public integral_constant<bool, is_pod<T>::value && !is_volatile<T>::value>{};
 
-#define EASTL_DECLARE_TRIVIAL_RELOCATE(T) namespace physx{ template <> struct has_trivial_relocate<T> : public true_type{}; template <> struct has_trivial_relocate<const T> : public true_type{}; }
+#define EASTL_DECLARE_TRIVIAL_RELOCATE(T) namespace hacd{ template <> struct has_trivial_relocate<T> : public true_type{}; template <> struct has_trivial_relocate<const T> : public true_type{}; }
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2462,7 +2462,7 @@ namespace physx
 	struct iterator_traits<T*>
 	{
 		typedef EASTL_ITC_NS::random_access_iterator_tag iterator_category;     // To consider: Change this to contiguous_iterator_tag for the case that 
-		typedef T                                        value_type;            //              EASTL_ITC_NS is "physx" instead of "std".
+		typedef T                                        value_type;            //              EASTL_ITC_NS is "hacd" instead of "std".
 		typedef ptrdiff_t                                difference_type;
 		typedef T*                                       pointer;
 		typedef T&                                       reference;
@@ -2496,17 +2496,17 @@ namespace physx
 	/// beginning of an array.
 	///
 	template <typename Iterator>
-	class reverse_iterator : public iterator<typename physx::iterator_traits<Iterator>::iterator_category,
-		typename physx::iterator_traits<Iterator>::value_type,
-		typename physx::iterator_traits<Iterator>::difference_type,
-		typename physx::iterator_traits<Iterator>::pointer,
-		typename physx::iterator_traits<Iterator>::reference>
+	class reverse_iterator : public iterator<typename hacd::iterator_traits<Iterator>::iterator_category,
+		typename hacd::iterator_traits<Iterator>::value_type,
+		typename hacd::iterator_traits<Iterator>::difference_type,
+		typename hacd::iterator_traits<Iterator>::pointer,
+		typename hacd::iterator_traits<Iterator>::reference>
 	{
 	public:
 		typedef Iterator                                                   iterator_type;
-		typedef typename physx::iterator_traits<Iterator>::pointer         pointer;
-		typedef typename physx::iterator_traits<Iterator>::reference       reference;
-		typedef typename physx::iterator_traits<Iterator>::difference_type difference_type;
+		typedef typename hacd::iterator_traits<Iterator>::pointer         pointer;
+		typedef typename hacd::iterator_traits<Iterator>::reference       reference;
+		typedef typename hacd::iterator_traits<Iterator>::difference_type difference_type;
 
 	protected:
 		Iterator mIterator;
@@ -2794,11 +2794,11 @@ namespace physx
 	/// Creates an instance of an insert_iterator.
 	///
 	template <typename Container, typename Iterator>
-	inline physx::insert_iterator<Container>
+	inline hacd::insert_iterator<Container>
 		inserter(Container& x, Iterator i)
 	{
 		typedef typename Container::iterator iterator;
-		return physx::insert_iterator<Container>(x, iterator(i));
+		return hacd::insert_iterator<Container>(x, iterator(i));
 	}
 
 
@@ -2812,10 +2812,10 @@ namespace physx
 	/// iterators (e.g. with list). The former is more efficient.
 	///
 	template <typename InputIterator>
-	inline typename physx::iterator_traits<InputIterator>::difference_type
+	inline typename hacd::iterator_traits<InputIterator>::difference_type
 		distance_impl(InputIterator first, InputIterator last, EASTL_ITC_NS::input_iterator_tag)
 	{
-		typename physx::iterator_traits<InputIterator>::difference_type n = 0;
+		typename hacd::iterator_traits<InputIterator>::difference_type n = 0;
 
 		while(first != last)
 		{
@@ -2826,7 +2826,7 @@ namespace physx
 	}
 
 	template <typename RandomAccessIterator>
-	inline typename physx::iterator_traits<RandomAccessIterator>::difference_type
+	inline typename hacd::iterator_traits<RandomAccessIterator>::difference_type
 		distance_impl(RandomAccessIterator first, RandomAccessIterator last, EASTL_ITC_NS::random_access_iterator_tag)
 	{
 		return last - first;
@@ -2837,10 +2837,10 @@ namespace physx
 	// as InputIterators and thus can seriously hamper performance in the case
 	// of large ranges of bidirectional_iterator_tag iterators.
 	//template <typename InputIterator>
-	//inline typename physx::iterator_traits<InputIterator>::difference_type
+	//inline typename hacd::iterator_traits<InputIterator>::difference_type
 	//distance_impl(InputIterator first, InputIterator last, ...)
 	//{
-	//    typename physx::iterator_traits<InputIterator>::difference_type n = 0;
+	//    typename hacd::iterator_traits<InputIterator>::difference_type n = 0;
 	//
 	//    while(first != last)
 	//    {
@@ -2851,12 +2851,12 @@ namespace physx
 	//}
 
 	template <typename InputIterator>
-	inline typename physx::iterator_traits<InputIterator>::difference_type
+	inline typename hacd::iterator_traits<InputIterator>::difference_type
 		distance(InputIterator first, InputIterator last)
 	{
-		typedef typename physx::iterator_traits<InputIterator>::iterator_category IC;
+		typedef typename hacd::iterator_traits<InputIterator>::iterator_category IC;
 
-		return physx::distance_impl(first, last, IC());
+		return hacd::distance_impl(first, last, IC());
 	}
 
 
@@ -2916,9 +2916,9 @@ namespace physx
 	inline void
 		advance(InputIterator& i, Distance n)
 	{
-		typedef typename physx::iterator_traits<InputIterator>::iterator_category IC;
+		typedef typename hacd::iterator_traits<InputIterator>::iterator_category IC;
 
-		physx::advance_impl(i, n, IC());
+		hacd::advance_impl(i, n, IC());
 	}
 
 
@@ -3193,7 +3193,7 @@ namespace physx
 		template <typename ForwardIterator1, typename ForwardIterator2>
 		static void iter_swap(ForwardIterator1 a, ForwardIterator2 b)
 		{
-			typedef typename physx::iterator_traits<ForwardIterator1>::value_type value_type_a;
+			typedef typename hacd::iterator_traits<ForwardIterator1>::value_type value_type_a;
 
 			value_type_a temp(*a);
 			*a = *b;
@@ -3207,7 +3207,7 @@ namespace physx
 		template <typename ForwardIterator1, typename ForwardIterator2>
 		static void iter_swap(ForwardIterator1 a, ForwardIterator2 b)
 		{
-			physx::swap(*a, *b);
+			hacd::swap(*a, *b);
 		}
 	};
 
@@ -3224,10 +3224,10 @@ namespace physx
 	template <typename ForwardIterator1, typename ForwardIterator2>
 	inline void iter_swap(ForwardIterator1 a, ForwardIterator2 b)
 	{
-		typedef typename physx::iterator_traits<ForwardIterator1>::value_type value_type_a;
-		typedef typename physx::iterator_traits<ForwardIterator2>::value_type value_type_b;
-		typedef typename physx::iterator_traits<ForwardIterator1>::reference  reference_a;
-		typedef typename physx::iterator_traits<ForwardIterator2>::reference  reference_b;
+		typedef typename hacd::iterator_traits<ForwardIterator1>::value_type value_type_a;
+		typedef typename hacd::iterator_traits<ForwardIterator2>::value_type value_type_b;
+		typedef typename hacd::iterator_traits<ForwardIterator1>::reference  reference_a;
+		typedef typename hacd::iterator_traits<ForwardIterator2>::reference  reference_b;
 
 		iter_swap_impl<type_and<is_same<value_type_a, value_type_b>::value, is_same<value_type_a&, reference_a>::value, is_same<value_type_b&, reference_b>::value >::value >::iter_swap(a, b);
 	}
@@ -3338,7 +3338,7 @@ namespace physx
 		typedef rbtree_iterator<T, Pointer, Reference>      this_type;
 		typedef rbtree_iterator<T, T*, T&>                  iterator;
 		typedef rbtree_iterator<T, const T*, const T&>      const_iterator;
-		typedef size_t                                size_type;     // See config.h for the definition of size_t, which defaults to physx::PxU32.
+		typedef size_t                                size_type;     // See config.h for the definition of size_t, which defaults to hacd::HaU32.
 		typedef ptrdiff_t                                   difference_type;
 		typedef T                                           value_type;
 		typedef rbtree_node_base                            base_node_type;
@@ -3389,7 +3389,7 @@ namespace physx
 
 	/// rb_base
 	/// This specialization is used for 'set'. In this case, Key and Value 
-	/// will be the same as each other and ExtractKey will be physx::use_self.
+	/// will be the same as each other and ExtractKey will be hacd::use_self.
 	///
 	template <typename Key, typename Value, typename Compare, typename ExtractKey, bool bUniqueKeys, typename RBTree>
 	struct rb_base
@@ -3408,7 +3408,7 @@ namespace physx
 	/// rb_base
 	/// This class is used for 'multiset'.
 	/// In this case, Key and Value will be the same as each 
-	/// other and ExtractKey will be physx::use_self.
+	/// other and ExtractKey will be hacd::use_self.
 	///
 	template <typename Key, typename Value, typename Compare, typename ExtractKey, typename RBTree>
 	struct rb_base<Key, Value, Compare, ExtractKey, false, RBTree>
@@ -3428,9 +3428,9 @@ namespace physx
 	/// This specialization is used for 'map'.
 	///
 	template <typename Key, typename Pair, typename Compare, typename RBTree>
-	struct rb_base<Key, Pair, Compare, physx::use_first<Pair>, true, RBTree>
+	struct rb_base<Key, Pair, Compare, hacd::use_first<Pair>, true, RBTree>
 	{
-		typedef physx::use_first<Pair> extract_key;
+		typedef hacd::use_first<Pair> extract_key;
 
 	public:
 		Compare mCompare; // To do: Make sure that empty Compare classes go away via empty base optimizations.
@@ -3445,9 +3445,9 @@ namespace physx
 	/// This specialization is used for 'multimap'.
 	///
 	template <typename Key, typename Pair, typename Compare, typename RBTree>
-	struct rb_base<Key, Pair, Compare, physx::use_first<Pair>, false, RBTree>
+	struct rb_base<Key, Pair, Compare, hacd::use_first<Pair>, false, RBTree>
 	{
-		typedef physx::use_first<Pair> extract_key;
+		typedef hacd::use_first<Pair> extract_key;
 
 	public:
 		Compare mCompare; // To do: Make sure that empty Compare classes go away via empty base optimizations.
@@ -3486,8 +3486,8 @@ namespace physx
 	///
 	/// ExtractKey (functor): This is a class which gets the key from a stored
 	/// node. With map and set, the node is a pair, whereas with set and multiset
-	/// the node is just the value. ExtractKey will be either physx::use_first (map and multimap)
-	/// or physx::use_self (set and multiset).
+	/// the node is just the value. ExtractKey will be either hacd::use_first (map and multimap)
+	/// or hacd::use_self (set and multiset).
 	///
 	/// bMutableIterators (bool): true if rbtree::iterator is a mutable
 	/// iterator, false if iterator and const_iterator are both const iterators. 
@@ -3517,7 +3517,7 @@ namespace physx
 	{
 	public:
 		typedef ptrdiff_t                                                                       difference_type;
-		typedef size_t                                                                    size_type;     // See config.h for the definition of size_t, which defaults to physx::PxU32.
+		typedef size_t                                                                    size_type;     // See config.h for the definition of size_t, which defaults to hacd::HaU32.
 		typedef Key                                                                             key_type;
 		typedef Value                                                                           value_type;
 		typedef rbtree_node<value_type>                                                         node_type;
@@ -3527,12 +3527,12 @@ namespace physx
 			rbtree_iterator<value_type, value_type*, value_type&>, 
 			rbtree_iterator<value_type, const value_type*, const value_type&> >::type   iterator;
 		typedef rbtree_iterator<value_type, const value_type*, const value_type&>               const_iterator;
-		typedef physx::reverse_iterator<iterator>                                               reverse_iterator;
-		typedef physx::reverse_iterator<const_iterator>                                         const_reverse_iterator;
+		typedef hacd::reverse_iterator<iterator>                                               reverse_iterator;
+		typedef hacd::reverse_iterator<const_iterator>                                         const_reverse_iterator;
 
 		typedef Allocator                                                                       allocator_type;
 		typedef Compare                                                                         key_compare;
-		typedef typename type_select<bUniqueKeys, physx::pair<iterator, bool>, iterator>::type  insert_return_type;  // map/set::insert return a pair, multimap/multiset::iterator return an iterator.
+		typedef typename type_select<bUniqueKeys, hacd::pair<iterator, bool>, iterator>::type  insert_return_type;  // map/set::insert return a pair, multimap/multiset::iterator return an iterator.
 		typedef rbtree<Key, Value, Compare, Allocator, 
 			ExtractKey, bMutableIterators, bUniqueKeys>                             this_type;
 		typedef rb_base<Key, Value, Compare, ExtractKey, bUniqueKeys, this_type>                base_type;
@@ -3671,10 +3671,10 @@ namespace physx
 
 		// Intentionally return a pair and not an iterator for DoInsertValue(..., true_type)
 		// This is because the C++ standard for map and set is to return a pair and not just an iterator.
-		physx::pair<iterator, bool> DoInsertValue(const value_type& value, true_type);  // true_type means keys are unique.
+		hacd::pair<iterator, bool> DoInsertValue(const value_type& value, true_type);  // true_type means keys are unique.
 		iterator DoInsertValue(const value_type& value, false_type);                    // false_type means keys are not unique.
 
-		physx::pair<iterator, bool> DoInsertKey(const key_type& key, true_type);
+		hacd::pair<iterator, bool> DoInsertKey(const key_type& key, true_type);
 		iterator DoInsertKey(const key_type& key, false_type);
 
 		iterator DoInsertValue(iterator position, const value_type& value, true_type);
@@ -4000,8 +4000,8 @@ namespace physx
 		{
 			// Most of our members can be exchaged by a basic swap:
 			// We leave mAllocator as-is.
-			physx::swap(mnSize,              x.mnSize);
-			physx::swap(base_type::mCompare, x.mCompare);
+			hacd::swap(mnSize,              x.mnSize);
+			hacd::swap(base_type::mCompare, x.mCompare);
 
 			// However, because our anchor node is a part of our class instance and not 
 			// dynamically allocated, we can't do a swap of it but must do a more elaborate
@@ -4012,9 +4012,9 @@ namespace physx
 			// We optimize for the expected most common case: both pointers being non-null.
 			if(mAnchor.mpNodeParent && x.mAnchor.mpNodeParent) // If both pointers are non-null...
 			{
-				physx::swap(mAnchor.mpNodeRight,  x.mAnchor.mpNodeRight);
-				physx::swap(mAnchor.mpNodeLeft,   x.mAnchor.mpNodeLeft);
-				physx::swap(mAnchor.mpNodeParent, x.mAnchor.mpNodeParent);
+				hacd::swap(mAnchor.mpNodeRight,  x.mAnchor.mpNodeRight);
+				hacd::swap(mAnchor.mpNodeLeft,   x.mAnchor.mpNodeLeft);
+				hacd::swap(mAnchor.mpNodeParent, x.mAnchor.mpNodeParent);
 
 				// We need to fix up the anchors to point to themselves (we can't just swap them).
 				mAnchor.mpNodeParent->mpNodeParent   = &mAnchor;
@@ -4047,7 +4047,7 @@ namespace physx
 		}
 		else
 		{
-			const this_type temp(*this); // Can't call physx::swap because that would
+			const this_type temp(*this); // Can't call hacd::swap because that would
 			*this = x;                   // itself call this member swap function.
 			x     = temp;
 		}
@@ -4067,7 +4067,7 @@ namespace physx
 
 
 	template <typename K, typename V, typename C, typename A, typename E, bool bM, bool bU>
-	physx::pair<typename rbtree<K, V, C, A, E, bM, bU>::iterator, bool>
+	hacd::pair<typename rbtree<K, V, C, A, E, bM, bU>::iterator, bool>
 		rbtree<K, V, C, A, E, bM, bU>::DoInsertValue(const value_type& value, true_type) // true_type means keys are unique.
 	{
 		// This is the pathway for insertion of unique keys (map and set, but not multimap and multiset).
@@ -4155,7 +4155,7 @@ namespace physx
 
 
 	template <typename K, typename V, typename C, typename A, typename E, bool bM, bool bU>
-	physx::pair<typename rbtree<K, V, C, A, E, bM, bU>::iterator, bool>
+	hacd::pair<typename rbtree<K, V, C, A, E, bM, bU>::iterator, bool>
 		rbtree<K, V, C, A, E, bM, bU>::DoInsertKey(const key_type& key, true_type) // true_type means keys are unique.
 	{
 		// This code is essentially a slightly modified copy of the the rbtree::insert 
@@ -5567,28 +5567,28 @@ namespace physx
 	PX_INLINE mem_fun_t<Result, T>
 		mem_fun(Result (T::*MemberFunction)())
 	{
-		return physx::mem_fun_t<Result, T>(MemberFunction);
+		return hacd::mem_fun_t<Result, T>(MemberFunction);
 	}
 
 	template <typename Result, typename T, typename Argument>
 	PX_INLINE mem_fun1_t<Result, T, Argument>
 		mem_fun(Result (T::*MemberFunction)(Argument))
 	{
-		return physx::mem_fun1_t<Result, T, Argument>(MemberFunction);
+		return hacd::mem_fun1_t<Result, T, Argument>(MemberFunction);
 	}
 
 	template <typename Result, typename T>
 	PX_INLINE const_mem_fun_t<Result, T>
 		mem_fun(Result (T::*MemberFunction)() const)
 	{
-		return physx::const_mem_fun_t<Result, T>(MemberFunction);
+		return hacd::const_mem_fun_t<Result, T>(MemberFunction);
 	}
 
 	template <typename Result, typename T, typename Argument>
 	PX_INLINE const_mem_fun1_t<Result, T, Argument>
 		mem_fun(Result (T::*MemberFunction)(Argument) const)
 	{
-		return physx::const_mem_fun1_t<Result, T, Argument>(MemberFunction);
+		return hacd::const_mem_fun1_t<Result, T, Argument>(MemberFunction);
 	}
 
 
@@ -5707,28 +5707,28 @@ namespace physx
 	PX_INLINE mem_fun_ref_t<Result, T>
 		mem_fun_ref(Result (T::*MemberFunction)())
 	{
-		return physx::mem_fun_ref_t<Result, T>(MemberFunction);
+		return hacd::mem_fun_ref_t<Result, T>(MemberFunction);
 	}
 
 	template <typename Result, typename T, typename Argument>
 	PX_INLINE mem_fun1_ref_t<Result, T, Argument>
 		mem_fun_ref(Result (T::*MemberFunction)(Argument))
 	{
-		return physx::mem_fun1_ref_t<Result, T, Argument>(MemberFunction);
+		return hacd::mem_fun1_ref_t<Result, T, Argument>(MemberFunction);
 	}
 
 	template <typename Result, typename T>
 	PX_INLINE const_mem_fun_ref_t<Result, T>
 		mem_fun_ref(Result (T::*MemberFunction)() const)
 	{
-		return physx::const_mem_fun_ref_t<Result, T>(MemberFunction);
+		return hacd::const_mem_fun_ref_t<Result, T>(MemberFunction);
 	}
 
 	template <typename Result, typename T, typename Argument>
 	PX_INLINE const_mem_fun1_ref_t<Result, T, Argument>
 		mem_fun_ref(Result (T::*MemberFunction)(Argument) const)
 	{
-		return physx::const_mem_fun1_ref_t<Result, T, Argument>(MemberFunction);
+		return hacd::const_mem_fun1_ref_t<Result, T, Argument>(MemberFunction);
 	}
 
 
@@ -5806,67 +5806,67 @@ namespace physx
 	//      special eastl_hash customized for such strings that's better than what we provide.
 	///////////////////////////////////////////////////////////////////////////
 
-	template <> struct eastl_hash<physx::PxI8*>
+	template <> struct eastl_hash<hacd::HaI8*>
 	{
-		size_t operator()(const physx::PxI8* p) const
+		size_t operator()(const hacd::HaI8* p) const
 		{
 			size_t c, result = 2166136261U;  // FNV1 eastl_hash. Perhaps the best string eastl_hash.
-			while((c = (physx::PxU8)*p++) != 0)  // Using '!=' disables compiler warnings.
+			while((c = (hacd::HaU8)*p++) != 0)  // Using '!=' disables compiler warnings.
 				result = (result * 16777619) ^ c;
 			return (size_t)result;
 		}
 	};
 
-	template <> struct eastl_hash<const physx::PxI8*>
+	template <> struct eastl_hash<const hacd::HaI8*>
 	{
-		size_t operator()(const physx::PxI8* p) const
+		size_t operator()(const hacd::HaI8* p) const
 		{
 			size_t c, result = 2166136261U;
-			while((c = (physx::PxU8)*p++) != 0) // cast to unsigned 8 bit.
+			while((c = (hacd::HaU8)*p++) != 0) // cast to unsigned 8 bit.
 				result = (result * 16777619) ^ c;
 			return (size_t)result;
 		}
 	};
 
-	template <> struct eastl_hash<physx::PxI16*>
+	template <> struct eastl_hash<hacd::HaI16*>
 	{
-		size_t operator()(const physx::PxI16* p) const
+		size_t operator()(const hacd::HaI16* p) const
 		{
 			size_t c, result = 2166136261U;
-			while((c = (physx::PxU16)*p++) != 0) // cast to unsigned 16 bit.
+			while((c = (HaU16)*p++) != 0) // cast to unsigned 16 bit.
 				result = (result * 16777619) ^ c;
 			return (size_t)result;
 		}
 	};
 
-	template <> struct eastl_hash<const physx::PxI16*>
+	template <> struct eastl_hash<const hacd::HaI16*>
 	{
-		size_t operator()(const physx::PxI16* p) const
+		size_t operator()(const hacd::HaI16* p) const
 		{
 			size_t c, result = 2166136261U;
-			while((c = (physx::PxU16)*p++) != 0) // cast to unsigned 16 bit.
+			while((c = (HaU16)*p++) != 0) // cast to unsigned 16 bit.
 				result = (result * 16777619) ^ c;
 			return (size_t)result;
 		}
 	};
 
-	template <> struct eastl_hash<physx::PxU32*>
+	template <> struct eastl_hash<hacd::HaU32*>
 	{
-		size_t operator()(const physx::PxU32* p) const
+		size_t operator()(const hacd::HaU32* p) const
 		{
 			size_t c, result = 2166136261U;
-			while((c = (physx::PxU32)*p++) != 0) // cast to unsigned 32 bit.
+			while((c = (hacd::HaU32)*p++) != 0) // cast to unsigned 32 bit.
 				result = (result * 16777619) ^ c;
 			return (size_t)result;
 		}
 	};
 
-	template <> struct eastl_hash<const physx::PxU32*>
+	template <> struct eastl_hash<const hacd::HaU32*>
 	{
-		size_t operator()(const physx::PxU32* p) const
+		size_t operator()(const hacd::HaU32* p) const
 		{
 			size_t c, result = 2166136261U;
-			while((c = (physx::PxU32)*p++) != 0) // cast to unsigned 32 bit.
+			while((c = (hacd::HaU32)*p++) != 0) // cast to unsigned 32 bit.
 				result = (result * 16777619) ^ c;
 			return (size_t)result;
 		}
@@ -5877,14 +5877,14 @@ namespace physx
 	/// Defines a generic string eastl_hash for an arbitrary EASTL basic_string container.
 	///
 	/// Example usage:
-	///    physx::hash_set<MyString, physx::string_hash<MyString> > hashSet;
+	///    hacd::hash_set<MyString, hacd::string_hash<MyString> > hashSet;
 	///
 	template <typename String>
 	struct string_hash
 	{
 		typedef String                                         string_type;
 		typedef typename String::value_type                    value_type;
-		typedef typename physx::add_unsigned<value_type>::type unsigned_value_type;
+		typedef typename hacd::add_unsigned<value_type>::type unsigned_value_type;
 
 		size_t operator()(const string_type& s) const
 		{
@@ -5897,7 +5897,7 @@ namespace physx
 	};
 
 
-} // namespace physx
+} // namespace hacd
 
 #pragma warning(pop)
 

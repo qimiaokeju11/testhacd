@@ -46,9 +46,9 @@ namespace HACD
         m_deleted = false;
     }
     
-    bool GraphVertex::DeleteEdge(physx::PxI32 name)
+    bool GraphVertex::DeleteEdge(hacd::HaI32 name)
     {
-        PxI32Set::iterator it = m_edges.find(name);
+        HaI32Set::iterator it = m_edges.find(name);
         if (it != m_edges.end() )
 		{
 			m_edges.erase(it);
@@ -68,29 +68,29 @@ namespace HACD
     {
     }
     
-	void Graph::Allocate(physx::PxU32 nV, physx::PxU32 nE)
+	void Graph::Allocate(hacd::HaU32 nV, hacd::HaU32 nE)
 	{ 
 		m_nV = nV;
 		m_edges.reserve(nE);
 		m_vertices.resize(nV);
-		for(physx::PxU32 i = 0; i < nV; i++)
+		for(hacd::HaU32 i = 0; i < nV; i++)
 		{
-			m_vertices[i].m_name = static_cast<physx::PxI32>(i);
+			m_vertices[i].m_name = static_cast<hacd::HaI32>(i);
 		}
 	}
 
-    physx::PxI32 Graph::AddVertex()
+    hacd::HaI32 Graph::AddVertex()
     {
-		physx::PxU32 name = (physx::PxU32)m_vertices.size();
+		hacd::HaU32 name = (hacd::HaU32)m_vertices.size();
 		m_vertices.resize(name+1);
         m_vertices[name].m_name = name;
         m_nV++;
-        return static_cast<physx::PxI32>(name);
+        return static_cast<hacd::HaI32>(name);
     }
     
-    physx::PxI32 Graph::AddEdge(physx::PxI32 v1, physx::PxI32 v2)
+    hacd::HaI32 Graph::AddEdge(hacd::HaI32 v1, hacd::HaI32 v2)
     {
-		physx::PxU32 name =(physx::PxU32) m_edges.size();
+		hacd::HaU32 name =(hacd::HaU32) m_edges.size();
 		m_edges.push_back(GraphEdge());
         m_edges[name].m_name = name;
         m_edges[name].m_v1 = v1;
@@ -98,15 +98,15 @@ namespace HACD
         m_vertices[v1].AddEdge(name);
         m_vertices[v2].AddEdge(name);
         m_nE++;
-		return static_cast<physx::PxI32>(name);
+		return static_cast<hacd::HaI32>(name);
     }
 
-    bool Graph::DeleteEdge(physx::PxI32 name)
+    bool Graph::DeleteEdge(hacd::HaI32 name)
     {
-		if (name < static_cast<physx::PxI32>(m_edges.size()))
+		if (name < static_cast<hacd::HaI32>(m_edges.size()))
 		{
-            physx::PxI32 v1 = m_edges[name].m_v1;
-            physx::PxI32 v2 = m_edges[name].m_v2;
+            hacd::HaI32 v1 = m_edges[name].m_v1;
+            hacd::HaI32 v2 = m_edges[name].m_v2;
 			m_edges[name].m_deleted = true;
             m_vertices[v1].DeleteEdge(name);
             m_vertices[v2].DeleteEdge(name);
@@ -119,13 +119,13 @@ namespace HACD
 		}
 		return false;
     }
-    bool Graph::DeleteVertex(physx::PxI32 name)
+    bool Graph::DeleteVertex(hacd::HaI32 name)
     {
-		if (name < static_cast<physx::PxI32>(m_vertices.size()))
+		if (name < static_cast<hacd::HaI32>(m_vertices.size()))
 		{
 			m_vertices[name].m_deleted = true;
             m_vertices[name].m_edges.clear();
-            m_vertices[name].m_ancestors = PxU32Vector();
+            m_vertices[name].m_ancestors = HaU32Vector();
             delete m_vertices[name].m_convexHull;
 			m_vertices[name].m_distPoints.clear();
 			m_vertices[name].m_boudaryEdges.clear();
@@ -135,9 +135,9 @@ namespace HACD
 		}
 		return false;
     }    
-    bool Graph::EdgeCollapse(physx::PxI32 v1, physx::PxI32 v2)
+    bool Graph::EdgeCollapse(hacd::HaI32 v1, hacd::HaI32 v2)
 	{
-		physx::PxI32 edgeToDelete = GetEdgeID(v1, v2);
+		hacd::HaI32 edgeToDelete = GetEdgeID(v1, v2);
         if (edgeToDelete >= 0) 
 		{
 			// delete the edge (v1, v2)
@@ -145,25 +145,25 @@ namespace HACD
 			// add v2 to v1 ancestors
             m_vertices[v1].m_ancestors.push_back(v2);
 			// add v2's ancestors to v1's ancestors
-			PxU32Vector newArray;
-			PxU32Vector	&oldArray = m_vertices[v1].m_ancestors;
-			PxU32Vector	&insertArray = m_vertices[v2].m_ancestors;
+			HaU32Vector newArray;
+			HaU32Vector	&oldArray = m_vertices[v1].m_ancestors;
+			HaU32Vector	&insertArray = m_vertices[v2].m_ancestors;
 			newArray.reserve( insertArray.size() + oldArray.size() );
-			for (physx::PxU32 i=0; i<insertArray.size(); i++)
+			for (hacd::HaU32 i=0; i<insertArray.size(); i++)
 			{
 				newArray.push_back( insertArray[i] );
 			}
-			for (physx::PxU32 i=0; i<oldArray.size(); i++)
+			for (hacd::HaU32 i=0; i<oldArray.size(); i++)
 			{
 				newArray.push_back( oldArray[i] );
 			}
 			m_vertices[v1].m_ancestors = newArray;
 
 			// update adjacency information
-			PxI32Set & v1Edges =  m_vertices[v1].m_edges;
-			PxI32Set::const_iterator ed(m_vertices[v2].m_edges.begin());
-			PxI32Set::const_iterator itEnd(m_vertices[v2].m_edges.end());
-			physx::PxI32 b = -1;
+			HaI32Set & v1Edges =  m_vertices[v1].m_edges;
+			HaI32Set::const_iterator ed(m_vertices[v2].m_edges.begin());
+			HaI32Set::const_iterator itEnd(m_vertices[v2].m_edges.end());
+			hacd::HaI32 b = -1;
 			for(; ed != itEnd; ++ed) 
 			{
 				if (m_edges[*ed].m_v1 == v2)
@@ -194,12 +194,12 @@ namespace HACD
 		return false;
     }
     
-    physx::PxI32 Graph::GetEdgeID(physx::PxI32 v1, physx::PxI32 v2) const
+    hacd::HaI32 Graph::GetEdgeID(hacd::HaI32 v1, hacd::HaI32 v2) const
     {
-		if (v1 < static_cast<physx::PxI32>(m_vertices.size()) && !m_vertices[v1].m_deleted)
+		if (v1 < static_cast<hacd::HaI32>(m_vertices.size()) && !m_vertices[v1].m_deleted)
 		{
-			PxI32Set::const_iterator ed(m_vertices[v1].m_edges.begin());
-			PxI32Set::const_iterator itEnd(m_vertices[v1].m_edges.end());
+			HaI32Set::const_iterator ed(m_vertices[v1].m_edges.begin());
+			HaI32Set::const_iterator itEnd(m_vertices[v1].m_edges.end());
 			for(; ed != itEnd; ++ed) 
 			{
 				if ( (m_edges[*ed].m_v1 == v2) || 
@@ -212,10 +212,10 @@ namespace HACD
         return -1;
     }
     
-    physx::PxI32 Graph::ExtractCCs()
+    hacd::HaI32 Graph::ExtractCCs()
 	{
         // all CCs to -1
-        for (physx::PxU32 v = 0; v < m_vertices.size(); ++v) 
+        for (hacd::HaU32 v = 0; v < m_vertices.size(); ++v) 
 		{
 			if (!m_vertices[v].m_deleted)
 			{
@@ -225,9 +225,9 @@ namespace HACD
         
         // we get the CCs
         m_nCCs = 0;
-		physx::PxI32 v2 = -1;
-		PxU32Vector temp;
-        for (physx::PxU32 v = 0; v < m_vertices.size(); ++v) 
+		hacd::HaI32 v2 = -1;
+		HaU32Vector temp;
+        for (hacd::HaU32 v = 0; v < m_vertices.size(); ++v) 
 		{
 			if (!m_vertices[v].m_deleted && m_vertices[v].m_cc == -1) 
 			{
@@ -236,10 +236,10 @@ namespace HACD
                 temp.push_back(m_vertices[v].m_name);
                 while (temp.size()) 
 				{
-                    physx::PxI32 vertex = temp[temp.size()-1];
+                    hacd::HaI32 vertex = temp[temp.size()-1];
                     temp.pop_back();                    
-					PxI32Set::const_iterator ed(m_vertices[vertex].m_edges.begin());
-					PxI32Set::const_iterator itEnd(m_vertices[vertex].m_edges.end());
+					HaI32Set::const_iterator ed(m_vertices[vertex].m_edges.begin());
+					HaI32Set::const_iterator itEnd(m_vertices[vertex].m_edges.end());
 					for(; ed != itEnd; ++ed) 
 					{
                         if (m_edges[*ed].m_v1 == vertex) 
@@ -266,20 +266,20 @@ namespace HACD
 	{
 		return;
         ExtractCCs();
-		PxU32Vector clustersRep;
-		clustersRep.resize(m_nCCs,(physx::PxU32) -1);
-		physx::PxU32 done = 0;
-        for (physx::PxU32 v = 0; (done<m_nCCs) && (v < m_vertices.size()); ++v) 
+		HaU32Vector clustersRep;
+		clustersRep.resize(m_nCCs,(hacd::HaU32) -1);
+		hacd::HaU32 done = 0;
+        for (hacd::HaU32 v = 0; (done<m_nCCs) && (v < m_vertices.size()); ++v) 
 		{
 			if (!m_vertices[v].m_deleted && m_vertices[v].m_cc >=0 && clustersRep[m_vertices[v].m_cc] == -1)
 			{
-				clustersRep[m_vertices[v].m_cc] = static_cast<physx::PxI32>(done);
+				clustersRep[m_vertices[v].m_cc] = static_cast<hacd::HaI32>(done);
 				done++;
 			}
         }
-        for (physx::PxU32 i = 0; i < m_nCCs; i++) 
+        for (hacd::HaU32 i = 0; i < m_nCCs; i++) 
 		{
-            for (physx::PxU32 j = i+1; j < m_nCCs; j++) 
+            for (hacd::HaU32 j = i+1; j < m_nCCs; j++) 
 			{
                 AddEdge(clustersRep[i], clustersRep[j]);
             }

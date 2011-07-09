@@ -38,11 +38,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PHYSX_MAP_SET_H
 #define PHYSX_MAP_SET_H
 
+#include "PlatformConfig.h"
 #include "PxMapSetInternal.h"
-#include "PxSimpleTypes.h"
 
 
-namespace physx
+namespace hacd
 {
 
     /// EASTL_MAP_DEFAULT_NAME
@@ -94,13 +94,13 @@ namespace physx
     ///     MemoryPool myPool(sizeof(WidgetMap::node_type), 100);          // Make a pool of 100 Widget nodes.
     ///     WidgetMap myMap(&myPool);                                      // Create a map that uses the pool.
     ///
-    template <typename Key, typename T, typename Compare = physx::less<Key>, typename Allocator = EASTLAllocatorType>
+    template <typename Key, typename T, typename Compare = hacd::less<Key>, typename Allocator = EASTLAllocatorType>
     class map
-        : public rbtree<Key, physx::pair<const Key, T>, Compare, Allocator, physx::use_first<physx::pair<const Key, T> >, true, true>
+        : public rbtree<Key, hacd::pair<const Key, T>, Compare, Allocator, hacd::use_first<hacd::pair<const Key, T> >, true, true>
     {
     public:
-        typedef rbtree<Key, physx::pair<const Key, T>, Compare, Allocator,
-                        physx::use_first<physx::pair<const Key, T> >, true, true>   base_type;
+        typedef rbtree<Key, hacd::pair<const Key, T>, Compare, Allocator,
+                        hacd::use_first<hacd::pair<const Key, T> >, true, true>   base_type;
         typedef map<Key, T, Compare, Allocator>                                     this_type;
         typedef typename base_type::size_type                                       size_type;
         typedef typename base_type::key_type                                        key_type;
@@ -153,8 +153,8 @@ namespace physx
         size_type erase(const Key& key);
         size_type count(const Key& key) const;
 
-        physx::pair<iterator, iterator>             equal_range(const Key& key);
-        physx::pair<const_iterator, const_iterator> equal_range(const Key& key) const;
+        hacd::pair<iterator, iterator>             equal_range(const Key& key);
+        hacd::pair<const_iterator, const_iterator> equal_range(const Key& key) const;
 
         T& operator[](const Key& key); // Of map, multimap, set, and multimap, only map has operator[].
 
@@ -182,13 +182,13 @@ namespace physx
     ///     MemoryPool myPool(sizeof(WidgetMap::node_type), 100);               // Make a pool of 100 Widget nodes.
     ///     WidgetMap myMap(&myPool);                                           // Create a map that uses the pool.
     ///
-    template <typename Key, typename T, typename Compare = physx::less<Key>, typename Allocator = EASTLAllocatorType>
+    template <typename Key, typename T, typename Compare = hacd::less<Key>, typename Allocator = EASTLAllocatorType>
     class multimap
-        : public rbtree<Key, physx::pair<const Key, T>, Compare, Allocator, physx::use_first<physx::pair<const Key, T> >, true, false>
+        : public rbtree<Key, hacd::pair<const Key, T>, Compare, Allocator, hacd::use_first<hacd::pair<const Key, T> >, true, false>
     {
     public:
-        typedef rbtree<Key, physx::pair<const Key, T>, Compare, Allocator, 
-                        physx::use_first<physx::pair<const Key, T> >, true, false>  base_type;
+        typedef rbtree<Key, hacd::pair<const Key, T>, Compare, Allocator, 
+                        hacd::use_first<hacd::pair<const Key, T> >, true, false>  base_type;
         typedef multimap<Key, T, Compare, Allocator>                                this_type;
         typedef typename base_type::size_type                                       size_type;
         typedef typename base_type::key_type                                        key_type;
@@ -241,14 +241,14 @@ namespace physx
         size_type erase(const Key& key);
         size_type count(const Key& key) const;
 
-        physx::pair<iterator, iterator>             equal_range(const Key& key);
-        physx::pair<const_iterator, const_iterator> equal_range(const Key& key) const;
+        hacd::pair<iterator, iterator>             equal_range(const Key& key);
+        hacd::pair<const_iterator, const_iterator> equal_range(const Key& key) const;
 
         /// equal_range_small
         /// This is a special version of equal_range which is optimized for the 
         /// case of there being few or no duplicated keys in the tree.
-        physx::pair<iterator, iterator>             equal_range_small(const Key& key);
-        physx::pair<const_iterator, const_iterator> equal_range_small(const Key& key) const;
+        hacd::pair<iterator, iterator>             equal_range_small(const Key& key);
+        hacd::pair<const_iterator, const_iterator> equal_range_small(const Key& key) const;
 
     }; // multimap
 
@@ -314,7 +314,7 @@ namespace physx
 
 
     template <typename Key, typename T, typename Compare, typename Allocator>
-    inline physx::pair<typename map<Key, T, Compare, Allocator>::iterator,
+    inline hacd::pair<typename map<Key, T, Compare, Allocator>::iterator,
                        typename map<Key, T, Compare, Allocator>::iterator>
     map<Key, T, Compare, Allocator>::equal_range(const Key& key)
     {
@@ -325,15 +325,15 @@ namespace physx
         const iterator itLower(lower_bound(key));
 
         if((itLower == end()) || mCompare(key, itLower.mpNode->mValue.first)) // If at the end or if (key is < itLower)...
-            return physx::pair<iterator, iterator>(itLower, itLower);
+            return hacd::pair<iterator, iterator>(itLower, itLower);
 
         iterator itUpper(itLower);
-        return physx::pair<iterator, iterator>(itLower, ++itUpper);
+        return hacd::pair<iterator, iterator>(itLower, ++itUpper);
     }
     
 
     template <typename Key, typename T, typename Compare, typename Allocator>
-    inline physx::pair<typename map<Key, T, Compare, Allocator>::const_iterator, 
+    inline hacd::pair<typename map<Key, T, Compare, Allocator>::const_iterator, 
                        typename map<Key, T, Compare, Allocator>::const_iterator>
     map<Key, T, Compare, Allocator>::equal_range(const Key& key) const
     {
@@ -341,10 +341,10 @@ namespace physx
         const const_iterator itLower(lower_bound(key));
 
         if((itLower == end()) || mCompare(key, itLower.mpNode->mValue.first)) // If at the end or if (key is < itLower)...
-            return physx::pair<const_iterator, const_iterator>(itLower, itLower);
+            return hacd::pair<const_iterator, const_iterator>(itLower, itLower);
 
         const_iterator itUpper(itLower);
-        return physx::pair<const_iterator, const_iterator>(itLower, ++itUpper);
+        return hacd::pair<const_iterator, const_iterator>(itLower, ++itUpper);
     }
 
 
@@ -365,7 +365,7 @@ namespace physx
         return (*itLower).second;
 
         // Reference implementation of this function, which may not be as fast:
-        //iterator it(base_type::insert(physx::pair<iterator, iterator>(key, T())).first);
+        //iterator it(base_type::insert(hacd::pair<iterator, iterator>(key, T())).first);
         //return it->second;
     }
 
@@ -423,8 +423,8 @@ namespace physx
     inline typename multimap<Key, T, Compare, Allocator>::size_type
     multimap<Key, T, Compare, Allocator>::erase(const Key& key)
     {
-        const physx::pair<iterator, iterator> range(equal_range(key));
-        const size_type n = (size_type)physx::distance(range.first, range.second);
+        const hacd::pair<iterator, iterator> range(equal_range(key));
+        const size_type n = (size_type)hacd::distance(range.first, range.second);
         base_type::erase(range.first, range.second);
         return n;
     }
@@ -434,20 +434,20 @@ namespace physx
     inline typename multimap<Key, T, Compare, Allocator>::size_type
     multimap<Key, T, Compare, Allocator>::count(const Key& key) const
     {
-        const physx::pair<const_iterator, const_iterator> range(equal_range(key));
-        return (size_type)physx::distance(range.first, range.second);
+        const hacd::pair<const_iterator, const_iterator> range(equal_range(key));
+        return (size_type)hacd::distance(range.first, range.second);
     }
 
 
     template <typename Key, typename T, typename Compare, typename Allocator>
-    inline physx::pair<typename multimap<Key, T, Compare, Allocator>::iterator,
+    inline hacd::pair<typename multimap<Key, T, Compare, Allocator>::iterator,
                        typename multimap<Key, T, Compare, Allocator>::iterator>
     multimap<Key, T, Compare, Allocator>::equal_range(const Key& key)
     {
         // There are multiple ways to implement equal_range. The implementation mentioned
         // in the C++ standard and which is used by most (all?) commercial STL implementations
         // is this:
-        //    return physx::pair<iterator, iterator>(lower_bound(key), upper_bound(key));
+        //    return hacd::pair<iterator, iterator>(lower_bound(key), upper_bound(key));
         //
         // This does two tree searches -- one for the lower bound and one for the 
         // upper bound. This works well for the case whereby you have a large container
@@ -455,22 +455,22 @@ namespace physx
         // of equal_range called equal_range_small for cases where the user is confident
         // that the number of duplicated items is only a few.
 
-        return physx::pair<iterator, iterator>(lower_bound(key), upper_bound(key));
+        return hacd::pair<iterator, iterator>(lower_bound(key), upper_bound(key));
     }
 
 
     template <typename Key, typename T, typename Compare, typename Allocator>
-    inline physx::pair<typename multimap<Key, T, Compare, Allocator>::const_iterator, 
+    inline hacd::pair<typename multimap<Key, T, Compare, Allocator>::const_iterator, 
                        typename multimap<Key, T, Compare, Allocator>::const_iterator>
     multimap<Key, T, Compare, Allocator>::equal_range(const Key& key) const
     {
         // See comments above in the non-const version of equal_range.
-        return physx::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
+        return hacd::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
     }
 
 
     template <typename Key, typename T, typename Compare, typename Allocator>
-    inline physx::pair<typename multimap<Key, T, Compare, Allocator>::iterator,
+    inline hacd::pair<typename multimap<Key, T, Compare, Allocator>::iterator,
                        typename multimap<Key, T, Compare, Allocator>::iterator>
     multimap<Key, T, Compare, Allocator>::equal_range_small(const Key& key)
     {
@@ -482,12 +482,12 @@ namespace physx
         while((itUpper != end()) && !mCompare(key, itUpper.mpNode->mValue.first))
             ++itUpper;
 
-        return physx::pair<iterator, iterator>(itLower, itUpper);
+        return hacd::pair<iterator, iterator>(itLower, itUpper);
     }
 
 
     template <typename Key, typename T, typename Compare, typename Allocator>
-    inline physx::pair<typename multimap<Key, T, Compare, Allocator>::const_iterator, 
+    inline hacd::pair<typename multimap<Key, T, Compare, Allocator>::const_iterator, 
                        typename multimap<Key, T, Compare, Allocator>::const_iterator>
     multimap<Key, T, Compare, Allocator>::equal_range_small(const Key& key) const
     {
@@ -499,7 +499,7 @@ namespace physx
         while((itUpper != end()) && !mCompare(key, itUpper.mpNode->mValue.first))
             ++itUpper;
 
-        return physx::pair<const_iterator, const_iterator>(itLower, itUpper);
+        return hacd::pair<const_iterator, const_iterator>(itLower, itUpper);
     }
 
 
@@ -561,12 +561,12 @@ namespace physx
     ///     MemoryPool myPool(sizeof(WidgetSet::node_type), 100);       // Make a pool of 100 Widget nodes.
     ///     WidgetSet mySet(&myPool);                                   // Create a map that uses the pool.
     ///
-    template <typename Key, typename Compare = physx::less<Key>, typename Allocator = EASTLAllocatorType>
+    template <typename Key, typename Compare = hacd::less<Key>, typename Allocator = EASTLAllocatorType>
     class set
-        : public rbtree<Key, Key, Compare, Allocator, physx::use_self<Key>, false, true>
+        : public rbtree<Key, Key, Compare, Allocator, hacd::use_self<Key>, false, true>
     {
     public:
-        typedef rbtree<Key, Key, Compare, Allocator, physx::use_self<Key>, false, true> base_type;
+        typedef rbtree<Key, Key, Compare, Allocator, hacd::use_self<Key>, false, true> base_type;
         typedef set<Key, Compare, Allocator>                                            this_type;
         typedef typename base_type::size_type                                           size_type;
         typedef typename base_type::value_type                                          value_type;
@@ -602,8 +602,8 @@ namespace physx
 
         size_type count(const Key& k) const;
 
-        physx::pair<iterator, iterator>             equal_range(const Key& k);
-        physx::pair<const_iterator, const_iterator> equal_range(const Key& k) const;
+        hacd::pair<iterator, iterator>             equal_range(const Key& k);
+        hacd::pair<const_iterator, const_iterator> equal_range(const Key& k) const;
 
     }; // set
 
@@ -630,12 +630,12 @@ namespace physx
     ///     MemoryPool myPool(sizeof(WidgetSet::node_type), 100);           // Make a pool of 100 Widget nodes.
     ///     WidgetSet mySet(&myPool);                                       // Create a map that uses the pool.
     ///
-    template <typename Key, typename Compare = physx::less<Key>, typename Allocator = EASTLAllocatorType>
+    template <typename Key, typename Compare = hacd::less<Key>, typename Allocator = EASTLAllocatorType>
     class multiset
-        : public rbtree<Key, Key, Compare, Allocator, physx::use_self<Key>, false, false>
+        : public rbtree<Key, Key, Compare, Allocator, hacd::use_self<Key>, false, false>
     {
     public:
-        typedef rbtree<Key, Key, Compare, Allocator, physx::use_self<Key>, false, false>    base_type;
+        typedef rbtree<Key, Key, Compare, Allocator, hacd::use_self<Key>, false, false>    base_type;
         typedef multiset<Key, Compare, Allocator>                                           this_type;
         typedef typename base_type::size_type                                               size_type;
         typedef typename base_type::value_type                                              value_type;
@@ -671,14 +671,14 @@ namespace physx
 
         size_type count(const Key& k) const;
 
-        physx::pair<iterator, iterator>             equal_range(const Key& k);
-        physx::pair<const_iterator, const_iterator> equal_range(const Key& k) const;
+        hacd::pair<iterator, iterator>             equal_range(const Key& k);
+        hacd::pair<const_iterator, const_iterator> equal_range(const Key& k) const;
 
         /// equal_range_small
         /// This is a special version of equal_range which is optimized for the 
         /// case of there being few or no duplicated keys in the tree.
-        physx::pair<iterator, iterator>             equal_range_small(const Key& k);
-        physx::pair<const_iterator, const_iterator> equal_range_small(const Key& k) const;
+        hacd::pair<iterator, iterator>             equal_range_small(const Key& k);
+        hacd::pair<const_iterator, const_iterator> equal_range_small(const Key& k) const;
 
     }; // multiset
 
@@ -791,7 +791,7 @@ namespace physx
 
 
     template <typename Key, typename Compare, typename Allocator>
-    inline physx::pair<typename set<Key, Compare, Allocator>::iterator,
+    inline hacd::pair<typename set<Key, Compare, Allocator>::iterator,
                        typename set<Key, Compare, Allocator>::iterator>
     set<Key, Compare, Allocator>::equal_range(const Key& k)
     {
@@ -802,15 +802,15 @@ namespace physx
         const iterator itLower(lower_bound(k));
 
         if((itLower == end()) || mCompare(k, *itLower)) // If at the end or if (k is < itLower)...
-            return physx::pair<iterator, iterator>(itLower, itLower);
+            return hacd::pair<iterator, iterator>(itLower, itLower);
 
         iterator itUpper(itLower);
-        return physx::pair<iterator, iterator>(itLower, ++itUpper);
+        return hacd::pair<iterator, iterator>(itLower, ++itUpper);
     }
     
 
     template <typename Key, typename Compare, typename Allocator>
-    inline physx::pair<typename set<Key, Compare, Allocator>::const_iterator, 
+    inline hacd::pair<typename set<Key, Compare, Allocator>::const_iterator, 
                        typename set<Key, Compare, Allocator>::const_iterator>
     set<Key, Compare, Allocator>::equal_range(const Key& k) const
     {
@@ -818,10 +818,10 @@ namespace physx
         const const_iterator itLower(lower_bound(k));
 
         if((itLower == end()) || mCompare(k, *itLower)) // If at the end or if (k is < itLower)...
-            return physx::pair<const_iterator, const_iterator>(itLower, itLower);
+            return hacd::pair<const_iterator, const_iterator>(itLower, itLower);
 
         const_iterator itUpper(itLower);
-        return physx::pair<const_iterator, const_iterator>(itLower, ++itUpper);
+        return hacd::pair<const_iterator, const_iterator>(itLower, ++itUpper);
     }
 
 
@@ -869,8 +869,8 @@ namespace physx
     inline typename multiset<Key, Compare, Allocator>::size_type
     multiset<Key, Compare, Allocator>::erase(const Key& k)
     {
-        const physx::pair<iterator, iterator> range(equal_range(k));
-        const size_type n = (size_type)physx::distance(range.first, range.second);
+        const hacd::pair<iterator, iterator> range(equal_range(k));
+        const size_type n = (size_type)hacd::distance(range.first, range.second);
         base_type::erase(range.first, range.second);
         return n;
     }
@@ -900,8 +900,8 @@ namespace physx
     inline typename multiset<Key, Compare, Allocator>::size_type
     multiset<Key, Compare, Allocator>::count(const Key& k) const
     {
-        const physx::pair<const_iterator, const_iterator> range(equal_range(k));
-        return (size_type)physx::distance(range.first, range.second);
+        const hacd::pair<const_iterator, const_iterator> range(equal_range(k));
+        return (size_type)hacd::distance(range.first, range.second);
     }
 
 
@@ -929,14 +929,14 @@ namespace physx
 
 
     template <typename Key, typename Compare, typename Allocator>
-    inline physx::pair<typename multiset<Key, Compare, Allocator>::iterator,
+    inline hacd::pair<typename multiset<Key, Compare, Allocator>::iterator,
                        typename multiset<Key, Compare, Allocator>::iterator>
     multiset<Key, Compare, Allocator>::equal_range(const Key& k)
     {
         // There are multiple ways to implement equal_range. The implementation mentioned
         // in the C++ standard and which is used by most (all?) commercial STL implementations
         // is this:
-        //    return physx::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
+        //    return hacd::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
         //
         // This does two tree searches -- one for the lower bound and one for the 
         // upper bound. This works well for the case whereby you have a large container
@@ -944,22 +944,22 @@ namespace physx
         // of equal_range called equal_range_small for cases where the user is confident
         // that the number of duplicated items is only a few.
 
-        return physx::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
+        return hacd::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
     }
 
 
     template <typename Key, typename Compare, typename Allocator>
-    inline physx::pair<typename multiset<Key, Compare, Allocator>::const_iterator, 
+    inline hacd::pair<typename multiset<Key, Compare, Allocator>::const_iterator, 
                        typename multiset<Key, Compare, Allocator>::const_iterator>
     multiset<Key, Compare, Allocator>::equal_range(const Key& k) const
     {
         // See comments above in the non-const version of equal_range.
-        return physx::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
+        return hacd::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
     }
 
 
     template <typename Key, typename Compare, typename Allocator>
-    inline physx::pair<typename multiset<Key, Compare, Allocator>::iterator,
+    inline hacd::pair<typename multiset<Key, Compare, Allocator>::iterator,
                        typename multiset<Key, Compare, Allocator>::iterator>
     multiset<Key, Compare, Allocator>::equal_range_small(const Key& k)
     {
@@ -971,12 +971,12 @@ namespace physx
         while((itUpper != end()) && !mCompare(k, itUpper.mpNode->mValue))
             ++itUpper;
 
-        return physx::pair<iterator, iterator>(itLower, itUpper);
+        return hacd::pair<iterator, iterator>(itLower, itUpper);
     }
 
 
     template <typename Key, typename Compare, typename Allocator>
-    inline physx::pair<typename multiset<Key, Compare, Allocator>::const_iterator, 
+    inline hacd::pair<typename multiset<Key, Compare, Allocator>::const_iterator, 
                        typename multiset<Key, Compare, Allocator>::const_iterator>
     multiset<Key, Compare, Allocator>::equal_range_small(const Key& k) const
     {
@@ -988,11 +988,11 @@ namespace physx
         while((itUpper != end()) && !mCompare(k, *itUpper))
             ++itUpper;
 
-        return physx::pair<const_iterator, const_iterator>(itLower, itUpper);
+        return hacd::pair<const_iterator, const_iterator>(itLower, itUpper);
     }
 
 
-} // namespace physx
+} // namespace hacd
 
 
 #endif // Header include guard

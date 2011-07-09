@@ -10,16 +10,16 @@ public:
 	class Hull
 	{
 		public:
-			physx::PxU32	mVertexCount;
-			physx::PxU32	mTriangleCount;
-			const physx::PxF32	*mVertices;
-			const physx::PxU32	*mIndices;
+			hacd::HaU32	mVertexCount;
+			hacd::HaU32	mTriangleCount;
+			const hacd::HaF32	*mVertices;
+			const hacd::HaU32	*mIndices;
 	};
 
 	virtual void			addConvexHull(const Hull &h) = 0;
 
-	virtual	physx::PxU32	performMerge(physx::PxF32 mergePercentage,physx::PxU32 maxHullVertices) = 0;
-	virtual	const Hull		*getMergedHull(physx::PxU32 index) = 0;
+	virtual	hacd::HaU32	performMerge(hacd::HaF32 mergePercentage,hacd::HaU32 maxHullVertices) = 0;
+	virtual	const Hull		*getMergedHull(hacd::HaU32 index) = 0;
 	virtual	void			release(void) = 0;
 protected:
 	virtual ~MergeConvexHulls(void)

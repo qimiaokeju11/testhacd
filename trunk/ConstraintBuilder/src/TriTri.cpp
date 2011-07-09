@@ -14,14 +14,14 @@
 *  Journal of Graphics Tools, 8(1), 2003
 *
 *  Several geometric predicates are defined.  Their parameters are all
-*  points.  Each point is an array of two or three physx::PxF32 precision
+*  points.  Each point is an array of two or three hacd::HaF32 precision
 *  floating point numbers. The geometric predicates implemented in
 *  this file are:
 *
-*    physx::PxI32 tri_tri_overlap_test_3d(p1,q1,r1,p2,q2,r2)
-*    physx::PxI32 tri_tri_overlap_test_2d(p1,q1,r1,p2,q2,r2)
+*    hacd::HaI32 tri_tri_overlap_test_3d(p1,q1,r1,p2,q2,r2)
+*    hacd::HaI32 tri_tri_overlap_test_2d(p1,q1,r1,p2,q2,r2)
 *
-*    physx::PxI32 tri_tri_intersection_test_3d(p1,q1,r1,p2,q2,r2,
+*    hacd::HaI32 tri_tri_intersection_test_3d(p1,q1,r1,p2,q2,r2,
 *                                     coplanar,source,target)
 *
 *       is a version that computes the segment of intersection when
@@ -43,23 +43,23 @@
 
 #pragma warning(disable:4100)
 
-physx::PxI32 tri_tri_overlap_test_3d(physx::PxF32 p1[3], physx::PxF32 q1[3], physx::PxF32 r1[3],
-			    physx::PxF32 p2[3], physx::PxF32 q2[3], physx::PxF32 r2[3]);
+hacd::HaI32 tri_tri_overlap_test_3d(hacd::HaF32 p1[3], hacd::HaF32 q1[3], hacd::HaF32 r1[3],
+			    hacd::HaF32 p2[3], hacd::HaF32 q2[3], hacd::HaF32 r2[3]);
 
 
-physx::PxI32 coplanar_tri_tri3d(physx::PxF32  p1[3], physx::PxF32  q1[3], physx::PxF32  r1[3],
-		       physx::PxF32  p2[3], physx::PxF32  q2[3], physx::PxF32  r2[3],
-		       physx::PxF32  N1[3], physx::PxF32  N2[3]);
+hacd::HaI32 coplanar_tri_tri3d(hacd::HaF32  p1[3], hacd::HaF32  q1[3], hacd::HaF32  r1[3],
+		       hacd::HaF32  p2[3], hacd::HaF32  q2[3], hacd::HaF32  r2[3],
+		       hacd::HaF32  N1[3], hacd::HaF32  N2[3]);
 
 
-physx::PxI32 tri_tri_overlap_test_2d(physx::PxF32 p1[2], physx::PxF32 q1[2], physx::PxF32 r1[2], 
-			    physx::PxF32 p2[2], physx::PxF32 q2[2], physx::PxF32 r2[2]);
+hacd::HaI32 tri_tri_overlap_test_2d(hacd::HaF32 p1[2], hacd::HaF32 q1[2], hacd::HaF32 r1[2], 
+			    hacd::HaF32 p2[2], hacd::HaF32 q2[2], hacd::HaF32 r2[2]);
 
 
-physx::PxI32 tri_tri_intersection_test_3d(physx::PxF32 p1[3], physx::PxF32 q1[3], physx::PxF32 r1[3], 
-				 physx::PxF32 p2[3], physx::PxF32 q2[3], physx::PxF32 r2[3],
-				 physx::PxI32 * coplanar, 
-				 physx::PxF32 source[3],physx::PxF32 target[3]);
+hacd::HaI32 tri_tri_intersection_test_3d(hacd::HaF32 p1[3], hacd::HaF32 q1[3], hacd::HaF32 r1[3], 
+				 hacd::HaF32 p2[3], hacd::HaF32 q2[3], hacd::HaF32 r2[3],
+				 hacd::HaI32 * coplanar, 
+				 hacd::HaF32 source[3],hacd::HaF32 target[3]);
 
 /* coplanar returns whether the triangles are coplanar  
 *  source and target are the endpoints of the segment of 
@@ -139,13 +139,13 @@ physx::PxI32 tri_tri_intersection_test_3d(physx::PxF32 p1[3], physx::PxF32 q1[3]
 */
 
 
-physx::PxI32 tri_tri_overlap_test_3d(physx::PxF32 p1[3], physx::PxF32 q1[3], physx::PxF32 r1[3], 
+hacd::HaI32 tri_tri_overlap_test_3d(hacd::HaF32 p1[3], hacd::HaF32 q1[3], hacd::HaF32 r1[3], 
 
-			    physx::PxF32 p2[3], physx::PxF32 q2[3], physx::PxF32 r2[3])
+			    hacd::HaF32 p2[3], hacd::HaF32 q2[3], hacd::HaF32 r2[3])
 {
-  physx::PxF32 dp1, dq1, dr1, dp2, dq2, dr2;
-  physx::PxF32 v1[3], v2[3];
-  physx::PxF32 N1[3], N2[3]; 
+  hacd::HaF32 dp1, dq1, dr1, dp2, dq2, dr2;
+  hacd::HaF32 v1[3], v2[3];
+  hacd::HaF32 N1[3], N2[3]; 
   
   /* Compute distance signs  of p1, q1 and r1 to the plane of
      triangle(p2,q2,r2) */
@@ -211,14 +211,14 @@ physx::PxI32 tri_tri_overlap_test_3d(physx::PxF32 p1[3], physx::PxF32 q1[3], phy
 
 
 
-physx::PxI32 coplanar_tri_tri3d(physx::PxF32 p1[3], physx::PxF32 q1[3], physx::PxF32 r1[3],
-		       physx::PxF32 p2[3], physx::PxF32 q2[3], physx::PxF32 r2[3],
-		       physx::PxF32 normal_1[3], physx::PxF32 normal_2[3]){
+hacd::HaI32 coplanar_tri_tri3d(hacd::HaF32 p1[3], hacd::HaF32 q1[3], hacd::HaF32 r1[3],
+		       hacd::HaF32 p2[3], hacd::HaF32 q2[3], hacd::HaF32 r2[3],
+		       hacd::HaF32 normal_1[3], hacd::HaF32 normal_2[3]){
   
-  physx::PxF32 P1[2],Q1[2],R1[2];
-  physx::PxF32 P2[2],Q2[2],R2[2];
+  hacd::HaF32 P1[2],Q1[2],R1[2];
+  hacd::HaF32 P2[2],Q2[2],R2[2];
 
-  physx::PxF32 n_x, n_y, n_z;
+  hacd::HaF32 n_x, n_y, n_z;
 
   n_x = ((normal_1[0]<0)?-normal_1[0]:normal_1[0]);
   n_y = ((normal_1[1]<0)?-normal_1[1]:normal_1[1]);
@@ -391,16 +391,16 @@ physx::PxI32 coplanar_tri_tri3d(physx::PxF32 p1[3], physx::PxF32 q1[3], physx::P
    source and target are the endpoints of the line segment of intersection 
 */
 
-physx::PxI32 tri_tri_intersection_test_3d(physx::PxF32 p1[3], physx::PxF32 q1[3], physx::PxF32 r1[3], 
-				 physx::PxF32 p2[3], physx::PxF32 q2[3], physx::PxF32 r2[3],
-				 physx::PxI32 * coplanar, 
-				 physx::PxF32 source[3], physx::PxF32 target[3] )
+hacd::HaI32 tri_tri_intersection_test_3d(hacd::HaF32 p1[3], hacd::HaF32 q1[3], hacd::HaF32 r1[3], 
+				 hacd::HaF32 p2[3], hacd::HaF32 q2[3], hacd::HaF32 r2[3],
+				 hacd::HaI32 * coplanar, 
+				 hacd::HaF32 source[3], hacd::HaF32 target[3] )
 				 
 {
-  physx::PxF32 dp1, dq1, dr1, dp2, dq2, dr2;
-  physx::PxF32 v1[3], v2[3], v[3];
-  physx::PxF32 N1[3], N2[3], N[3];
-  physx::PxF32 alpha;
+  hacd::HaF32 dp1, dq1, dr1, dp2, dq2, dr2;
+  hacd::HaF32 v1[3], v2[3], v[3];
+  hacd::HaF32 N1[3], N2[3], N[3];
+  hacd::HaF32 alpha;
 
   // Compute distance signs  of p1, q1 and r1 
   // to the plane of triangle(p2,q2,r2)
@@ -537,8 +537,8 @@ physx::PxI32 tri_tri_intersection_test_3d(physx::PxF32 p1[3], physx::PxF32 q1[3]
 
 
 
-physx::PxI32 ccw_tri_tri_intersection_2d(physx::PxF32 p1[2], physx::PxF32 q1[2], physx::PxF32 r1[2], 
-				physx::PxF32 p2[2], physx::PxF32 q2[2], physx::PxF32 r2[2]) {
+hacd::HaI32 ccw_tri_tri_intersection_2d(hacd::HaF32 p1[2], hacd::HaF32 q1[2], hacd::HaF32 r1[2], 
+				hacd::HaF32 p2[2], hacd::HaF32 q2[2], hacd::HaF32 r2[2]) {
   if ( ORIENT_2D(p2,q2,p1) >= 0.0f ) {
     if ( ORIENT_2D(q2,r2,p1) >= 0.0f ) {
       if ( ORIENT_2D(r2,p2,p1) >= 0.0f ) return 1;
@@ -556,8 +556,8 @@ physx::PxI32 ccw_tri_tri_intersection_2d(physx::PxF32 p1[2], physx::PxF32 q1[2],
 };
 
 
-physx::PxI32 tri_tri_overlap_test_2d(physx::PxF32 p1[2], physx::PxF32 q1[2], physx::PxF32 r1[2], 
-			    physx::PxF32 p2[2], physx::PxF32 q2[2], physx::PxF32 r2[2]) {
+hacd::HaI32 tri_tri_overlap_test_2d(hacd::HaF32 p1[2], hacd::HaF32 q1[2], hacd::HaF32 r1[2], 
+			    hacd::HaF32 p2[2], hacd::HaF32 q2[2], hacd::HaF32 r2[2]) {
   if ( ORIENT_2D(p1,q1,r1) < 0.0f )
     if ( ORIENT_2D(p2,q2,r2) < 0.0f )
       return ccw_tri_tri_intersection_2d(p1,r1,q1,p2,r2,q2);

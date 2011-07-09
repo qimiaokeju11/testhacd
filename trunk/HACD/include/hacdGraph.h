@@ -30,26 +30,26 @@ namespace HACD
     class Graph  
     {
     public:
-		physx::PxU32									GetNEdges() const { return m_nE;}
-		physx::PxU32									GetNVertices() const { return m_nV;}
-        bool                                    EdgeCollapse(physx::PxI32 v1, physx::PxI32 v2);
-        physx::PxI32                                    AddVertex();
-        physx::PxI32                                    AddEdge(physx::PxI32 v1, physx::PxI32 v2);
-        bool                                    DeleteEdge(physx::PxI32 name);	
-        bool                                    DeleteVertex(physx::PxI32 name);
-        physx::PxI32                                    GetEdgeID(physx::PxI32 v1, physx::PxI32 v2) const;
-        physx::PxI32                                    ExtractCCs();
+		hacd::HaU32									GetNEdges() const { return m_nE;}
+		hacd::HaU32									GetNVertices() const { return m_nV;}
+        bool                                    EdgeCollapse(hacd::HaI32 v1, hacd::HaI32 v2);
+        hacd::HaI32                                    AddVertex();
+        hacd::HaI32                                    AddEdge(hacd::HaI32 v1, hacd::HaI32 v2);
+        bool                                    DeleteEdge(hacd::HaI32 name);	
+        bool                                    DeleteVertex(hacd::HaI32 name);
+        hacd::HaI32                                    GetEdgeID(hacd::HaI32 v1, hacd::HaI32 v2) const;
+        hacd::HaI32                                    ExtractCCs();
         void                                    ConnectCCs();
 		void									Clear();
         
                                                 Graph();
         virtual                                 ~Graph();      
-		void									Allocate(physx::PxU32 nV, physx::PxU32 nE);
+		void									Allocate(hacd::HaU32 nV, hacd::HaU32 nE);
 
     private:
-        physx::PxU32                                  m_nV;
-        physx::PxU32                                  m_nE;
-        physx::PxU32                                  m_nCCs;
+        hacd::HaU32                                  m_nV;
+        hacd::HaU32                                  m_nE;
+        hacd::HaU32                                  m_nCCs;
         GraphEdgeVector                  m_edges;
         GraphVertexVector                m_vertices;
 

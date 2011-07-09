@@ -1,9 +1,9 @@
 #ifndef PX_FOUNDATION_PSARRAY_H
 #define PX_FOUNDATION_PSARRAY_H
 
-#include "PxSimpleTypes.h"
+#include "PlatformConfig.h"
 
-namespace physx
+namespace hacd
 {
 
 	/*!
@@ -42,7 +42,7 @@ namespace physx
 		/*!
 		Initialize array with given capacity
 		*/
-		PX_INLINE explicit vector(PxU32 size, const T& a = T())
+		PX_INLINE explicit vector(HaU32 size, const T& a = T())
 		: mData(0), mSize(0), mCapacity(0) 
 		{
 			resize(size, a);
@@ -63,7 +63,7 @@ namespace physx
 		Initialize array with given length
 		*/
 		PX_INLINE explicit vector(const T* first, const T* last)
-			: mSize(last<first?0:(PxU32)(last-first)), mCapacity(mSize)
+			: mSize(last<first?0:(HaU32)(last-first)), mCapacity(mSize)
 		{
 			mData = allocate(mSize);
 			copy(mData, mData + mSize, first);
@@ -103,7 +103,7 @@ namespace physx
 		\return
 		The element i in the array.
 		*/
-		PX_FORCE_INLINE const T& operator[] (PxU32 i) const 
+		PX_FORCE_INLINE const T& operator[] (HaU32 i) const 
 		{
 			PX_ASSERT(i < mSize);
 			return mData[i];
@@ -116,7 +116,7 @@ namespace physx
 		\return
 		The element i in the array.
 		*/
-		PX_FORCE_INLINE T& operator[] (PxU32 i) 
+		PX_FORCE_INLINE T& operator[] (HaU32 i) 
 		{
 			PX_ASSERT(i < mSize);
 			return mData[i];
@@ -194,7 +194,7 @@ namespace physx
 		\return
 		The number of of entries in the array.
 		*/
-		PX_FORCE_INLINE PxU32 size() const 
+		PX_FORCE_INLINE HaU32 size() const 
 		{
 			return mSize;
 		}
@@ -227,7 +227,7 @@ namespace physx
 
 		PX_INLINE iterator find(const T& a)
 		{
-			PxU32 index;
+			HaU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
 				;
 			return mData+index;
@@ -235,7 +235,7 @@ namespace physx
 
 		PX_INLINE const_iterator find(const T& a) const
 		{
-			PxU32 index;
+			HaU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
 				;
 			return mData+index;
@@ -297,7 +297,7 @@ namespace physx
 		The element that was removed.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE void replaceWithLast(PxU32 i)
+		PX_INLINE void replaceWithLast(HaU32 i)
 		{
 			PX_ASSERT(i<mSize);
 			mData[i] = mData[--mSize];
@@ -306,7 +306,7 @@ namespace physx
 
 		PX_INLINE void replaceWithLast(iterator i) 
 		{
-			replaceWithLast(static_cast<PxU32>(i-mData));
+			replaceWithLast(static_cast<HaU32>(i-mData));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -321,7 +321,7 @@ namespace physx
 
 		PX_INLINE bool findAndReplaceWithLast(const T& a)
 		{
-			PxU32 index = 0;
+			HaU32 index = 0;
 			while(index<mSize && mData[index]!=a)
 				++index;
 			if(index == mSize)
@@ -339,7 +339,7 @@ namespace physx
 		The position of the element that will be subtracted from this array.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE void remove(PxU32 i)
+		PX_INLINE void remove(HaU32 i)
 		{
 			PX_ASSERT(i<mSize);
 			for(T* it=mData+i; it->~T(), ++i<mSize; ++it)
@@ -358,18 +358,18 @@ namespace physx
 		The ending position of the elment that will be subtracted from this array.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE void removeRange(PxU32 begin,PxU32 count)
+		PX_INLINE void removeRange(HaU32 begin,HaU32 count)
 		{
 			PX_ASSERT(begin<mSize);
 			PX_ASSERT( (begin+count) <= mSize );
-			for (PxU32 i=0; i<count; i++)
+			for (HaU32 i=0; i<count; i++)
 			{
 				mData[begin+i].~T(); // call the destructor on the ones being removed first.
 			}
 			T *dest = &mData[begin]; // location we are copying the tail end objects to
 			T *src  = &mData[begin+count]; // start of tail objects
-			PxU32 move_count = mSize - (begin+count); // compute remainder that needs to be copied down
-			for (PxU32 i=0; i<move_count; i++)
+			HaU32 move_count = mSize - (begin+count); // compute remainder that needs to be copied down
+			for (HaU32 i=0; i<move_count; i++)
 			{
 				new ( dest ) T(*src); // copy the old one to the new location
 			    src->~T(); // call the destructor on the old location
@@ -385,7 +385,7 @@ namespace physx
 		Resize array
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		PX_NOINLINE void resize(const PxU32 size, const T& a = T());
+		PX_NOINLINE void resize(const HaU32 size, const T& a = T());
 
 		//////////////////////////////////////////////////////////////////////////
 		/*!
@@ -416,7 +416,7 @@ namespace physx
 		Ensure that the array has at least size capacity.
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		PX_INLINE void reserve(const PxU32 capacity)
+		PX_INLINE void reserve(const HaU32 capacity)
 		{
 			if(capacity > this->capacity())
 				grow(capacity);
@@ -427,7 +427,7 @@ namespace physx
 		Query the capacity(allocated mem) for the array.
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		PX_FORCE_INLINE PxU32 capacity()	const
+		PX_FORCE_INLINE HaU32 capacity()	const
 		{
 			return mCapacity & ~PX_SIGN_BITMASK;
 		}
@@ -455,7 +455,7 @@ namespace physx
 
 		}
 
-		PX_INLINE T* allocate(PxU32 size)
+		PX_INLINE T* allocate(HaU32 size)
 		{
 			return size ? (T*)PX_ALLOC(sizeof(T) * size) : 0;
 		}
@@ -489,7 +489,7 @@ namespace physx
 		\param capacity
 		The number of entries that the set should be able to hold.
 		*/	
-		PX_INLINE void grow(PxU32 capacity) 
+		PX_INLINE void grow(HaU32 capacity) 
 		{
 			PX_ASSERT(this->capacity() < capacity);
 			recreate(capacity);
@@ -501,20 +501,20 @@ namespace physx
 		\param capacity
 		The number of entries that the set should be able to hold.
 		*/
-		PX_NOINLINE void recreate(PxU32 capacity);
+		PX_NOINLINE void recreate(HaU32 capacity);
 
 		// The idea here is to prevent accidental brain-damage with push_back or insert. Unfortunately
 		// it interacts badly with InlineArrays with smaller inline allocations.
 		// TODO(dsequeira): policy template arg, this is exactly what they're for.
-		PX_INLINE PxU32 capacityIncrement()	const
+		PX_INLINE HaU32 capacityIncrement()	const
 		{
-			const PxU32 capacity = this->capacity();
+			const HaU32 capacity = this->capacity();
 			return capacity == 0 ? 1 : capacity * 2;
 		}
 
 		// We need one bit to mark arrays that have been deserialized from a user-provided memory block.
 		// For alignment & memory saving purpose we store that bit in the rarely used capacity member.
-		PX_FORCE_INLINE	PxU32		isInUserMemory()		const
+		PX_FORCE_INLINE	HaU32		isInUserMemory()		const
 		{
 			return mCapacity & PX_SIGN_BITMASK;
 		}
@@ -522,15 +522,15 @@ namespace physx
 	public: // need to be public for serialization
 
 		T*					mData;
-		PxU32				mSize;
+		HaU32				mSize;
 
 	protected:
 
-		PxU32				mCapacity;
+		HaU32				mCapacity;
 	};
 
 	template<class T>
-	PX_NOINLINE void vector<T>::resize(const PxU32 size, const T& a)
+	PX_NOINLINE void vector<T>::resize(const HaU32 size, const T& a)
 	{
 		reserve(size);
 		create(mData + mSize, mData + size, a);
@@ -539,7 +539,7 @@ namespace physx
 	}
 
 	template<class T>
-	PX_NOINLINE void vector<T>::recreate(PxU32 capacity)
+	PX_NOINLINE void vector<T>::recreate(HaU32 capacity)
 	{
 		T* newData = allocate(capacity);
 		PX_ASSERT(!capacity || newData && newData != mData);
@@ -553,6 +553,6 @@ namespace physx
 		mCapacity = capacity;
 	}
 
-} // namespace physx
+} // namespace hacd
 
 #endif

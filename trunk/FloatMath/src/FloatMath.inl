@@ -37,14 +37,14 @@
 // operations without any vector, matrix, or quaternion
 // classes or templates.
 //
-// a vector (or point) is a 'PxF32 *' to 3 floating point numbers.
-// a matrix is a 'PxF32 *' to an array of 16 floating point numbers representing a 4x4 transformation matrix compatible with D3D or OGL
-// a quaternion is a 'PxF32 *' to 4 floats representing a quaternion x,y,z,w
+// a vector (or point) is a 'HaF32 *' to 3 floating point numbers.
+// a matrix is a 'HaF32 *' to an array of 16 floating point numbers representing a 4x4 transformation matrix compatible with D3D or OGL
+// a quaternion is a 'HaF32 *' to 4 floats representing a quaternion x,y,z,w
 //
 
 #pragma warning(disable:4996)
 
-namespace physx
+namespace hacd
 {
 
 void fm_inverseRT(const REAL matrix[16],const REAL pos[3],REAL t[3]) // inverse rotate translate the point.
@@ -124,10 +124,10 @@ void fm_decomposeTransform(const REAL local_transform[16],REAL trans[3],REAL rot
 
 }
 
-void fm_getSubMatrix(PxI32 ki,PxI32 kj,REAL pDst[16],const REAL matrix[16])
+void fm_getSubMatrix(HaI32 ki,HaI32 kj,REAL pDst[16],const REAL matrix[16])
 {
-	PxI32 row, col;
-	PxI32 dstCol = 0, dstRow = 0;
+	HaI32 row, col;
+	HaI32 dstCol = 0, dstRow = 0;
 
 	for ( col = 0; col < 4; col++ )
 	{
@@ -152,11 +152,11 @@ void  fm_inverseTransform(const REAL matrix[16],REAL inverse_matrix[16])
 {
 	REAL determinant = fm_getDeterminant(matrix);
 	determinant = 1.0f / determinant;
-	for (PxI32 i = 0; i < 4; i++ )
+	for (HaI32 i = 0; i < 4; i++ )
 	{
-		for (PxI32 j = 0; j < 4; j++ )
+		for (HaI32 j = 0; j < 4; j++ )
 		{
-			PxI32 sign = 1 - ( ( i + j ) % 2 ) * 2;
+			HaI32 sign = 1 - ( ( i + j ) % 2 ) * 2;
 			REAL subMat[16];
 			fm_identity(subMat);
 			fm_getSubMatrix( i, j, subMat, matrix );
@@ -238,10 +238,10 @@ void fm_eulerToMatrix(REAL ax,REAL ay,REAL az,REAL *matrix) // convert euler (in
   fm_quatToMatrix(quat,matrix);
 }
 
-void fm_getAABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *bmin,REAL *bmax)
+void fm_getAABB(HaU32 vcount,const REAL *points,HaU32 pstride,REAL *bmin,REAL *bmax)
 {
 
-  const PxU8 *source = (const PxU8 *) points;
+  const HaU8 *source = (const HaU8 *) points;
 
 	bmin[0] = points[0];
 	bmin[1] = points[1];
@@ -252,7 +252,7 @@ void fm_getAABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *bmin,REAL *b
 	bmax[2] = points[2];
 
 
-  for (PxU32 i=1; i<vcount; i++)
+  for (HaU32 i=1; i<vcount; i++)
   {
   	source+=pstride;
   	const REAL *p = (const REAL *) source;
@@ -362,7 +362,7 @@ void fm_matrixToQuat(const REAL *matrix,REAL *quat) // convert the 3x3 portion o
 
 	if (tr > 0.0f )
 	{
-		REAL s = (REAL) ::sqrt ( (PxF64) (tr + 1.0f) );
+		REAL s = (REAL) ::sqrt ( (HaF64) (tr + 1.0f) );
 		quat[3] = s * 0.5f;
 		s = 0.5f / s;
 		quat[0] = (matrix[1*4+2] - matrix[2*4+1]) * s;
@@ -373,16 +373,16 @@ void fm_matrixToQuat(const REAL *matrix,REAL *quat) // convert the 3x3 portion o
 	else
 	{
 		// diagonal is negative
-		PxI32 nxt[3] = {1, 2, 0};
+		HaI32 nxt[3] = {1, 2, 0};
 		REAL  qa[4];
 
-		PxI32 i = 0;
+		HaI32 i = 0;
 
 		if (matrix[1*4+1] > matrix[0*4+0]) i = 1;
 		if (matrix[2*4+2] > matrix[i*4+i]) i = 2;
 
-		PxI32 j = nxt[i];
-		PxI32 k = nxt[j];
+		HaI32 j = nxt[i];
+		HaI32 k = nxt[j];
 
 		REAL s = ::sqrt ( ((matrix[i*4+i] - (matrix[j*4+j] + matrix[k*4+k])) + 1.0f) );
 
@@ -651,9 +651,9 @@ void  fm_matrixMultiply(const REAL *pA,const REAL *pB,REAL *pM)
 
 #else
 	memset(pM, 0, sizeof(REAL)*16);
-	for(PxI32 i=0; i<4; i++ )
-		for(PxI32 j=0; j<4; j++ )
-			for(PxI32 k=0; k<4; k++ )
+	for(HaI32 i=0; i<4; i++ )
+		for(HaI32 j=0; j<4; j++ )
+			for(HaI32 k=0; k<4; k++ )
 				pM[4*i+j] +=  pA[4*i+k] * pB[4*k+j];
 #endif
 }
@@ -857,7 +857,7 @@ bool  fm_insideTriangleXZ(const REAL *p,const REAL *p1,const REAL *p2,const REAL
 {
   bool ret = false;
 
-  PxI32 c = 0;
+  HaI32 c = 0;
   if ( fm_pointTestXZ(p,p1,p2) ) c = !c;
   if ( fm_pointTestXZ(p,p2,p3) ) c = !c;
   if ( fm_pointTestXZ(p,p3,p1) ) c = !c;
@@ -879,9 +879,9 @@ bool  fm_insideAABB(const REAL *pos,const REAL *bmin,const REAL *bmax)
 }
 
 
-PxU32 fm_clipTestPoint(const REAL *bmin,const REAL *bmax,const REAL *pos)
+HaU32 fm_clipTestPoint(const REAL *bmin,const REAL *bmax,const REAL *pos)
 {
-  PxU32 ret = 0;
+  HaU32 ret = 0;
 
   if ( pos[0] < bmin[0] )
     ret|=FMCS_XMIN;
@@ -901,9 +901,9 @@ PxU32 fm_clipTestPoint(const REAL *bmin,const REAL *bmax,const REAL *pos)
   return ret;
 }
 
-PxU32 fm_clipTestPointXZ(const REAL *bmin,const REAL *bmax,const REAL *pos) // only tests X and Z, not Y
+HaU32 fm_clipTestPointXZ(const REAL *bmin,const REAL *bmax,const REAL *pos) // only tests X and Z, not Y
 {
-  PxU32 ret = 0;
+  HaU32 ret = 0;
 
   if ( pos[0] < bmin[0] )
     ret|=FMCS_XMIN;
@@ -918,13 +918,13 @@ PxU32 fm_clipTestPointXZ(const REAL *bmin,const REAL *bmax,const REAL *pos) // o
   return ret;
 }
 
-PxU32 fm_clipTestAABB(const REAL *bmin,const REAL *bmax,const REAL *p1,const REAL *p2,const REAL *p3,PxU32 &andCode)
+HaU32 fm_clipTestAABB(const REAL *bmin,const REAL *bmax,const REAL *p1,const REAL *p2,const REAL *p3,HaU32 &andCode)
 {
-  PxU32 orCode = 0;
+  HaU32 orCode = 0;
 
   andCode = FMCS_XMIN | FMCS_XMAX | FMCS_YMIN | FMCS_YMAX | FMCS_ZMIN | FMCS_ZMAX;
 
-  PxU32 c = fm_clipTestPoint(bmin,bmax,p1);
+  HaU32 c = fm_clipTestPoint(bmin,bmax,p1);
   orCode|=c;
   andCode&=c;
 
@@ -943,7 +943,7 @@ bool intersect(const REAL *si,const REAL *ei,const REAL *bmin,const REAL *bmax,R
 {
   REAL st,et,fst = 0,fet = 1;
 
-  for (PxI32 i = 0; i < 3; i++)
+  for (HaI32 i = 0; i < 3; i++)
   {
     if (*si < *ei)
     {
@@ -1371,14 +1371,14 @@ public:
 
   bool QLAlgorithm(void)
   {
-    const PxI32 iMaxIter = 32;
+    const HaI32 iMaxIter = 32;
 
-    for (PxI32 i0 = 0; i0 <3; i0++)
+    for (HaI32 i0 = 0; i0 <3; i0++)
     {
-      PxI32 i1;
+      HaI32 i1;
       for (i1 = 0; i1 < iMaxIter; i1++)
       {
-        PxI32 i2;
+        HaI32 i2;
         for (i2 = i0; i2 <= (3-2); i2++)
         {
           Type fTmp = fabs(m_afDiag[i2]) + fabs(m_afDiag[i2+1]);
@@ -1401,7 +1401,7 @@ public:
           fG = m_afDiag[i2]-m_afDiag[i0]+m_afSubd[i0]/(fG+fR);
         }
         Type fSin = (Type)1.0, fCos = (Type)1.0, fP = (Type)0.0;
-        for (PxI32 i3 = i2-1; i3 >= i0; i3--)
+        for (HaI32 i3 = i2-1; i3 >= i0; i3--)
         {
           Type fF = fSin*m_afSubd[i3];
           Type fB = fCos*m_afSubd[i3];
@@ -1426,7 +1426,7 @@ public:
           fP = fSin*fR;
           m_afDiag[i3+1] = fG+fP;
           fG = fCos*fR-fB;
-          for (PxI32 i4 = 0; i4 < 3; i4++)
+          for (HaI32 i4 = 0; i4 < 3; i4++)
           {
             fF = mElement[i4][i3+1];
             mElement[i4][i3+1] = fSin*mElement[i4][i3]+fCos*fF;
@@ -1448,12 +1448,12 @@ public:
   void DecreasingSort(void)
   {
     //sort eigenvalues in decreasing order, e[0] >= ... >= e[iSize-1]
-    for (PxI32 i0 = 0, i1; i0 <= 3-2; i0++)
+    for (HaI32 i0 = 0, i1; i0 <= 3-2; i0++)
     {
       // locate maximum eigenvalue
       i1 = i0;
       Type fMax = m_afDiag[i1];
-      PxI32 i2;
+      HaI32 i2;
       for (i2 = i0+1; i2 < 3; i2++)
       {
         if (m_afDiag[i2] > fMax)
@@ -1486,7 +1486,7 @@ public:
     if (!m_bIsRotation)
     {
       // change sign on the first column
-      for (PxI32 iRow = 0; iRow <3; iRow++)
+      for (HaI32 iRow = 0; iRow <3; iRow++)
       {
         mElement[iRow][0] = -mElement[iRow][0];
       }
@@ -1501,11 +1501,11 @@ public:
 
 #endif
 
-bool fm_computeBestFitPlane(PxU32 vcount,
+bool fm_computeBestFitPlane(HaU32 vcount,
                      const REAL *points,
-                     PxU32 vstride,
+                     HaU32 vstride,
                      const REAL *weights,
-                     PxU32 wstride,
+                     HaU32 wstride,
                      REAL *plane)
 {
   bool ret = false;
@@ -1518,7 +1518,7 @@ bool fm_computeBestFitPlane(PxU32 vcount,
     const char *source  = (const char *) points;
     const char *wsource = (const char *) weights;
 
-    for (PxU32 i=0; i<vcount; i++)
+    for (HaU32 i=0; i<vcount; i++)
     {
 
       const REAL *p = (const REAL *) source;
@@ -1562,7 +1562,7 @@ bool fm_computeBestFitPlane(PxU32 vcount,
     const char *source  = (const char *) points;
     const char *wsource = (const char *) weights;
 
-    for (PxU32 i=0; i<vcount; i++)
+    for (HaU32 i=0; i<vcount; i++)
     {
 
       const REAL *p = (const REAL *) source;
@@ -1890,18 +1890,18 @@ public:
   }
 
 
-  PxI32 NumVertices(void) const { return mVcount; };
+  HaI32 NumVertices(void) const { return mVcount; };
 
-  const point<Type>& Vertex(PxI32 index)
+  const point<Type>& Vertex(HaI32 index)
   {
     if ( index < 0 ) index+=mVcount;
     return mVertices[index];
   };
 
 
-  void set(const point<Type> *pts,PxI32 count)
+  void set(const point<Type> *pts,HaI32 count)
   {
-    for (PxI32 i=0; i<count; i++)
+    for (HaI32 i=0; i<count; i++)
     {
       mVertices[i] = pts[i];
     }
@@ -1911,13 +1911,13 @@ public:
 
   void Split_Polygon(polygon<Type> *poly,plane<Type> *part, polygon<Type> &front, polygon<Type> &back)
   {
-    PxI32   count = poly->NumVertices ();
-    PxI32   out_c = 0, in_c = 0;
+    HaI32   count = poly->NumVertices ();
+    HaI32   out_c = 0, in_c = 0;
     point<Type> ptA, ptB,outpts[MAXPTS],inpts[MAXPTS];
     Type sideA, sideB;
     ptA = poly->Vertex (count - 1);
     sideA = part->Classify_Point (ptA);
-    for (PxI32 i = -1; ++i < count;)
+    for (HaI32 i = -1; ++i < count;)
     {
       ptB = poly->Vertex(i);
       sideB = part->Classify_Point(ptB);
@@ -1951,7 +1951,7 @@ public:
     back.set(&inpts[0], in_c);
   }
 
-  PxI32           mVcount;
+  HaI32           mVcount;
   point<Type>   mVertices[MAXPTS];
 };
 
@@ -1959,7 +1959,7 @@ public:
 
 #endif
 
-static inline void add(const REAL *p,REAL *dest,PxU32 tstride,PxU32 &pcount)
+static inline void add(const REAL *p,REAL *dest,HaU32 tstride,HaU32 &pcount)
 {
   char *d = (char *) dest;
   d = d + pcount*tstride;
@@ -1974,12 +1974,12 @@ static inline void add(const REAL *p,REAL *dest,PxU32 tstride,PxU32 &pcount)
 
 PlaneTriResult fm_planeTriIntersection(const REAL *_plane,    // the plane equation in Ax+By+Cz+D format
                                     const REAL *triangle, // the source triangle.
-                                    PxU32 tstride,  // stride in bytes of the input and output *vertices*
+                                    HaU32 tstride,  // stride in bytes of the input and output *vertices*
                                     REAL        epsilon,  // the co-planar epsilon value.
                                     REAL       *front,    // the triangle in front of the
-                                    PxU32 &fcount,  // number of vertices in the 'front' triangle
+                                    HaU32 &fcount,  // number of vertices in the 'front' triangle
                                     REAL       *back,     // the triangle in back of the plane
-                                    PxU32 &bcount) // the number of vertices in the 'back' triangle.
+                                    HaU32 &bcount) // the number of vertices in the 'back' triangle.
 {
 
   fcount = 0;
@@ -2048,12 +2048,12 @@ PlaneTriResult fm_planeTriIntersection(const REAL *_plane,    // the plane equat
 
   pi.Split_Polygon(&pi,&part,pfront,pback);
 
-  for (PxI32 i=0; i<pfront.mVcount; i++)
+  for (HaI32 i=0; i<pfront.mVcount; i++)
   {
     add( &pfront.mVertices[i].x, front, tstride, fcount );
   }
 
-  for (PxI32 i=0; i<pback.mVcount; i++)
+  for (HaI32 i=0; i<pback.mVcount; i++)
   {
     add( &pback.mVertices[i].x, back, tstride, bcount );
   }
@@ -2074,14 +2074,14 @@ PlaneTriResult fm_planeTriIntersection(const REAL *_plane,    // the plane equat
 }
 
 // computes the OBB for this set of points relative to this transform matrix.
-void computeOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *matrix)
+void computeOBB(HaU32 vcount,const REAL *points,HaU32 pstride,REAL *sides,REAL *matrix)
 {
   const char *src = (const char *) points;
 
   REAL bmin[3] = { 1e9, 1e9, 1e9 };
   REAL bmax[3] = { -1e9, -1e9, -1e9 };
 
-  for (PxU32 i=0; i<vcount; i++)
+  for (HaU32 i=0; i<vcount; i++)
   {
     const REAL *p = (const REAL *) src;
     REAL t[3];
@@ -2119,7 +2119,7 @@ void computeOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *
 
 }
 
-void fm_computeBestFitOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *matrix,bool bruteForce)
+void fm_computeBestFitOBB(HaU32 vcount,const REAL *points,HaU32 pstride,REAL *sides,REAL *matrix,bool bruteForce)
 {
   REAL plane[4];
   fm_computeBestFitPlane(vcount,points,pstride,0,0,plane);
@@ -2155,7 +2155,7 @@ void fm_computeBestFitOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *si
   }
 }
 
-void fm_computeBestFitOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *pos,REAL *quat,bool bruteForce)
+void fm_computeBestFitOBB(HaU32 vcount,const REAL *points,HaU32 pstride,REAL *sides,REAL *pos,REAL *quat,bool bruteForce)
 {
   REAL matrix[16];
   fm_computeBestFitOBB(vcount,points,pstride,sides,matrix,bruteForce);
@@ -2163,7 +2163,7 @@ void fm_computeBestFitOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *si
   fm_matrixToQuat(matrix,quat);
 }
 
-void fm_computeBestFitABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *pos)
+void fm_computeBestFitABB(HaU32 vcount,const REAL *points,HaU32 pstride,REAL *sides,REAL *pos)
 {
 	REAL bmin[3];
 	REAL bmax[3];
@@ -2177,7 +2177,7 @@ void fm_computeBestFitABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *si
   bmax[2] = points[2];
 
 	const char *cp = (const char *) points;
-	for (PxU32 i=0; i<vcount; i++)
+	for (HaU32 i=0; i<vcount; i++)
 	{
 		const REAL *p = (const REAL *) cp;
 
@@ -2267,14 +2267,14 @@ public:
     mDistance = 0;
   }
   KdTreeNode  *mNode;
-  PxF64        mDistance;
+  HaF64        mDistance;
 };
 
 class KdTreeInterface
 {
 public:
-  virtual const PxF64 * getPositionDouble(PxU32 index) const = 0;
-  virtual const PxF32  * getPositionFloat(PxU32 index) const = 0;
+  virtual const HaF64 * getPositionDouble(HaU32 index) const = 0;
+  virtual const HaF32  * getPositionFloat(HaU32 index) const = 0;
 };
 
 class KdTreeNode
@@ -2287,7 +2287,7 @@ public:
     mRight = 0;
   }
 
-  KdTreeNode(PxU32 index)
+  KdTreeNode(HaU32 index)
   {
     mIndex = index;
     mLeft = 0;
@@ -2301,8 +2301,8 @@ public:
 
   void addDouble(KdTreeNode *node,Axes dim,const KdTreeInterface *iface)
   {
-    const PxF64 *nodePosition = iface->getPositionDouble( node->mIndex );
-    const PxF64 *position     = iface->getPositionDouble( mIndex );
+    const HaF64 *nodePosition = iface->getPositionDouble( node->mIndex );
+    const HaF64 *position     = iface->getPositionDouble( mIndex );
     switch ( dim )
     {
       case X_AXIS:
@@ -2360,8 +2360,8 @@ public:
 
   void addFloat(KdTreeNode *node,Axes dim,const KdTreeInterface *iface)
   {
-    const PxF32 *nodePosition = iface->getPositionFloat( node->mIndex );
-    const PxF32 *position     = iface->getPositionFloat( mIndex );
+    const HaF32 *nodePosition = iface->getPositionFloat( node->mIndex );
+    const HaF32 *position     = iface->getPositionFloat( mIndex );
     switch ( dim )
     {
       case X_AXIS:
@@ -2417,16 +2417,16 @@ public:
   }
 
 
-  PxU32 getIndex(void) const { return mIndex; };
+  HaU32 getIndex(void) const { return mIndex; };
 
-  void search(Axes axis,const PxF64 *pos,PxF64 radius,PxU32 &count,PxU32 maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
+  void search(Axes axis,const HaF64 *pos,HaF64 radius,HaU32 &count,HaU32 maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
   {
 
-    const PxF64 *position = iface->getPositionDouble(mIndex);
+    const HaF64 *position = iface->getPositionDouble(mIndex);
 
-    PxF64 dx = pos[0] - position[0];
-    PxF64 dy = pos[1] - position[1];
-    PxF64 dz = pos[2] - position[2];
+    HaF64 dx = pos[0] - position[0];
+    HaF64 dy = pos[1] - position[1];
+    HaF64 dz = pos[2] - position[2];
 
     KdTreeNode *search1 = 0;
     KdTreeNode *search2 = 0;
@@ -2480,8 +2480,8 @@ public:
         break;
     }
 
-    PxF64 r2 = radius*radius;
-    PxF64 m  = dx*dx+dy*dy+dz*dz;
+    HaF64 r2 = radius*radius;
+    HaF64 m  = dx*dx+dy*dy+dz*dz;
 
     if ( m < r2 )
     {
@@ -2516,14 +2516,14 @@ public:
           {
             bool inserted = false;
 
-            for (PxU32 i=0; i<count; i++)
+            for (HaU32 i=0; i<count; i++)
             {
               if ( m < found[i].mDistance ) // if this one is closer than a pre-existing one...
               {
                 // insertion sort...
-                PxU32 scan = count;
+                HaU32 scan = count;
                 if ( scan >= maxObjects ) scan=maxObjects-1;
-                for (PxU32 j=scan; j>i; j--)
+                for (HaU32 j=scan; j>i; j--)
                 {
                   found[j] = found[j-1];
                 }
@@ -2558,14 +2558,14 @@ public:
 
   }
 
-  void search(Axes axis,const PxF32 *pos,PxF32 radius,PxU32 &count,PxU32 maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
+  void search(Axes axis,const HaF32 *pos,HaF32 radius,HaU32 &count,HaU32 maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
   {
 
-    const PxF32 *position = iface->getPositionFloat(mIndex);
+    const HaF32 *position = iface->getPositionFloat(mIndex);
 
-    PxF32 dx = pos[0] - position[0];
-    PxF32 dy = pos[1] - position[1];
-    PxF32 dz = pos[2] - position[2];
+    HaF32 dx = pos[0] - position[0];
+    HaF32 dy = pos[1] - position[1];
+    HaF32 dz = pos[2] - position[2];
 
     KdTreeNode *search1 = 0;
     KdTreeNode *search2 = 0;
@@ -2619,8 +2619,8 @@ public:
         break;
     }
 
-    PxF32 r2 = radius*radius;
-    PxF32 m  = dx*dx+dy*dy+dz*dz;
+    HaF32 r2 = radius*radius;
+    HaF32 m  = dx*dx+dy*dy+dz*dz;
 
     if ( m < r2 )
     {
@@ -2655,14 +2655,14 @@ public:
           {
             bool inserted = false;
 
-            for (PxU32 i=0; i<count; i++)
+            for (HaU32 i=0; i<count; i++)
             {
               if ( m < found[i].mDistance ) // if this one is closer than a pre-existing one...
               {
                 // insertion sort...
-                PxU32 scan = count;
+                HaU32 scan = count;
                 if ( scan >= maxObjects ) scan=maxObjects-1;
-                for (PxU32 j=scan; j>i; j--)
+                for (HaU32 j=scan; j>i; j--)
                 {
                   found[j] = found[j-1];
                 }
@@ -2705,7 +2705,7 @@ private:
 	KdTreeNode *getLeft(void)         { return mLeft; }
 	KdTreeNode *getRight(void)        { return mRight; }
 
-  PxU32          mIndex;
+  HaU32          mIndex;
   KdTreeNode     *mLeft;
   KdTreeNode     *mRight;
 };
@@ -2737,13 +2737,13 @@ public:
   }
 
   KdTreeNodeBundle  *mNext;
-  PxU32             mIndex;
+  HaU32             mIndex;
   KdTreeNode         mNodes[MAX_BUNDLE_SIZE];
 };
 
 
-typedef STDNAME::vector< PxF64 > DoubleVector;
-typedef STDNAME::vector< PxF32 >  FloatVector;
+typedef STDNAME::vector< HaF64 > DoubleVector;
+typedef STDNAME::vector< HaF32 >  FloatVector;
 
 class KdTree : public KdTreeInterface, public UserAllocated
 {
@@ -2761,34 +2761,34 @@ public:
     reset();
   }
 
-  const PxF64 * getPositionDouble(PxU32 index) const
+  const HaF64 * getPositionDouble(HaU32 index) const
   {
     assert( mUseDouble );
     assert ( index < mVcount );
     return  &mVerticesDouble[index*3];
   }
 
-  const PxF32 * getPositionFloat(PxU32 index) const
+  const HaF32 * getPositionFloat(HaU32 index) const
   {
     assert( !mUseDouble );
     assert ( index < mVcount );
     return  &mVerticesFloat[index*3];
   }
 
-  PxU32 search(const PxF64 *pos,PxF64 radius,PxU32 maxObjects,KdTreeFindNode *found) const
+  HaU32 search(const HaF64 *pos,HaF64 radius,HaU32 maxObjects,KdTreeFindNode *found) const
   {
     assert( mUseDouble );
     if ( !mRoot )	return 0;
-    PxU32 count = 0;
+    HaU32 count = 0;
     mRoot->search(X_AXIS,pos,radius,count,maxObjects,found,this);
     return count;
   }
 
-  PxU32 search(const PxF32 *pos,PxF32 radius,PxU32 maxObjects,KdTreeFindNode *found) const
+  HaU32 search(const HaF32 *pos,HaF32 radius,HaU32 maxObjects,KdTreeFindNode *found) const
   {
     assert( !mUseDouble );
     if ( !mRoot )	return 0;
-    PxU32 count = 0;
+    HaU32 count = 0;
     mRoot->search(X_AXIS,pos,radius,count,maxObjects,found,this);
     return count;
   }
@@ -2809,10 +2809,10 @@ public:
     mVcount = 0;
   }
 
-  PxU32 add(PxF64 x,PxF64 y,PxF64 z)
+  HaU32 add(HaF64 x,HaF64 y,HaF64 z)
   {
     assert(mUseDouble);
-    PxU32 ret = mVcount;
+    HaU32 ret = mVcount;
     mVerticesDouble.push_back(x);
     mVerticesDouble.push_back(y);
     mVerticesDouble.push_back(z);
@@ -2829,10 +2829,10 @@ public:
     return ret;
   }
 
-  PxU32 add(PxF32 x,PxF32 y,PxF32 z)
+  HaU32 add(HaF32 x,HaF32 y,HaF32 z)
   {
     assert(!mUseDouble);
-    PxU32 ret = mVcount;
+    HaU32 ret = mVcount;
     mVerticesFloat.push_back(x);
     mVerticesFloat.push_back(y);
     mVerticesFloat.push_back(z);
@@ -2849,7 +2849,7 @@ public:
     return ret;
   }
 
-  KdTreeNode * getNewNode(PxU32 index)
+  KdTreeNode * getNewNode(HaU32 index)
   {
     if ( mBundle == 0 )
     {
@@ -2866,14 +2866,14 @@ public:
     return node;
   }
 
-  PxU32 getNearest(const PxF64 *pos,PxF64 radius,bool &_found) const // returns the nearest possible neighbor's index.
+  HaU32 getNearest(const HaF64 *pos,HaF64 radius,bool &_found) const // returns the nearest possible neighbor's index.
   {
     assert( mUseDouble );
-    PxU32 ret = 0;
+    HaU32 ret = 0;
 
     _found = false;
     KdTreeFindNode found[1];
-    PxU32 count = search(pos,radius,1,found);
+    HaU32 count = search(pos,radius,1,found);
     if ( count )
     {
       KdTreeNode *node = found[0].mNode;
@@ -2883,14 +2883,14 @@ public:
     return ret;
   }
 
-  PxU32 getNearest(const PxF32 *pos,PxF32 radius,bool &_found) const // returns the nearest possible neighbor's index.
+  HaU32 getNearest(const HaF32 *pos,HaF32 radius,bool &_found) const // returns the nearest possible neighbor's index.
   {
     assert( !mUseDouble );
-    PxU32 ret = 0;
+    HaU32 ret = 0;
 
     _found = false;
     KdTreeFindNode found[1];
-    PxU32 count = search(pos,radius,1,found);
+    HaU32 count = search(pos,radius,1,found);
     if ( count )
     {
       KdTreeNode *node = found[0].mNode;
@@ -2900,10 +2900,10 @@ public:
     return ret;
   }
 
-  const PxF64 * getVerticesDouble(void) const
+  const HaF64 * getVerticesDouble(void) const
   {
     assert( mUseDouble );
-    const PxF64 *ret = 0;
+    const HaF64 *ret = 0;
     if ( !mVerticesDouble.empty() )
     {
       ret = &mVerticesDouble[0];
@@ -2911,10 +2911,10 @@ public:
     return ret;
   }
 
-  const PxF32 * getVerticesFloat(void) const
+  const HaF32 * getVerticesFloat(void) const
   {
     assert( !mUseDouble );
-    const PxF32 * ret = 0;
+    const HaF32 * ret = 0;
     if ( !mVerticesFloat.empty() )
     {
       ret = &mVerticesFloat[0];
@@ -2922,7 +2922,7 @@ public:
     return ret;
   }
 
-  PxU32 getVcount(void) const { return mVcount; };
+  HaU32 getVcount(void) const { return mVcount; };
 
   void setUseDouble(bool useDouble)
   {
@@ -2933,7 +2933,7 @@ private:
   bool                    mUseDouble;
   KdTreeNode             *mRoot;
   KdTreeNodeBundle       *mBundle;
-  PxU32                  mVcount;
+  HaU32                  mVcount;
   DoubleVector            mVerticesDouble;
   FloatVector             mVerticesFloat;
 };
@@ -2943,19 +2943,19 @@ private:
 class MyVertexIndex : public fm_VertexIndex, public UserAllocated
 {
 public:
-  MyVertexIndex(PxF64 granularity,bool snapToGrid)
+  MyVertexIndex(HaF64 granularity,bool snapToGrid)
   {
     mDoubleGranularity = granularity;
-    mFloatGranularity  = (PxF32)granularity;
+    mFloatGranularity  = (HaF32)granularity;
     mSnapToGrid        = snapToGrid;
     mUseDouble         = true;
     mKdTree.setUseDouble(true);
   }
 
-  MyVertexIndex(PxF32 granularity,bool snapToGrid)
+  MyVertexIndex(HaF32 granularity,bool snapToGrid)
   {
     mDoubleGranularity = granularity;
-    mFloatGranularity  = (PxF32)granularity;
+    mFloatGranularity  = (HaF32)granularity;
     mSnapToGrid        = snapToGrid;
     mUseDouble         = false;
     mKdTree.setUseDouble(false);
@@ -2967,27 +2967,27 @@ public:
   }
 
 
-  PxF64 snapToGrid(PxF64 p)
+  HaF64 snapToGrid(HaF64 p)
   {
-    PxF64 m = fmod(p,mDoubleGranularity);
+    HaF64 m = fmod(p,mDoubleGranularity);
     p-=m;
     return p;
   }
 
-  PxF32 snapToGrid(PxF32 p)
+  HaF32 snapToGrid(HaF32 p)
   {
-    PxF32 m = fmodf(p,mFloatGranularity);
+    HaF32 m = fmodf(p,mFloatGranularity);
     p-=m;
     return p;
   }
 
-  PxU32    getIndex(const PxF32 *_p,bool &newPos)  // get index for a vector PxF32
+  HaU32    getIndex(const HaF32 *_p,bool &newPos)  // get index for a vector HaF32
   {
-    PxU32 ret;
+    HaU32 ret;
 
     if ( mUseDouble )
     {
-      PxF64 p[3];
+      HaF64 p[3];
       p[0] = _p[0];
       p[1] = _p[1];
       p[2] = _p[2];
@@ -2996,7 +2996,7 @@ public:
 
     newPos = false;
 
-    PxF32 p[3];
+    HaF32 p[3];
 
     if ( mSnapToGrid )
     {
@@ -3023,22 +3023,22 @@ public:
     return ret;
   }
 
-  PxU32    getIndex(const PxF64 *_p,bool &newPos)  // get index for a vector PxF64
+  HaU32    getIndex(const HaF64 *_p,bool &newPos)  // get index for a vector HaF64
   {
-    PxU32 ret;
+    HaU32 ret;
 
     if ( !mUseDouble )
     {
-      PxF32 p[3];
-      p[0] = (PxF32)_p[0];
-      p[1] = (PxF32)_p[1];
-      p[2] = (PxF32)_p[2];
+      HaF32 p[3];
+      p[0] = (HaF32)_p[0];
+      p[1] = (HaF32)_p[1];
+      p[2] = (HaF32)_p[2];
       return getIndex(p,newPos);
     }
 
     newPos = false;
 
-    PxF64 p[3];
+    HaF64 p[3];
 
     if ( mSnapToGrid )
     {
@@ -3065,9 +3065,9 @@ public:
     return ret;
   }
 
-  const PxF32 *   getVerticesFloat(void) const
+  const HaF32 *   getVerticesFloat(void) const
   {
-    const PxF32 * ret = 0;
+    const HaF32 * ret = 0;
 
     assert( !mUseDouble );
 
@@ -3076,9 +3076,9 @@ public:
     return ret;
   }
 
-  const PxF64 *  getVerticesDouble(void) const
+  const HaF64 *  getVerticesDouble(void) const
   {
-    const PxF64 * ret = 0;
+    const HaF64 * ret = 0;
 
     assert( mUseDouble );
 
@@ -3087,12 +3087,12 @@ public:
     return ret;
   }
 
-  const PxF32 *   getVertexFloat(PxU32 index) const
+  const HaF32 *   getVertexFloat(HaU32 index) const
   {
-    const PxF32 * ret  = 0;
+    const HaF32 * ret  = 0;
     assert( !mUseDouble );
 #ifdef _DEBUG
-    PxU32 vcount = mKdTree.getVcount();
+    HaU32 vcount = mKdTree.getVcount();
     assert( index < vcount );
 #endif
     ret =  mKdTree.getVerticesFloat();
@@ -3100,12 +3100,12 @@ public:
     return ret;
   }
 
-  const PxF64 *   getVertexDouble(PxU32 index) const
+  const HaF64 *   getVertexDouble(HaU32 index) const
   {
-    const PxF64 * ret = 0;
+    const HaF64 * ret = 0;
     assert( mUseDouble );
 #ifdef _DEBUG
-    PxU32 vcount = mKdTree.getVcount();
+    HaU32 vcount = mKdTree.getVcount();
     assert( index < vcount );
 #endif
     ret =  mKdTree.getVerticesDouble();
@@ -3114,7 +3114,7 @@ public:
     return ret;
   }
 
-  PxU32    getVcount(void) const
+  HaU32    getVcount(void) const
   {
     return mKdTree.getVcount();
   }
@@ -3125,7 +3125,7 @@ public:
   }
 
 
-  bool            saveAsObj(const char *fname,PxU32 tcount,PxU32 *indices)
+  bool            saveAsObj(const char *fname,HaU32 tcount,HaU32 *indices)
   {
     bool ret = false;
 
@@ -3135,31 +3135,31 @@ public:
     {
       ret = true;
 
-      PxU32 vcount    = getVcount();
+      HaU32 vcount    = getVcount();
       if ( mUseDouble )
       {
-        const PxF64 *v  = getVerticesDouble();
-        for (PxU32 i=0; i<vcount; i++)
+        const HaF64 *v  = getVerticesDouble();
+        for (HaU32 i=0; i<vcount; i++)
         {
-          fprintf(fph,"v %0.9f %0.9f %0.9f\r\n", (PxF32)v[0], (PxF32)v[1], (PxF32)v[2] );
+          fprintf(fph,"v %0.9f %0.9f %0.9f\r\n", (HaF32)v[0], (HaF32)v[1], (HaF32)v[2] );
           v+=3;
         }
       }
       else
       {
-        const PxF32 *v  = getVerticesFloat();
-        for (PxU32 i=0; i<vcount; i++)
+        const HaF32 *v  = getVerticesFloat();
+        for (HaU32 i=0; i<vcount; i++)
         {
           fprintf(fph,"v %0.9f %0.9f %0.9f\r\n", v[0], v[1], v[2] );
           v+=3;
         }
       }
 
-      for (PxU32 i=0; i<tcount; i++)
+      for (HaU32 i=0; i<tcount; i++)
       {
-        PxU32 i1 = *indices++;
-        PxU32 i2 = *indices++;
-        PxU32 i3 = *indices++;
+        HaU32 i1 = *indices++;
+        HaU32 i2 = *indices++;
+        HaU32 i3 = *indices++;
         fprintf(fph,"f %d %d %d\r\n", i1+1, i2+1, i3+1 );
       }
       fclose(fph);
@@ -3171,18 +3171,18 @@ public:
 private:
   bool    mUseDouble:1;
   bool    mSnapToGrid:1;
-  PxF64  mDoubleGranularity;
-  PxF32   mFloatGranularity;
+  HaF64  mDoubleGranularity;
+  HaF32   mFloatGranularity;
   VERTEX_INDEX::KdTree  mKdTree;
 };
 
-fm_VertexIndex * fm_createVertexIndex(PxF64 granularity,bool snapToGrid) // create an indexed vertex system for doubles
+fm_VertexIndex * fm_createVertexIndex(HaF64 granularity,bool snapToGrid) // create an indexed vertex system for doubles
 {
   MyVertexIndex *ret = PX_NEW(MyVertexIndex)(granularity,snapToGrid);
   return static_cast< fm_VertexIndex *>(ret);
 }
 
-fm_VertexIndex * fm_createVertexIndex(PxF32 granularity,bool snapToGrid)  // create an indexed vertext system for floats
+fm_VertexIndex * fm_createVertexIndex(HaF32 granularity,bool snapToGrid)  // create an indexed vertext system for floats
 {
   MyVertexIndex *ret = PX_NEW(MyVertexIndex)(granularity,snapToGrid);
   return static_cast< fm_VertexIndex *>(ret);
@@ -3211,10 +3211,10 @@ void          fm_releaseVertexIndex(fm_VertexIndex *vindex)
 class fm_quickSort
 {
 public:
-	void qsort(void **base,PxI32 num); // perform the qsort.
+	void qsort(void **base,HaI32 num); // perform the qsort.
 protected:
   // -1 less, 0 equal, +1 greater.
-	virtual PxI32 compare(void **p1,void **p2) = 0;
+	virtual HaI32 compare(void **p1,void **p2) = 0;
 private:
 	void inline swap(char **a,char **b);
 };
@@ -3233,14 +3233,14 @@ void fm_quickSort::swap(char **a,char **b)
 }
 
 
-void fm_quickSort::qsort(void **b,PxI32 num)
+void fm_quickSort::qsort(void **b,HaI32 num)
 {
 	char *lo,*hi;
 	char *mid;
 	char *bottom, *top;
-	PxI32 size;
+	HaI32 size;
 	char *lostk[30], *histk[30];
-	PxI32 stkptr;
+	HaI32 stkptr;
 	char **base = (char **)b;
 
 	if (num < 2 ) return;
@@ -3252,7 +3252,7 @@ void fm_quickSort::qsort(void **b,PxI32 num)
 
 nextone:
 
-	size = (PxI32)(hi - lo) / sizeof(char**) + 1;
+	size = (HaI32)(hi - lo) / sizeof(char**) + 1;
 
 	mid = lo + (size / 2) * sizeof(char **);
 	swap((char **)mid,(char **)lo);
@@ -3322,7 +3322,7 @@ nextone:
 
 typedef STDNAME::vector< fm_LineSegment > LineSegmentVector;
 
-static inline void setMinMax(PxF64 &vmin,PxF64 &vmax,PxF64 v1,PxF64 v2)
+static inline void setMinMax(HaF64 &vmin,HaF64 &vmax,HaF64 v1,HaF64 v2)
 {
   if ( v1 <= v2 )
   {
@@ -3345,10 +3345,10 @@ public:
     mIndex = 0;
     mTime = 0;
   }
-  Intersection(PxF64 time,const PxF64 *from,const PxF64 *to,fm_VertexIndex *vpool)
+  Intersection(HaF64 time,const HaF64 *from,const HaF64 *to,fm_VertexIndex *vpool)
   {
     mTime = time;
-    PxF64 pos[3];
+    HaF64 pos[3];
     pos[0] = (to[0]-from[0])*time+from[0];
     pos[1] = (to[1]-from[1])*time+from[1];
     pos[2] = (to[2]-from[2])*time+from[2];
@@ -3356,8 +3356,8 @@ public:
     mIndex = vpool->getIndex(pos,newPos);
   }
 
-  PxU32    mIndex;
-  PxF64    mTime;
+  HaU32    mIndex;
+  HaF64    mTime;
 };
 
 
@@ -3367,15 +3367,15 @@ class MyLineSegment : public fm_LineSegment, public UserAllocated
 {
 public:
 
-  void init(const fm_LineSegment &s,fm_VertexIndex *vpool,PxU32 x)
+  void init(const fm_LineSegment &s,fm_VertexIndex *vpool,HaU32 x)
   {
     fm_LineSegment *dest = static_cast< fm_LineSegment *>(this);
     *dest = s;
 
     mFlipped = false;
 
-    const PxF64 *p1 = vpool->getVertexDouble(mE1);
-    const PxF64 *p2 = vpool->getVertexDouble(mE2);
+    const HaF64 *p1 = vpool->getVertexDouble(mE1);
+    const HaF64 *p2 = vpool->getVertexDouble(mE2);
 
     setMinMax(mMin[0],mMax[0],p1[0],p2[0]);
     setMinMax(mMin[1],mMax[1],p1[1],p2[1]);
@@ -3409,9 +3409,9 @@ public:
   }
 
   // we already know that the x-extent overlaps or we wouldn't be in this routine..
-  void intersect(MyLineSegment *segment,PxU32 x,PxU32 y,PxU32 /* z */,fm_VertexIndex *vpool)
+  void intersect(MyLineSegment *segment,HaU32 x,HaU32 y,HaU32 /* z */,fm_VertexIndex *vpool)
   {
-    PxU32 count = 0;
+    HaU32 count = 0;
 
     // if the two segments share any start/end points then they cannot intersect at all!
 
@@ -3431,10 +3431,10 @@ public:
       else
       {
 
-        PxF64 a1[2];
-        PxF64 a2[2];
-        PxF64 b1[2];
-        PxF64 b2[2];
+        HaF64 a1[2];
+        HaF64 a2[2];
+        HaF64 b1[2];
+        HaF64 b2[2];
 
         a1[0] = mFrom[x];
         a1[1] = mFrom[y];
@@ -3449,7 +3449,7 @@ public:
         b2[1] = segment->mTo[y];
 
 
-        PxF64 t1,t2;
+        HaF64 t1,t2;
         IntersectResult result = fm_intersectLineSegments2dTime(a1,a2,b1,b2,t1,t2);
 
         if ( result == IR_DO_INTERSECT )
@@ -3463,7 +3463,7 @@ public:
     }
   }
 
-  void addIntersect(PxF64 time,fm_VertexIndex *vpool)
+  void addIntersect(HaF64 time,fm_VertexIndex *vpool)
   {
     Intersection intersect(time,mFrom,mTo,vpool);
 
@@ -3518,7 +3518,7 @@ public:
     }
     else
     {
-      PxU32 prev = mE1;
+      HaU32 prev = mE1;
       IntersectionList::iterator i;
       for (i=mIntersections.begin(); i!=mIntersections.end(); ++i)
       {
@@ -3540,18 +3540,18 @@ public:
     }
   }
 
-  void swap(PxU32 &a,PxU32 &b)
+  void swap(HaU32 &a,HaU32 &b)
   {
-    PxU32 temp = a;
+    HaU32 temp = a;
     a = b;
     b = temp;
   }
 
   bool             mFlipped;
-  PxF64            mFrom[3];
-  PxF64            mTo[3];
-  PxF64            mMin[3];
-  PxF64            mMax[3];
+  HaF64            mFrom[3];
+  HaF64            mTo[3];
+  HaF64            mMin[3];
+  HaF64            mMax[3];
   IntersectionList mIntersections;
 };
 
@@ -3564,7 +3564,7 @@ public:
   {
 
   }
-  fm_LineSegment * performLineSweep(const fm_LineSegment *segments,PxU32 icount,const PxF64 *planeEquation,fm_VertexIndex *pool,PxU32 &scount)
+  fm_LineSegment * performLineSweep(const fm_LineSegment *segments,HaU32 icount,const HaF64 *planeEquation,fm_VertexIndex *pool,HaU32 &scount)
   {
     fm_LineSegment *ret = 0;
 
@@ -3595,19 +3595,19 @@ public:
     MyLineSegment *mls   = PX_NEW(MyLineSegment)[icount];
     MyLineSegment **mptr = (MyLineSegment **)PX_ALLOC(sizeof(MyLineSegment *)*icount);
 
-    for (PxU32 i=0; i<icount; i++)
+    for (HaU32 i=0; i<icount; i++)
     {
       mls[i].init(segments[i],pool,mX);
       mptr[i] = &mls[i];
     }
 
-    qsort((void **)mptr,(PxI32)icount);
+    qsort((void **)mptr,(HaI32)icount);
 
-    for (PxU32 i=0; i<icount; i++)
+    for (HaU32 i=0; i<icount; i++)
     {
       MyLineSegment *segment = mptr[i];
-      PxF64 esegment = segment->mTo[mX];
-      for (PxU32 j=i+1; j<icount; j++)
+      HaF64 esegment = segment->mTo[mX];
+      for (HaU32 j=i+1; j<icount; j++)
       {
         MyLineSegment *test = mptr[j];
         if ( test->mFrom[mX] >= esegment )
@@ -3621,7 +3621,7 @@ public:
       }
     }
 
-    for (PxU32 i=0; i<icount; i++)
+    for (HaU32 i=0; i<icount; i++)
     {
       MyLineSegment *segment = mptr[i];
       segment->getResults(mResults);
@@ -3633,16 +3633,16 @@ public:
 
     if ( !mResults.empty() )
     {
-      scount = (PxU32)mResults.size();
+      scount = (HaU32)mResults.size();
       ret = &mResults[0];
     }
 
     return ret;
   }
 
-	PxI32 compare(void **p1,void **p2)
+	HaI32 compare(void **p1,void **p2)
   {
-    PxI32 ret = 0;
+    HaI32 ret = 0;
 
     MyLineSegment **m1 = (MyLineSegment **) p1;
     MyLineSegment **m2 = (MyLineSegment **) p2;
@@ -3662,9 +3662,9 @@ public:
     return ret;
   }
 
-  PxU32              mX;  // index for the x-axis
-  PxU32              mY;  // index for the y-axis
-  PxU32              mZ;
+  HaU32              mX;  // index for the x-axis
+  HaU32              mY;  // index for the y-axis
+  HaU32              mZ;
   fm_VertexIndex        *mfm_VertexIndex;
   LineSegmentVector  mResults;
 };
@@ -3689,10 +3689,10 @@ void        fm_releaseLineSweep(fm_LineSweep *sweep)
 
 
 
-REAL fm_computeBestFitAABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *bmin,REAL *bmax) // returns the diagonal distance
+REAL fm_computeBestFitAABB(HaU32 vcount,const REAL *points,HaU32 pstride,REAL *bmin,REAL *bmax) // returns the diagonal distance
 {
 
-  const PxU8 *source = (const PxU8 *) points;
+  const HaU8 *source = (const HaU8 *) points;
 
 	bmin[0] = points[0];
 	bmin[1] = points[1];
@@ -3703,7 +3703,7 @@ REAL fm_computeBestFitAABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *b
 	bmax[2] = points[2];
 
 
-  for (PxU32 i=1; i<vcount; i++)
+  for (HaU32 i=1; i<vcount; i++)
   {
   	source+=pstride;
   	const REAL *p = (const REAL *) source;
@@ -3827,11 +3827,11 @@ inline REAL det(const REAL *p1,const REAL *p2,const REAL *p3)
 }
 
 
-REAL  fm_computeMeshVolume(const REAL *vertices,PxU32 tcount,const PxU32 *indices)
+REAL  fm_computeMeshVolume(const REAL *vertices,HaU32 tcount,const HaU32 *indices)
 {
 	REAL volume = 0;
 
-	for (PxU32 i=0; i<tcount; i++,indices+=3)
+	for (HaU32 i=0; i<tcount; i++,indices+=3)
 	{
   	const REAL *p1 = &vertices[ indices[0]*3 ];
 		const REAL *p2 = &vertices[ indices[1]*3 ];
@@ -3846,9 +3846,9 @@ REAL  fm_computeMeshVolume(const REAL *vertices,PxU32 tcount,const PxU32 *indice
 }
 
 
-const REAL * fm_getPoint(const REAL *points,PxU32 pstride,PxU32 index)
+const REAL * fm_getPoint(const REAL *points,HaU32 pstride,HaU32 index)
 {
-  const PxU8 *scan = (const PxU8 *)points;
+  const HaU8 *scan = (const HaU8 *)points;
   scan+=(index*pstride);
   return (REAL *)scan;
 }
@@ -3878,12 +3878,12 @@ bool fm_insideTriangle(REAL Ax, REAL Ay,
 }
 
 
-REAL fm_areaPolygon2d(PxU32 pcount,const REAL *points,PxU32 pstride)
+REAL fm_areaPolygon2d(HaU32 pcount,const REAL *points,HaU32 pstride)
 {
-  PxI32 n = (PxI32)pcount;
+  HaI32 n = (HaI32)pcount;
 
   REAL A=0.0f;
-  for(PxI32 p=n-1,q=0; q<n; p=q++)
+  for(HaI32 p=n-1,q=0; q<n; p=q++)
   {
     const REAL *p1 = fm_getPoint(points,pstride,p);
     const REAL *p2 = fm_getPoint(points,pstride,q);
@@ -3893,15 +3893,15 @@ REAL fm_areaPolygon2d(PxU32 pcount,const REAL *points,PxU32 pstride)
 }
 
 
-bool  fm_pointInsidePolygon2d(PxU32 pcount,const REAL *points,PxU32 pstride,const REAL *point,PxU32 xindex,PxU32 yindex)
+bool  fm_pointInsidePolygon2d(HaU32 pcount,const REAL *points,HaU32 pstride,const REAL *point,HaU32 xindex,HaU32 yindex)
 {
-  PxU32 j = pcount-1;
-  PxI32 oddNodes = 0;
+  HaU32 j = pcount-1;
+  HaI32 oddNodes = 0;
 
   REAL x = point[xindex];
   REAL y = point[yindex];
 
-  for (PxU32 i=0; i<pcount; i++)
+  for (HaU32 i=0; i<pcount; i++)
   {
     const REAL *p1 = fm_getPoint(points,pstride,i);
     const REAL *p2 = fm_getPoint(points,pstride,j);
@@ -3926,9 +3926,9 @@ bool  fm_pointInsidePolygon2d(PxU32 pcount,const REAL *points,PxU32 pstride,cons
 }
 
 
-PxU32 fm_consolidatePolygon(PxU32 pcount,const REAL *points,PxU32 pstride,REAL *_dest,REAL epsilon) // collapses co-linear edges.
+HaU32 fm_consolidatePolygon(HaU32 pcount,const REAL *points,HaU32 pstride,REAL *_dest,REAL epsilon) // collapses co-linear edges.
 {
-  PxU32 ret = 0;
+  HaU32 ret = 0;
 
 
   if ( pcount >= 3 )
@@ -3938,7 +3938,7 @@ PxU32 fm_consolidatePolygon(PxU32 pcount,const REAL *points,PxU32 pstride,REAL *
     const REAL *next    = fm_getPoint(points,pstride,1);
     REAL *dest = _dest;
 
-    for (PxU32 i=0; i<pcount; i++)
+    for (HaU32 i=0; i<pcount; i++)
     {
 
       next = (i+1)==pcount ? points : next;
@@ -4020,7 +4020,7 @@ public:
 
 #endif
 
-void splitRect(PxU32 axis,
+void splitRect(HaU32 axis,
 						   const Rect3d<REAL> &source,
 							 Rect3d<REAL> &b1,
 							 Rect3d<REAL> &b2,
@@ -4055,10 +4055,10 @@ void splitRect(PxU32 axis,
 	}
 }
 
-bool fm_computeSplitPlane(PxU32 vcount,
+bool fm_computeSplitPlane(HaU32 vcount,
                           const REAL *vertices,
-                          PxU32 /* tcount */,
-                          const PxU32 * /* indices */,
+                          HaU32 /* tcount */,
+                          const HaU32 * /* indices */,
                           REAL *plane)
 {
 
@@ -4086,7 +4086,7 @@ bool fm_computeSplitPlane(PxU32 vcount,
 
 	REAL laxis = dx;
 
-	PxU32 axis = 0;
+	HaU32 axis = 0;
 
 	if ( dy > dx )
 	{
@@ -4263,22 +4263,22 @@ void fm_copy3(const REAL *source,REAL *dest)
 }
 
 
-PxU32  fm_copyUniqueVertices(PxU32 vcount,const REAL *input_vertices,REAL *output_vertices,PxU32 tcount,const PxU32 *input_indices,PxU32 *output_indices)
+HaU32  fm_copyUniqueVertices(HaU32 vcount,const REAL *input_vertices,REAL *output_vertices,HaU32 tcount,const HaU32 *input_indices,HaU32 *output_indices)
 {
-  PxU32 ret = 0;
+  HaU32 ret = 0;
 
   REAL *vertices = (REAL *)PX_ALLOC(sizeof(REAL)*vcount*3);
   memcpy(vertices,input_vertices,sizeof(REAL)*vcount*3);
   REAL *dest = output_vertices;
 
-  PxU32 *reindex = (PxU32 *)PX_ALLOC(sizeof(PxU32)*vcount);
-  memset(reindex,0xFF,sizeof(PxU32)*vcount);
+  HaU32 *reindex = (HaU32 *)PX_ALLOC(sizeof(HaU32)*vcount);
+  memset(reindex,0xFF,sizeof(HaU32)*vcount);
 
-  PxU32 icount = tcount*3;
+  HaU32 icount = tcount*3;
 
-  for (PxU32 i=0; i<icount; i++)
+  for (HaU32 i=0; i<icount; i++)
   {
-    PxU32 index = *input_indices++;
+    HaU32 index = *input_indices++;
 
     assert( index < vcount );
 
@@ -4303,22 +4303,22 @@ PxU32  fm_copyUniqueVertices(PxU32 vcount,const REAL *input_vertices,REAL *outpu
   return ret;
 }
 
-bool    fm_isMeshCoplanar(PxU32 tcount,const PxU32 *indices,const REAL *vertices,bool doubleSided) // returns true if this collection of indexed triangles are co-planar!
+bool    fm_isMeshCoplanar(HaU32 tcount,const HaU32 *indices,const REAL *vertices,bool doubleSided) // returns true if this collection of indexed triangles are co-planar!
 {
   bool ret = true;
 
   if ( tcount > 0 )
   {
-    PxU32 i1 = indices[0];
-    PxU32 i2 = indices[1];
-    PxU32 i3 = indices[2];
+    HaU32 i1 = indices[0];
+    HaU32 i2 = indices[1];
+    HaU32 i3 = indices[2];
     const REAL *p1 = &vertices[i1*3];
     const REAL *p2 = &vertices[i2*3];
     const REAL *p3 = &vertices[i3*3];
     REAL plane[4];
     plane[3] = fm_computePlane(p1,p2,p3,plane);
-    const PxU32 *scan = &indices[3];
-    for (PxU32 i=1; i<tcount; i++)
+    const HaU32 *scan = &indices[3];
+    for (HaU32 i=1; i<tcount; i++)
     {
       i1 = *scan++;
       i2 = *scan++;
@@ -4375,7 +4375,7 @@ void  fm_initMinMax(REAL bmin[3],REAL bmax[3])
 
 #define TESSELATE_H
 
-typedef STDNAME::vector< PxU32 > UintVector;
+typedef STDNAME::vector< HaU32 > UintVector;
 
 class Myfm_Tesselate : public fm_Tesselate, public UserAllocated
 {
@@ -4385,9 +4385,9 @@ public:
 
   }
 
-  const PxU32 * tesselate(fm_VertexIndex *vindex,PxU32 tcount,const PxU32 *indices,PxF32 longEdge,PxU32 maxDepth,PxU32 &outcount)
+  const HaU32 * tesselate(fm_VertexIndex *vindex,HaU32 tcount,const HaU32 *indices,HaF32 longEdge,HaU32 maxDepth,HaU32 &outcount)
   {
-    const PxU32 *ret = 0;
+    const HaU32 *ret = 0;
 
     mMaxDepth = maxDepth;
     mLongEdge  = longEdge*longEdge;
@@ -4396,19 +4396,19 @@ public:
 
     if ( mVertices->isDouble() )
     {
-      PxU32 vcount = mVertices->getVcount();
-      PxF64 *vertices = (PxF64 *)PX_ALLOC(sizeof(PxF64)*vcount*3);
-      memcpy(vertices,mVertices->getVerticesDouble(),sizeof(PxF64)*vcount*3);
+      HaU32 vcount = mVertices->getVcount();
+      HaF64 *vertices = (HaF64 *)PX_ALLOC(sizeof(HaF64)*vcount*3);
+      memcpy(vertices,mVertices->getVerticesDouble(),sizeof(HaF64)*vcount*3);
 
-      for (PxU32 i=0; i<tcount; i++)
+      for (HaU32 i=0; i<tcount; i++)
       {
-        PxU32 i1 = *indices++;
-        PxU32 i2 = *indices++;
-        PxU32 i3 = *indices++;
+        HaU32 i1 = *indices++;
+        HaU32 i2 = *indices++;
+        HaU32 i3 = *indices++;
 
-        const PxF64 *p1 = &vertices[i1*3];
-        const PxF64 *p2 = &vertices[i2*3];
-        const PxF64 *p3 = &vertices[i3*3];
+        const HaF64 *p1 = &vertices[i1*3];
+        const HaF64 *p2 = &vertices[i2*3];
+        const HaF64 *p3 = &vertices[i3*3];
 
         tesselate(p1,p2,p3,0);
 
@@ -4417,20 +4417,20 @@ public:
     }
     else
     {
-      PxU32 vcount = mVertices->getVcount();
-      PxF32 *vertices = (PxF32 *)PX_ALLOC(sizeof(PxF32)*vcount*3);
-      memcpy(vertices,mVertices->getVerticesFloat(),sizeof(PxF32)*vcount*3);
+      HaU32 vcount = mVertices->getVcount();
+      HaF32 *vertices = (HaF32 *)PX_ALLOC(sizeof(HaF32)*vcount*3);
+      memcpy(vertices,mVertices->getVerticesFloat(),sizeof(HaF32)*vcount*3);
 
 
-      for (PxU32 i=0; i<tcount; i++)
+      for (HaU32 i=0; i<tcount; i++)
       {
-        PxU32 i1 = *indices++;
-        PxU32 i2 = *indices++;
-        PxU32 i3 = *indices++;
+        HaU32 i1 = *indices++;
+        HaU32 i2 = *indices++;
+        HaU32 i3 = *indices++;
 
-        const PxF32 *p1 = &vertices[i1*3];
-        const PxF32 *p2 = &vertices[i2*3];
-        const PxF32 *p3 = &vertices[i3*3];
+        const HaF32 *p1 = &vertices[i1*3];
+        const HaF32 *p2 = &vertices[i2*3];
+        const HaF32 *p3 = &vertices[i3*3];
 
         tesselate(p1,p2,p3,0);
 
@@ -4438,17 +4438,17 @@ public:
       PX_FREE(vertices);
     }
 
-    outcount = (PxU32)(mIndices.size()/3);
+    outcount = (HaU32)(mIndices.size()/3);
     ret = &mIndices[0];
 
 
     return ret;
   }
 
-  void tesselate(const PxF32 *p1,const PxF32 *p2,const PxF32 *p3,PxU32 recurse)
+  void tesselate(const HaF32 *p1,const HaF32 *p2,const HaF32 *p3,HaU32 recurse)
   {
   	bool split = false;
-  	PxF32 l1,l2,l3;
+  	HaF32 l1,l2,l3;
 
     l1 = l2 = l3 = 0;
 
@@ -4465,7 +4465,7 @@ public:
 
     if ( split )
   	{
-  		PxU32 edge;
+  		HaU32 edge;
 
   		if ( l1 >= l2 && l1 >= l3 )
   			edge = 0;
@@ -4474,7 +4474,7 @@ public:
   		else
   			edge = 2;
 
-			PxF32 split[3];
+			HaF32 split[3];
 
   		switch ( edge )
   		{
@@ -4505,9 +4505,9 @@ public:
   	{
       bool newp;
 
-      PxU32 i1 = mVertices->getIndex(p1,newp);
-      PxU32 i2 = mVertices->getIndex(p2,newp);
-      PxU32 i3 = mVertices->getIndex(p3,newp);
+      HaU32 i1 = mVertices->getIndex(p1,newp);
+      HaU32 i2 = mVertices->getIndex(p2,newp);
+      HaU32 i3 = mVertices->getIndex(p3,newp);
 
       mIndices.push_back(i1);
       mIndices.push_back(i2);
@@ -4516,10 +4516,10 @@ public:
 
   }
 
-  void tesselate(const PxF64 *p1,const PxF64 *p2,const PxF64 *p3,PxU32 recurse)
+  void tesselate(const HaF64 *p1,const HaF64 *p2,const HaF64 *p3,HaU32 recurse)
   {
   	bool split = false;
-  	PxF64 l1,l2,l3;
+  	HaF64 l1,l2,l3;
 
     l1 = l2 = l3 = 0;
 
@@ -4536,7 +4536,7 @@ public:
 
     if ( split )
   	{
-  		PxU32 edge;
+  		HaU32 edge;
 
   		if ( l1 >= l2 && l1 >= l3 )
   			edge = 0;
@@ -4545,7 +4545,7 @@ public:
   		else
   			edge = 2;
 
-			PxF64 split[3];
+			HaF64 split[3];
 
   		switch ( edge )
   		{
@@ -4576,9 +4576,9 @@ public:
   	{
       bool newp;
 
-      PxU32 i1 = mVertices->getIndex(p1,newp);
-      PxU32 i2 = mVertices->getIndex(p2,newp);
-      PxU32 i3 = mVertices->getIndex(p3,newp);
+      HaU32 i1 = mVertices->getIndex(p1,newp);
+      HaU32 i2 = mVertices->getIndex(p2,newp);
+      HaU32 i3 = mVertices->getIndex(p3,newp);
 
       mIndices.push_back(i1);
       mIndices.push_back(i2);
@@ -4588,11 +4588,11 @@ public:
   }
 
 private:
-  PxF32           mLongEdge;
-  PxF64          mLongEdgeD;
+  HaF32           mLongEdge;
+  HaF64          mLongEdgeD;
   fm_VertexIndex *mVertices;
   UintVector    mIndices;
-  PxU32          mMaxDepth;
+  HaU32          mMaxDepth;
 };
 
 fm_Tesselate * fm_createTesselate(void)
@@ -4615,7 +4615,7 @@ void           fm_releaseTesselate(fm_Tesselate *t)
 #define RAY_ABB_INTERSECT
 
 //! Integer representation of a floating-point value.
-#define IR(x)	((PxU32&)x)
+#define IR(x)	((HaU32&)x)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -4628,7 +4628,7 @@ void           fm_releaseTesselate(fm_Tesselate *t)
 *
 *	Should work provided:
 *	1) the integer representation of 0.0f is 0x00000000
-*	2) the sign bit of the PxF32 is the most significant one
+*	2) the sign bit of the HaF32 is the most significant one
 *
 *	Report bugs: p.terdiman@codercorner.com
 *
@@ -4640,14 +4640,14 @@ void           fm_releaseTesselate(fm_Tesselate *t)
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define RAYAABB_EPSILON 0.00001f
-bool fm_intersectRayAABB(const PxF32 MinB[3],const PxF32 MaxB[3],const PxF32 origin[3],const PxF32 dir[3],PxF32 coord[3])
+bool fm_intersectRayAABB(const HaF32 MinB[3],const HaF32 MaxB[3],const HaF32 origin[3],const HaF32 dir[3],HaF32 coord[3])
 {
   bool Inside = true;
-  PxF32 MaxT[3];
+  HaF32 MaxT[3];
   MaxT[0]=MaxT[1]=MaxT[2]=-1.0f;
 
   // Find candidate planes.
-  for(PxU32 i=0;i<3;i++)
+  for(HaU32 i=0;i<3;i++)
   {
     if(origin[i] < MinB[i])
     {
@@ -4677,14 +4677,14 @@ bool fm_intersectRayAABB(const PxF32 MinB[3],const PxF32 MaxB[3],const PxF32 ori
   }
 
   // Get largest of the maxT's for final choice of intersection
-  PxU32 WhichPlane = 0;
+  HaU32 WhichPlane = 0;
   if(MaxT[1] > MaxT[WhichPlane])	WhichPlane = 1;
   if(MaxT[2] > MaxT[WhichPlane])	WhichPlane = 2;
 
   // Check final candidate actually inside box
   if(IR(MaxT[WhichPlane])&0x80000000) return false;
 
-  for(PxU32 i=0;i<3;i++)
+  for(HaU32 i=0;i<3;i++)
   {
     if(i!=WhichPlane)
     {
@@ -4699,21 +4699,21 @@ bool fm_intersectRayAABB(const PxF32 MinB[3],const PxF32 MaxB[3],const PxF32 ori
   return true;	// ray hits box
 }
 
-bool fm_intersectLineSegmentAABB(const PxF32 bmin[3],const PxF32 bmax[3],const PxF32 p1[3],const PxF32 p2[3],PxF32 intersect[3])
+bool fm_intersectLineSegmentAABB(const HaF32 bmin[3],const HaF32 bmax[3],const HaF32 p1[3],const HaF32 p2[3],HaF32 intersect[3])
 {
   bool ret = false;
 
-  PxF32 dir[3];
+  HaF32 dir[3];
   dir[0] = p2[0] - p1[0];
   dir[1] = p2[1] - p1[1];
   dir[2] = p2[2] - p1[2];
-  PxF32 dist = fm_normalize(dir);
+  HaF32 dist = fm_normalize(dir);
   if ( dist > RAYAABB_EPSILON )
   {
     ret = fm_intersectRayAABB(bmin,bmax,p1,dir,intersect);
     if ( ret )
     {
-      PxF32 d = fm_distanceSquared(p1,intersect);
+      HaF32 d = fm_distanceSquared(p1,intersect);
       if ( d  > (dist*dist) )
       {
         ret = false;
@@ -4730,20 +4730,20 @@ bool fm_intersectLineSegmentAABB(const PxF32 bmin[3],const PxF32 bmax[3],const P
 #define OBB_TO_AABB
 
 #pragma warning(disable:4100)
-void    fm_OBBtoAABB(const PxF32 obmin[3],const PxF32 obmax[3],const PxF32 matrix[16],PxF32 abmin[3],PxF32 abmax[3])
+void    fm_OBBtoAABB(const HaF32 obmin[3],const HaF32 obmax[3],const HaF32 matrix[16],HaF32 abmin[3],HaF32 abmax[3])
 {
   assert(0); // not yet implemented.
 }
 
 
-const REAL * computePos(PxU32 index,const REAL *vertices,PxU32 vstride)
+const REAL * computePos(HaU32 index,const REAL *vertices,HaU32 vstride)
 {
   const char *tmp = (const char *)vertices;
   tmp+=(index*vstride);
   return (const REAL*)tmp;
 }
 
-void computeNormal(PxU32 index,REAL *normals,PxU32 nstride,const REAL *normal)
+void computeNormal(HaU32 index,REAL *normals,HaU32 nstride,const REAL *normal)
 {
   char *tmp = (char *)normals;
   tmp+=(index*nstride);
@@ -4753,18 +4753,18 @@ void computeNormal(PxU32 index,REAL *normals,PxU32 nstride,const REAL *normal)
   dest[2]+=normal[2];
 }
 
-void fm_computeMeanNormals(PxU32 vcount,       // the number of vertices
+void fm_computeMeanNormals(HaU32 vcount,       // the number of vertices
                            const REAL *vertices,     // the base address of the vertex position data.
-                           PxU32 vstride,      // the stride between position data.
+                           HaU32 vstride,      // the stride between position data.
                            REAL *normals,            // the base address  of the destination for mean vector normals
-                           PxU32 nstride,      // the stride between normals
-                           PxU32 tcount,       // the number of triangles
-                           const PxU32 *indices)     // the triangle indices
+                           HaU32 nstride,      // the stride between normals
+                           HaU32 tcount,       // the number of triangles
+                           const HaU32 *indices)     // the triangle indices
 {
 
   // Step #1 : Zero out the vertex normals
   char *dest = (char *)normals;
-  for (PxU32 i=0; i<vcount; i++)
+  for (HaU32 i=0; i<vcount; i++)
   {
     REAL *n = (REAL *)dest;
     n[0] = 0;
@@ -4774,13 +4774,13 @@ void fm_computeMeanNormals(PxU32 vcount,       // the number of vertices
   }
 
   // Step #2 : Compute the face normals and accumulate them
-  const PxU32 *scan = indices;
-  for (PxU32 i=0; i<tcount; i++)
+  const HaU32 *scan = indices;
+  for (HaU32 i=0; i<tcount; i++)
   {
 
-    PxU32 i1 = *scan++;
-    PxU32 i2 = *scan++;
-    PxU32 i3 = *scan++;
+    HaU32 i1 = *scan++;
+    HaU32 i2 = *scan++;
+    HaU32 i3 = *scan++;
 
     const REAL *p1 = computePos(i1,vertices,vstride);
     const REAL *p2 = computePos(i2,vertices,vstride);
@@ -4797,7 +4797,7 @@ void fm_computeMeanNormals(PxU32 vcount,       // the number of vertices
 
   // Normalize the accumulated normals
   dest = (char *)normals;
-  for (PxU32 i=0; i<vcount; i++)
+  for (HaU32 i=0; i<vcount; i++)
   {
     REAL *n = (REAL *)dest;
     fm_normalize(n);
@@ -4826,7 +4826,7 @@ static inline void Copy(REAL *dest,const REAL *source)
 }
 
 
-REAL  fm_computeBestFitSphere(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *center)
+REAL  fm_computeBestFitSphere(HaU32 vcount,const REAL *points,HaU32 pstride,REAL *center)
 {
 	REAL radius;
 	REAL radius2;
@@ -4851,7 +4851,7 @@ REAL  fm_computeBestFitSphere(PxU32 vcount,const REAL *points,PxU32 pstride,REAL
 	const char *scan = (const char *)points;
 
 
-	for (PxU32 i=0; i<vcount; i++)
+	for (HaU32 i=0; i<vcount; i++)
 	{
 		const REAL *caller_p = (const REAL *)scan;
 		if (caller_p[0]<xmin[0])
@@ -4924,7 +4924,7 @@ REAL  fm_computeBestFitSphere(PxU32 vcount,const REAL *points,PxU32 pstride,REAL
 	/* SECOND PASS: increment current sphere */
 	{
 		const char *scan = (const char *)points;
-		for (PxU32 i=0; i<vcount; i++)
+		for (HaU32 i=0; i<vcount; i++)
 		{
 			const REAL *caller_p = (const REAL *)scan;
 			dx = caller_p[0]-center[0];
@@ -4952,13 +4952,13 @@ REAL  fm_computeBestFitSphere(PxU32 vcount,const REAL *points,PxU32 pstride,REAL
 }
 
 
-void fm_computeBestFitCapsule(PxU32 vcount,const REAL *points,PxU32 pstride,REAL &radius,REAL &height,REAL matrix[16],bool bruteForce)
+void fm_computeBestFitCapsule(HaU32 vcount,const REAL *points,HaU32 pstride,REAL &radius,REAL &height,REAL matrix[16],bool bruteForce)
 {
   REAL sides[3];
   REAL omatrix[16];
   fm_computeBestFitOBB(vcount,points,pstride,sides,omatrix,bruteForce);
 
-  PxI32 axis = 0;
+  HaI32 axis = 0;
   if ( sides[0] > sides[1] && sides[0] > sides[2] )
     axis = 0;
   else if ( sides[1] > sides[0] && sides[1] > sides[2] )
@@ -4978,8 +4978,8 @@ void fm_computeBestFitCapsule(PxU32 vcount,const REAL *points,PxU32 pstride,REAL
         fm_eulerMatrix(0,0,FM_PI/2,localTransform);
         fm_matrixMultiply(localTransform,omatrix,matrix);
 
-        const PxU8 *scan = (const PxU8 *)points;
-        for (PxU32 i=0; i<vcount; i++)
+        const HaU8 *scan = (const HaU8 *)points;
+        for (HaU32 i=0; i<vcount; i++)
         {
           const REAL *p = (const REAL *)scan;
           REAL t[3];
@@ -5004,8 +5004,8 @@ void fm_computeBestFitCapsule(PxU32 vcount,const REAL *points,PxU32 pstride,REAL
         fm_eulerMatrix(0,FM_PI/2,0,localTransform);
         fm_matrixMultiply(localTransform,omatrix,matrix);
 
-        const PxU8 *scan = (const PxU8 *)points;
-        for (PxU32 i=0; i<vcount; i++)
+        const HaU8 *scan = (const HaU8 *)points;
+        for (HaU32 i=0; i<vcount; i++)
         {
           const REAL *p = (const REAL *)scan;
           REAL t[3];
@@ -5030,8 +5030,8 @@ void fm_computeBestFitCapsule(PxU32 vcount,const REAL *points,PxU32 pstride,REAL
         fm_eulerMatrix(FM_PI/2,0,0,localTransform);
         fm_matrixMultiply(localTransform,omatrix,matrix);
 
-        const PxU8 *scan = (const PxU8 *)points;
-        for (PxU32 i=0; i<vcount; i++)
+        const HaU8 *scan = (const HaU8 *)points;
+        for (HaU32 i=0; i<vcount; i++)
         {
           const REAL *p = (const REAL *)scan;
           REAL t[3];
@@ -5063,17 +5063,17 @@ void fm_computeBestFitCapsule(PxU32 vcount,const REAL *points,PxU32 pstride,REAL
 
 #define TRIANGULATE_H
 
-typedef PxU32 TU32;
+typedef HaU32 TU32;
 
 class TVec
 {
 public:
-	TVec(PxF64 _x,PxF64 _y,PxF64 _z) { x = _x; y = _y; z = _z; };
+	TVec(HaF64 _x,HaF64 _y,HaF64 _z) { x = _x; y = _y; z = _z; };
 	TVec(void) { };
 
-  PxF64 x;
-  PxF64 y;
-  PxF64 z;
+  HaF64 x;
+  HaF64 y;
+  HaF64 z;
 };
 
 typedef STDNAME::vector< TVec >  TVecVector;
@@ -5101,7 +5101,7 @@ public:
         mIndices.clear();
     }
 
-    virtual void addPoint(PxF64 x,PxF64 y,PxF64 z)
+    virtual void addPoint(HaF64 x,HaF64 y,HaF64 z)
     {
         TVec v(x,y,z);
         // update bounding box...
@@ -5125,9 +5125,9 @@ public:
 
     // Triangulation happens in 2d.  We could inverse transform the polygon around the normal direction, or we just use the two most signficant axes
     // Here we find the two longest axes and use them to triangulate.  Inverse transforming them would introduce more doubleing point error and isn't worth it.
-    virtual PxU32 * triangulate(PxU32 &tcount,PxF64 epsilon)
+    virtual HaU32 * triangulate(HaU32 &tcount,HaF64 epsilon)
     {
-        PxU32 *ret = 0;
+        HaU32 *ret = 0;
         tcount = 0;
         mEpsilon = epsilon;
 
@@ -5135,11 +5135,11 @@ public:
         {
             mPoints.clear();
 
-          PxF64 dx = mMax.x - mMin.x; // locate the first, second and third longest edges and store them in i1, i2, i3
-          PxF64 dy = mMax.y - mMin.y;
-          PxF64 dz = mMax.z - mMin.z;
+          HaF64 dx = mMax.x - mMin.x; // locate the first, second and third longest edges and store them in i1, i2, i3
+          HaF64 dy = mMax.y - mMin.y;
+          HaF64 dz = mMax.z - mMin.z;
 
-          PxU32 i1,i2,i3;
+          HaU32 i1,i2,i3;
 
           if ( dx > dy && dx > dz )
           {
@@ -5184,9 +5184,9 @@ public:
               }
           }
 
-          PxU32 pcount = (PxU32)mInputPoints.size();
-          const PxF64 *points = &mInputPoints[0].x;
-          for (PxU32 i=0; i<pcount; i++)
+          HaU32 pcount = (HaU32)mInputPoints.size();
+          const HaF64 *points = &mInputPoints[0].x;
+          for (HaU32 i=0; i<pcount; i++)
           {
             TVec v( points[i1], points[i2], points[i3] );
             mPoints.push_back(v);
@@ -5195,7 +5195,7 @@ public:
 
           mIndices.clear();
           triangulate(mIndices);
-          tcount = (PxU32)mIndices.size()/3;
+          tcount = (HaU32)mIndices.size()/3;
           if ( tcount )
           {
               ret = &mIndices[0];
@@ -5204,14 +5204,14 @@ public:
         return ret;
     }
 
-    virtual const PxF64 * getPoint(PxU32 index)
+    virtual const HaF64 * getPoint(HaU32 index)
     {
         return &mInputPoints[index].x;
     }
 
 
 private:
-    PxF64                  mEpsilon;
+    HaF64                  mEpsilon;
     TVec                   mMin;
     TVec                   mMax;
     TVecVector             mInputPoints;
@@ -5222,9 +5222,9 @@ private:
     bool _insideTriangle(const TVec& A, const TVec& B, const TVec& C,const TVec& P);
 
     ///     Returns the area of the contour
-    PxF64 _area();
+    HaF64 _area();
 
-    bool _snip(PxI32 u, PxI32 v, PxI32 w, PxI32 n, PxI32 *V);
+    bool _snip(HaI32 u, HaI32 v, HaI32 w, HaI32 n, HaI32 *V);
 
     ///     Processes the triangulation
     void _process(TU32Vector &indices);
@@ -5250,45 +5250,45 @@ void CTriangulator::triangulate(TU32Vector &indices)
 ///     Processes the triangulation
 void CTriangulator::_process(TU32Vector &indices)
 {
-    const PxI32 n = (const PxI32)mPoints.size();
+    const HaI32 n = (const HaI32)mPoints.size();
     if (n < 3)
         return;
-    PxI32 *V = (PxI32 *)PX_ALLOC(sizeof(PxI32)*n);
+    HaI32 *V = (HaI32 *)PX_ALLOC(sizeof(HaI32)*n);
 
 	bool flipped = false;
 
     if (0.0f < _area())
     {
-        for (PxI32 v = 0; v < n; v++)
+        for (HaI32 v = 0; v < n; v++)
             V[v] = v;
     }
     else
     {
 		flipped = true;
-        for (PxI32 v = 0; v < n; v++)
+        for (HaI32 v = 0; v < n; v++)
             V[v] = (n - 1) - v;
     }
 
-    PxI32 nv = n;
-    PxI32 count = 2 * nv;
-    for (PxI32 m = 0, v = nv - 1; nv > 2;)
+    HaI32 nv = n;
+    HaI32 count = 2 * nv;
+    for (HaI32 m = 0, v = nv - 1; nv > 2;)
     {
         if (0 >= (count--))
             return;
 
-        PxI32 u = v;
+        HaI32 u = v;
         if (nv <= u)
             u = 0;
         v = u + 1;
         if (nv <= v)
             v = 0;
-        PxI32 w = v + 1;
+        HaI32 w = v + 1;
         if (nv <= w)
             w = 0;
 
         if (_snip(u, v, w, nv, V))
         {
-            PxI32 a, b, c, s, t;
+            HaI32 a, b, c, s, t;
             a = V[u];
             b = V[v];
             c = V[w];
@@ -5316,11 +5316,11 @@ void CTriangulator::_process(TU32Vector &indices)
 }
 
 ///     Returns the area of the contour
-PxF64 CTriangulator::_area()
+HaF64 CTriangulator::_area()
 {
-    PxI32 n = (PxU32)mPoints.size();
-    PxF64 A = 0.0f;
-    for (PxI32 p = n - 1, q = 0; q < n; p = q++)
+    HaI32 n = (HaU32)mPoints.size();
+    HaF64 A = 0.0f;
+    for (HaI32 p = n - 1, q = 0; q < n; p = q++)
     {
         const TVec &pval = mPoints[p];
         const TVec &qval = mPoints[q];
@@ -5330,9 +5330,9 @@ PxF64 CTriangulator::_area()
     return A;
 }
 
-bool CTriangulator::_snip(PxI32 u, PxI32 v, PxI32 w, PxI32 n, PxI32 *V)
+bool CTriangulator::_snip(HaI32 u, HaI32 v, HaI32 w, HaI32 n, HaI32 *V)
 {
-    PxI32 p;
+    HaI32 p;
 
     const TVec &A = mPoints[ V[u] ];
     const TVec &B = mPoints[ V[v] ];
@@ -5355,8 +5355,8 @@ bool CTriangulator::_snip(PxI32 u, PxI32 v, PxI32 w, PxI32 n, PxI32 *V)
 ///     Tests if a point is inside the given triangle
 bool CTriangulator::_insideTriangle(const TVec& A, const TVec& B, const TVec& C,const TVec& P)
 {
-    PxF64 ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
-    PxF64 cCROSSap, bCROSScp, aCROSSbp;
+    HaF64 ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
+    HaF64 cCROSSap, bCROSScp, aCROSSbp;
 
     ax = C.x - B.x;  ay = C.y - B.y;
     bx = A.x - C.x;  by = A.y - C.y;
@@ -5393,57 +5393,57 @@ public:
     mPointsDouble = 0;
   }
 
-  virtual const PxF64 *       triangulate3d(PxU32 pcount,
-                                             const PxF64 *_points,
-                                             PxU32 vstride,
-                                             PxU32 &tcount,
+  virtual const HaF64 *       triangulate3d(HaU32 pcount,
+                                             const HaF64 *_points,
+                                             HaU32 vstride,
+                                             HaU32 &tcount,
                                              bool consolidate,
-                                             PxF64 epsilon)
+                                             HaF64 epsilon)
   {
     reset();
 
-    PxF64 *points = (PxF64 *)PX_ALLOC(sizeof(PxF64)*pcount*3);
+    HaF64 *points = (HaF64 *)PX_ALLOC(sizeof(HaF64)*pcount*3);
     if ( consolidate )
     {
       pcount = fm_consolidatePolygon(pcount,_points,vstride,points,1-epsilon);
     }
     else
     {
-      PxF64 *dest = points;
-      for (PxU32 i=0; i<pcount; i++)
+      HaF64 *dest = points;
+      for (HaU32 i=0; i<pcount; i++)
       {
-        const PxF64 *src = fm_getPoint(_points,vstride,i);
+        const HaF64 *src = fm_getPoint(_points,vstride,i);
         dest[0] = src[0];
         dest[1] = src[1];
         dest[2] = src[2];
         dest+=3;
       }
-      vstride = sizeof(PxF64)*3;
+      vstride = sizeof(HaF64)*3;
     }
 
     if ( pcount >= 3 )
     {
       CTriangulator ct;
-      for (PxU32 i=0; i<pcount; i++)
+      for (HaU32 i=0; i<pcount; i++)
       {
-        const PxF64 *src = fm_getPoint(points,vstride,i);
+        const HaF64 *src = fm_getPoint(points,vstride,i);
         ct.addPoint( src[0], src[1], src[2] );
       }
-      PxU32 _tcount;
-      PxU32 *indices = ct.triangulate(_tcount,epsilon);
+      HaU32 _tcount;
+      HaU32 *indices = ct.triangulate(_tcount,epsilon);
       if ( indices )
       {
         tcount = _tcount;
-        mPointsDouble = (PxF64 *)PX_ALLOC(sizeof(PxF64)*tcount*3*3);
-        PxF64 *dest = mPointsDouble;
-        for (PxU32 i=0; i<tcount; i++)
+        mPointsDouble = (HaF64 *)PX_ALLOC(sizeof(HaF64)*tcount*3*3);
+        HaF64 *dest = mPointsDouble;
+        for (HaU32 i=0; i<tcount; i++)
         {
-          PxU32 i1 = indices[i*3+0];
-          PxU32 i2 = indices[i*3+1];
-          PxU32 i3 = indices[i*3+2];
-          const PxF64 *p1 = ct.getPoint(i1);
-          const PxF64 *p2 = ct.getPoint(i2);
-          const PxF64 *p3 = ct.getPoint(i3);
+          HaU32 i1 = indices[i*3+0];
+          HaU32 i2 = indices[i*3+1];
+          HaU32 i3 = indices[i*3+2];
+          const HaF64 *p1 = ct.getPoint(i1);
+          const HaF64 *p2 = ct.getPoint(i2);
+          const HaF64 *p3 = ct.getPoint(i3);
 
           dest[0] = p1[0];
           dest[1] = p1[1];
@@ -5465,34 +5465,34 @@ public:
     return mPointsDouble;
   }
 
-  virtual const PxF32  *       triangulate3d(PxU32 pcount,
-                                             const PxF32  *points,
-                                             PxU32 vstride,
-                                             PxU32 &tcount,
+  virtual const HaF32  *       triangulate3d(HaU32 pcount,
+                                             const HaF32  *points,
+                                             HaU32 vstride,
+                                             HaU32 &tcount,
                                              bool consolidate,
-                                             PxF32 epsilon)
+                                             HaF32 epsilon)
   {
     reset();
 
-    PxF64 *temp = (PxF64 *)PX_ALLOC(sizeof(PxF64)*pcount*3);
-    PxF64 *dest = temp;
-    for (PxU32 i=0; i<pcount; i++)
+    HaF64 *temp = (HaF64 *)PX_ALLOC(sizeof(HaF64)*pcount*3);
+    HaF64 *dest = temp;
+    for (HaU32 i=0; i<pcount; i++)
     {
-      const PxF32 *p = fm_getPoint(points,vstride,i);
+      const HaF32 *p = fm_getPoint(points,vstride,i);
       dest[0] = p[0];
       dest[1] = p[1];
       dest[2] = p[2];
       dest+=3;
     }
-    const PxF64 *results = triangulate3d(pcount,temp,sizeof(PxF64)*3,tcount,consolidate,epsilon);
+    const HaF64 *results = triangulate3d(pcount,temp,sizeof(HaF64)*3,tcount,consolidate,epsilon);
     if ( results )
     {
-      PxU32 fcount = tcount*3*3;
-      mPointsFloat = (PxF32 *)PX_ALLOC(sizeof(PxF32)*tcount*3*3);
-      PxF32 *dest = mPointsFloat;
-      for (PxU32 i=0; i<fcount; i++)
+      HaU32 fcount = tcount*3*3;
+      mPointsFloat = (HaF32 *)PX_ALLOC(sizeof(HaF32)*tcount*3*3);
+      HaF32 *dest = mPointsFloat;
+      for (HaU32 i=0; i<fcount; i++)
       {
-        dest[i] = (PxF32) results[i];
+        dest[i] = (HaF32) results[i];
       }
       PX_FREE(mPointsDouble);
       mPointsDouble = 0;
@@ -5503,8 +5503,8 @@ public:
   }
 
 private:
-  PxF32 *mPointsFloat;
-  PxF64 *mPointsDouble;
+  HaF32 *mPointsFloat;
+  HaF64 *mPointsDouble;
 };
 
 fm_Triangulate * fm_createTriangulate(void)
@@ -5562,7 +5562,7 @@ bool fm_isValidTriangle(const REAL *p1,const REAL *p2,const REAL *p3,REAL epsilo
 		_vertices[7] = p3[1];
 		_vertices[8] = p3[2];
 
-		PxU32 pcount = fm_consolidatePolygon(3,_vertices,sizeof(REAL)*3,vertices,1-epsilon);
+		HaU32 pcount = fm_consolidatePolygon(3,_vertices,sizeof(REAL)*3,vertices,1-epsilon);
 		if ( pcount == 3 )
 		{
 		  ret = true;
@@ -5588,9 +5588,9 @@ void  fm_multiplyQuat(const REAL *left,const REAL *right,REAL *quat)
 	quat[2] = d;
 }
 
-bool  fm_computeCentroid(PxU32 vcount,     // number of input data points
+bool  fm_computeCentroid(HaU32 vcount,     // number of input data points
 						 const REAL *points,     // starting address of points array.
-						 PxU32 vstride,    // stride between input points.
+						 HaU32 vstride,    // stride between input points.
 						 REAL *center)
 
 {
@@ -5601,7 +5601,7 @@ bool  fm_computeCentroid(PxU32 vcount,     // number of input data points
 		center[1] = 0;
 		center[2] = 0;
 		const char *scan = (const char *)points;
-		for (PxU32 i=0; i<vcount; i++)
+		for (HaU32 i=0; i<vcount; i++)
 		{
 			const REAL *p = (const REAL *)scan;
 			center[0]+=p[0];
