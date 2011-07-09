@@ -17,7 +17,7 @@
 #define HACD_CIRCULAR_LIST_H
 #include<stdlib.h>
 #include<hacdVersion.h>
-#include "PxSimpleTypes.h"
+#include "PlatformConfig.h"
 
 namespace HACD
 {
@@ -52,7 +52,7 @@ namespace HACD
         CircularListElement<T> *  &             GetHead() { return m_head;}        
 		const CircularListElement<T> *          GetHead() const { return m_head;}
 		bool                                    IsEmpty() const { return (m_size == 0);}
-		physx::PxU32                                  GetSize() const { return m_size; }
+		hacd::HaU32                                  GetSize() const { return m_size; }
 		const T &                               GetData() const { return m_head->GetData(); }        
 		T &                                     GetData() { return m_head->GetData();}
 		bool                                    Delete() ;
@@ -74,7 +74,7 @@ namespace HACD
 		virtual								    ~CircularList(void) {Clear();};
 	private:
 		CircularListElement<T> *				m_head;		//!< a pointer to the head of the circular list
-		physx::PxU32									m_size;		//!< number of element in the circular list
+		hacd::HaU32									m_size;		//!< number of element in the circular list
         
 	};
 }

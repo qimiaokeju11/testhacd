@@ -10,21 +10,21 @@
 #include <assert.h>
 #include <new>
 
-namespace physx
+namespace hacd
 {
 
-    typedef signed __int64		PxI64;
-    typedef signed int			PxI32;
-    typedef signed short		PxI16;
-    typedef signed char			PxI8;
+    typedef signed __int64		HaI64;
+    typedef signed int			HaI32;
+    typedef signed short		HaI16;
+    typedef signed char			HaI8;
 
-    typedef unsigned __int64	PxU64;
-    typedef unsigned int		PxU32;
-    typedef unsigned short		PxU16;
-    typedef unsigned char		PxU8;
+    typedef unsigned __int64	HaU64;
+    typedef unsigned int		HaU32;
+    typedef unsigned short		HaU16;
+    typedef unsigned char		HaU8;
 
-    typedef float				PxF32;
-    typedef double				PxF64;
+    typedef float				HaF32;
+    typedef double				HaF64;
 
 
 

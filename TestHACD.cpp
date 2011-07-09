@@ -7,9 +7,9 @@
 
 #pragma warning(disable:4996 4100)
 
+#include "PlatformConfig.h"
 #include "wavefront.h"
 #include "HACD.h"
-#include "PxSimpleTypes.h"
 #include "FloatMath.h"
 
 #ifdef WIN32
@@ -68,7 +68,62 @@ int getIntArg(int arg,int argc,const char **argv)
 	}
 	return ret;
 }
+#if USE_MESH_IMPORT
 
+void createSkeletalMesh(hacd::MeshImport *meshImport,hacd::MeshSystemContainer *msc,HACD::HACD_API *skel)
+{
+	hacd::MeshSystemContainer *output = meshImport->createMeshSystemContainer();
+//	hacd::MeshSystem *ms = meshImport->getMeshSystem(msc);
+	hacd::HaU32 boneCount = skel->getConstraintCount();
+	if ( boneCount )
+	{
+		hacd::MeshImportInterface *import = meshImport->getMeshImportInterface(output);
+		char **boneNames = (char **)PX_ALLOC(sizeof(char *)*boneCount);
+		for (hacd::HaU32 i=0; i<boneCount; i++)
+		{
+			char scratch[512];
+			sprintf_s(scratch,"bone%d", i );
+			hacd::HaU32 slen = (hacd::HaU32)strlen(scratch);
+			boneNames[i] = (char *)PX_ALLOC(slen+1);
+			memcpy(boneNames[i],scratch,slen+1);
+		}
+		hacd::MeshSkeleton skeleton;
+		skeleton.mBoneCount = boneCount;
+		skeleton.mBones		= (hacd::MeshBone *)PX_ALLOC(sizeof(hacd::MeshBone)*boneCount);
+		for (hacd::HaU32 i=0; i<boneCount; i++)
+		{
+			const HACD::HACD_API::Constraint *c = skel->getConstraint(i);
+			hacd::MeshBone &b = skeleton.mBones[i];
+			new ( &b ) hacd::MeshBone;
+			b.mName = boneNames[i];
+			b.mPosition[0] = c->mIntersect[0];
+			b.mPosition[1] = c->mIntersect[1];
+			b.mPosition[2] = c->mIntersect[2];
+			b.mParentIndex = -1;
+		}
+
+		import->importSkeleton(skeleton);
+
+		meshImport->gather(output);
+		hacd::MeshSystem *out = meshImport->getMeshSystem(output);
+		hacd::MeshSerialize mserialize(hacd::MSF_EZMESH);
+		meshImport->serializeMeshSystem(out,mserialize);
+		if ( mserialize.mBaseData )
+		{
+			FILE *fph = fopen("skeleton.ezm", "wb");
+			fwrite(mserialize.mBaseData,mserialize.mBaseLen,1,fph);
+			fclose(fph);
+		}
+
+		meshImport->releaseSerializeMemory(mserialize);
+
+		PX_FREE(skeleton.mBones);
+		PX_FREE(boneNames);
+	}
+	meshImport->releaseMeshSystemContainer(output);
+}
+
+#endif
 
 void main(int argc,const char ** argv)
 {
@@ -81,6 +136,8 @@ void main(int argc,const char ** argv)
 		printf("-c		: Concavity (default 100)\r\n");
 		printf("-m		: Mimimum number of hulls (default 2)\r\n");
 		printf("-merge	: Specifies the merge percentage.  Default is zero.\r\n");
+		printf("-constraint : Auto-generates constraints for the output convex hulls.\r\n");
+		printf("-mesh	: Generates an output skeletal mesh with the mesh deformation distance passed.\r\n");
 		printf("\r\n");
 		printf("Example: TestHACD hornbug.obj -c 500 -m 5\r\n");
 		printf("\r\n");
@@ -90,6 +147,9 @@ void main(int argc,const char ** argv)
 		HACD::HACD_API::Desc desc;
 		const char *wavefront = argv[1];
 		int scan = 2;
+		bool generateConstraints = false;
+		bool generateSkeletalMesh = false;
+		hacd::HaF32 weightingDistance = 0.1f;
 		while ( scan < argc )
 		{
 			const char *option = argv[scan];
@@ -113,6 +173,22 @@ void main(int argc,const char ** argv)
 				desc.mMergePercentage = getFloatArg(scan+1,argc,argv);
 				scan+=2;
 			}
+			else if ( strcmp(option,"-constraint") == 0 )
+			{
+				generateConstraints = true;
+				scan++;
+			}
+			else if ( strcmp(option,"-mesh") == 0 )
+			{
+				weightingDistance = getFloatArg(scan+1,argc,argv);
+				generateConstraints = true;
+				generateSkeletalMesh = true;
+				scan+=2;
+			}
+			else
+			{
+				scan++;
+			}
 		}
 
 		HACD::gHACD = HACD::createHACD_API();
@@ -128,10 +204,10 @@ void main(int argc,const char ** argv)
 				*slash = 0;
 			}
 			printf("Loading MeshImporter DLL's from directory '%s'\r\n", path);
-			physx::MeshImport *meshImport = physx::loadMeshImporters(path);
-			physx::MeshSystemContainer *msc = NULL;
-			STDNAME::vector< physx::PxU32 > indices;
-			physx::fm_VertexIndex *vertices = NULL;
+			hacd::MeshImport *meshImport = hacd::loadMeshImporters(path);
+			hacd::MeshSystemContainer *msc = NULL;
+			STDNAME::vector< hacd::HaU32 > indices;
+			hacd::fm_VertexIndex *vertices = NULL;
 			if ( meshImport )
 			{
 				printf("Opening input mesh file '%s' for read access.\r\n", wavefront );
@@ -139,7 +215,7 @@ void main(int argc,const char ** argv)
 				if ( fph )
 				{
 					fseek(fph,0L,SEEK_END);
-					physx::PxU32 len = ftell(fph);
+					hacd::HaU32 len = ftell(fph);
 					fseek(fph,0L,SEEK_SET);
 					if ( len )
 					{
@@ -149,23 +225,23 @@ void main(int argc,const char ** argv)
 						msc = meshImport->createMeshSystemContainer(wavefront,buffer,len,NULL);
 						if ( msc )
 						{
-							physx::MeshSystem *ms = meshImport->getMeshSystem(msc);
+							hacd::MeshSystem *ms = meshImport->getMeshSystem(msc);
 							// ok, we new need to convert the input graphics mesh into a single indexed triangle list.
-							vertices = physx::fm_createVertexIndex(0.0001f,false);
-							for (physx::PxU32 i=0; i<ms->mMeshCount; i++)
+							vertices = hacd::fm_createVertexIndex(0.0001f,false);
+							for (hacd::HaU32 i=0; i<ms->mMeshCount; i++)
 							{
-								physx::Mesh *m = ms->mMeshes[i];
-								for (physx::PxU32 i=0; i<m->mSubMeshCount; i++)
+								hacd::Mesh *m = ms->mMeshes[i];
+								for (hacd::HaU32 i=0; i<m->mSubMeshCount; i++)
 								{
-									physx::SubMesh *sm = m->mSubMeshes[i];
-									for (physx::PxU32 i=0; i<sm->mTriCount; i++)
+									hacd::SubMesh *sm = m->mSubMeshes[i];
+									for (hacd::HaU32 i=0; i<sm->mTriCount; i++)
 									{
-										physx::PxU32 i1 = sm->mIndices[i*3+0];
-										physx::PxU32 i2 = sm->mIndices[i*3+1];
-										physx::PxU32 i3 = sm->mIndices[i*3+2];
-										physx::MeshVertex &v1 = m->mVertices[i1];
-										physx::MeshVertex &v2 = m->mVertices[i2];
-										physx::MeshVertex &v3 = m->mVertices[i3];
+										hacd::HaU32 i1 = sm->mIndices[i*3+0];
+										hacd::HaU32 i2 = sm->mIndices[i*3+1];
+										hacd::HaU32 i3 = sm->mIndices[i*3+2];
+										hacd::MeshVertex &v1 = m->mVertices[i1];
+										hacd::MeshVertex &v2 = m->mVertices[i2];
+										hacd::MeshVertex &v3 = m->mVertices[i3];
 										bool newPos;
 										i1 = vertices->getIndex(v1.mPos,newPos);
 										i2 = vertices->getIndex(v2.mPos,newPos);
@@ -189,7 +265,7 @@ void main(int argc,const char ** argv)
 					}
 					if ( indices.size() )
 					{
-						desc.mTriangleCount = (physx::PxU32)(indices.size()/3);
+						desc.mTriangleCount = (hacd::HaU32)(indices.size()/3);
 						desc.mIndices = &indices[0];
 						desc.mVertexCount = vertices->getVcount();
 						desc.mVertices = vertices->getVerticesFloat();
@@ -212,13 +288,13 @@ void main(int argc,const char ** argv)
 			{
 				desc.mTriangleCount = obj.mTriCount;
 				desc.mVertexCount = obj.mVertexCount;
-				desc.mIndices = (physx::PxU32 *)obj.mIndices;
+				desc.mIndices = (hacd::HaU32 *)obj.mIndices;
 				desc.mVertices = obj.mVertices;
 			}
 #endif		
 			if ( desc.mTriangleCount )
 			{
-				physx::PxU32 hullCount = HACD::gHACD->performHACD(desc);
+				hacd::HaU32 hullCount = HACD::gHACD->performHACD(desc);
 				if ( hullCount != 0 )
 				{
 					printf("Produced %d output convex hulls.\r\n", hullCount );
@@ -226,44 +302,68 @@ void main(int argc,const char ** argv)
 					if ( fph )
 					{
 						fprintf(fph,"# Input mesh '%s' produced %d convex hulls.\r\n", wavefront, hullCount );
-						physx::PxU32 *baseVertex = new physx::PxU32[hullCount];
-						physx::PxU32 vertexCount = 0;
-						for (physx::PxU32 i=0; i<hullCount; i++)
+						hacd::HaU32 *baseVertex = new hacd::HaU32[hullCount];
+						hacd::HaU32 vertexCount = 0;
+						for (hacd::HaU32 i=0; i<hullCount; i++)
 						{
 							const HACD::HACD_API::Hull *hull = HACD::gHACD->getHull(i);
 							if ( hull )
 							{
 								baseVertex[i] = vertexCount;
 								fprintf(fph,"## Hull %d has %d vertices.\r\n", i+1, hull->mVertexCount );
-								for (physx::PxU32 i=0; i<hull->mVertexCount; i++)
+								for (hacd::HaU32 i=0; i<hull->mVertexCount; i++)
 								{
-									const physx::PxF32 *p = &hull->mVertices[i*3];
+									const hacd::HaF32 *p = &hull->mVertices[i*3];
 									fprintf(fph,"v %0.9f %0.9f %0.9f\r\n", p[0], p[1], p[2] );
 								}
 								vertexCount+=hull->mVertexCount;
 							}
 						}
-						for (physx::PxU32 i=0; i<hullCount; i++)
+						for (hacd::HaU32 i=0; i<hullCount; i++)
 						{
 							const HACD::HACD_API::Hull *hull = HACD::gHACD->getHull(i);
 							if ( hull )
 							{
-								physx::PxU32 startVertex = baseVertex[i];
+								hacd::HaU32 startVertex = baseVertex[i];
 								fprintf(fph,"# Convex Hull %d contains %d triangles and %d vertices.  Starting vertex index is: %d It has a volume of: %0.9f\r\n", i+1, hull->mTriangleCount, hull->mVertexCount, startVertex);
-								for (physx::PxU32 j=0; j<hull->mTriangleCount; j++)
+								for (hacd::HaU32 j=0; j<hull->mTriangleCount; j++)
 								{
-									physx::PxU32 i1 = hull->mIndices[j*3+0]+startVertex+1;
-									physx::PxU32 i2 = hull->mIndices[j*3+1]+startVertex+1;
-									physx::PxU32 i3 = hull->mIndices[j*3+2]+startVertex+1;
+									hacd::HaU32 i1 = hull->mIndices[j*3+0]+startVertex+1;
+									hacd::HaU32 i2 = hull->mIndices[j*3+1]+startVertex+1;
+									hacd::HaU32 i3 = hull->mIndices[j*3+2]+startVertex+1;
 									fprintf(fph,"f %d %d %d\r\n", i1, i2, i3 );
 								}
 							}
 						}
-
 					}
 					else
 					{
 						printf("Failed to open output file.\r\n");
+					}
+					if ( generateConstraints && hullCount > 1 )
+					{
+						printf("Auto generating constraints between the convex hulls.\r\n");
+						hacd::HaU32 constraintCount = HACD::gHACD->generateConstraints();
+						printf("Generated %d constraints.\r\n", constraintCount );
+						for (hacd::HaU32 i=0; i<constraintCount; i++)
+						{
+							const HACD::HACD_API::Constraint *c = HACD::gHACD->getConstraint(i);
+							if ( c ) 
+							{
+								printf("Constraint%d : From Hull %d to Hull %d at location(%0.4f,%0.4f,%0.4f)\r\n", i+1,
+										c->mFrom,
+										c->mTo,
+										c->mIntersect[0],
+										c->mIntersect[1],
+										c->mIntersect[2] );
+							}
+						}
+#if USE_MESH_IMPORT
+						if ( generateSkeletalMesh )
+						{
+							createSkeletalMesh(meshImport,msc,HACD::gHACD);
+						}
+#endif
 					}
 				}
 			}

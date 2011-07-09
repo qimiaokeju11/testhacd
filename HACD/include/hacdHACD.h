@@ -22,7 +22,7 @@
 
 namespace HACD
 {
-    const physx::PxF64                                    sc_pi = 3.14159265;
+    const hacd::HaF64                                    sc_pi = 3.14159265;
 	class HACD;
 
 	typedef STDNAME::set< GraphEdgePQ > GraphEdgePQSet;
@@ -31,9 +31,9 @@ namespace HACD
 	class ReservablePriorityQueue
 	{
 	public:
-		void	reserve(physx::PxU32 size);
+		void	reserve(hacd::HaU32 size);
 		void	push(const GraphEdgePQ &pq);
-		physx::PxU32	size(void) const;
+		hacd::HaU32	size(void) const;
 		const GraphEdgePQ &	top(void);
 		void	pop(void);
 		bool	empty(void) const;
@@ -42,26 +42,26 @@ namespace HACD
 	};
 	
 	//! Provides an implementation of the Hierarchical Approximate Convex Decomposition (HACD) technique described in "A Simple and Efficient Approach for 3D Mesh Approximate Convex Decomposition" Game Programming Gems 8 - Chapter 2.8, p.202. A short version of the chapter was published in ICIP09 and is available at ftp://ftp.elet.polimi.it/users/Stefano.Tubaro/ICIP_USB_Proceedings_v2/pdfs/0003501.pdf
-	class HACD : public physx::UserAllocated
+	class HACD : public hacd::UserAllocated
 	{            
     public:
 		class CallBackFunction
 		{
 		public:
-			virtual bool progressUpdate(const char *message, physx::PxF64 progress, physx::PxF64 concavity, physx::PxU32 nVertices) = 0;
+			virtual bool progressUpdate(const char *message, hacd::HaF64 progress, hacd::HaF64 concavity, hacd::HaU32 nVertices) = 0;
 		};
 
 
 
 		//! Gives the triangles partitionas an array of size m_nTriangles where the i-th element specifies the cluster to which belong the i-th triangle
 		//! @return triangles partition
-		const physx::PxI32 * const							GetPartition() const { return m_partition;}
+		const hacd::HaI32 * const							GetPartition() const { return m_partition;}
         //! Sets the scale factor
 		//! @param scale scale factor
-		void										SetScaleFactor(physx::PxF64  scale) { m_scale = scale;}
+		void										SetScaleFactor(hacd::HaF64  scale) { m_scale = scale;}
 		//! Gives the scale factor
 		//! @return scale factor
-		const physx::PxF64								GetScaleFactor() const { return m_scale;}
+		const hacd::HaF64								GetScaleFactor() const { return m_scale;}
 		//! Sets the call-back function
 		//! @param callBack pointer to the call-back function
 		void										SetCallBack(CallBackFunction  *callBack) { m_callBack = callBack;}
@@ -89,71 +89,71 @@ namespace HACD
 		const bool									GetAddNeighboursDistPoints() const { return m_addExtraDistPoints;}
         //! Sets the points of the input mesh (Remark: the input points will be scaled and shifted. Use DenormalizeData() to invert those operations)
 		//! @param points pointer to the input points
-		void										SetPoints(Vec3<physx::PxF64>  * points) { m_points = points;}
+		void										SetPoints(Vec3<hacd::HaF64>  * points) { m_points = points;}
 		//! Gives the points of the input mesh (Remark: the input points will be scaled and shifted. Use DenormalizeData() to invert those operations)
 		//! @return pointer to the input points 
-		const Vec3<physx::PxF64>   *                      GetPoints() const { return m_points;}
+		const Vec3<hacd::HaF64>   *                      GetPoints() const { return m_points;}
 		//! Sets the triangles of the input mesh.
 		//! @param triangles points pointer to the input points
-		void										SetTriangles(Vec3<physx::PxI32>  * triangles) { m_triangles = triangles;}
+		void										SetTriangles(Vec3<hacd::HaI32>  * triangles) { m_triangles = triangles;}
 		//! Gives the triangles in the input mesh 
 		//! @return pointer to the input triangles 
-		const Vec3<physx::PxI32>   *			            GetTriangles() const { return m_triangles;}
+		const Vec3<hacd::HaI32>   *			            GetTriangles() const { return m_triangles;}
 		//! Sets the number of points in the input mesh.
 		//! @param nPoints number of points the input mesh
-		void										SetNPoints(physx::PxU32 nPoints) { m_nPoints = nPoints;}
+		void										SetNPoints(hacd::HaU32 nPoints) { m_nPoints = nPoints;}
 		//! Gives the number of points in the input mesh.
 		//! @return number of points the input mesh
-		const physx::PxU32								GetNPoints() const { return m_nPoints;}
+		const hacd::HaU32								GetNPoints() const { return m_nPoints;}
 		//! Sets the number of triangles in the input mesh.
 		//! @param nTriangles number of triangles in the input mesh
-		void										SetNTriangles(physx::PxU32 nTriangles) { m_nTriangles = nTriangles;}
+		void										SetNTriangles(hacd::HaU32 nTriangles) { m_nTriangles = nTriangles;}
 		//! Gives the number of triangles in the input mesh.
 		//! @return number of triangles the input mesh
-		const physx::PxU32								GetNTriangles() const { return m_nTriangles;}
+		const hacd::HaU32								GetNTriangles() const { return m_nTriangles;}
 		//! Sets the minimum number of clusters to be generated.
 		//! @param nClusters minimum number of clusters
-		void										SetNClusters(physx::PxU32 nClusters) { m_nMinClusters = nClusters;}
+		void										SetNClusters(hacd::HaU32 nClusters) { m_nMinClusters = nClusters;}
 		//! Gives the number of generated clusters.
 		//! @return number of generated clusters
-		const physx::PxU32								GetNClusters() const { return m_nClusters;}
+		const hacd::HaU32								GetNClusters() const { return m_nClusters;}
 		//! Sets the maximum allowed concavity.
 		//! @param concavity maximum concavity
-		void										SetConcavity(physx::PxF64 concavity) { m_concavity = concavity;}
+		void										SetConcavity(hacd::HaF64 concavity) { m_concavity = concavity;}
 		//! Gives the maximum allowed concavity.
 		//! @return maximum concavity
-		physx::PxF64                                      GetConcavity() const { return m_concavity;}
+		hacd::HaF64                                      GetConcavity() const { return m_concavity;}
         //! Sets the volume weight.
 		//! @param beta volume weight
-        void										SetVolumeWeight(physx::PxF64 beta) { m_beta = beta;}
+        void										SetVolumeWeight(hacd::HaF64 beta) { m_beta = beta;}
 		//! Gives the volume weight.
 		//! @return volume weight
-        physx::PxF64                                      GetVolumeWeight() const { return m_beta;}	
+        hacd::HaF64                                      GetVolumeWeight() const { return m_beta;}	
 		//! Sets the compacity weight (i.e. parameter alpha in ftp://ftp.elet.polimi.it/users/Stefano.Tubaro/ICIP_USB_Proceedings_v2/pdfs/0003501.pdf).
 		//! @param alpha compacity weight
-        void										SetCompacityWeight(physx::PxF64 alpha) { m_alpha = alpha;}
+        void										SetCompacityWeight(hacd::HaF64 alpha) { m_alpha = alpha;}
 		//! Gives the compacity weight (i.e. parameter alpha in ftp://ftp.elet.polimi.it/users/Stefano.Tubaro/ICIP_USB_Proceedings_v2/pdfs/0003501.pdf).
 		//! @return compacity weight
-        physx::PxF64                                      GetCompacityWeight() const { return m_alpha;}	
+        hacd::HaF64                                      GetCompacityWeight() const { return m_alpha;}	
 		//! Sets the maximum number of vertices for each generated convex-hull.
 		//! @param nVerticesPerCH maximum # vertices per CH
-        void										SetNVerticesPerCH(physx::PxU32 nVerticesPerCH) { m_nVerticesPerCH = nVerticesPerCH;}
+        void										SetNVerticesPerCH(hacd::HaU32 nVerticesPerCH) { m_nVerticesPerCH = nVerticesPerCH;}
 		//! Gives the maximum number of vertices for each generated convex-hull.
 		//! @return maximum # vertices per CH
-		const physx::PxU32								GetNVerticesPerCH() const { return m_nVerticesPerCH;}
+		const hacd::HaU32								GetNVerticesPerCH() const { return m_nVerticesPerCH;}
 		//! Gives the number of vertices for the cluster number numCH.
 		//! @return number of vertices
-		physx::PxU32                                      GetNPointsCH(physx::PxU32 numCH) const;
+		hacd::HaU32                                      GetNPointsCH(hacd::HaU32 numCH) const;
 		//! Gives the number of triangles for the cluster number numCH.
 		//! @param numCH cluster's number
 		//! @return number of triangles
-        physx::PxU32                                      GetNTrianglesCH(physx::PxU32 numCH) const;
+        hacd::HaU32                                      GetNTrianglesCH(hacd::HaU32 numCH) const;
 		//! Gives the vertices and the triangles of the cluster number numCH.
 		//! @param numCH cluster's number
 		//! @param points pointer to the vector of points to be filled
 		//! @param triangles pointer to the vector of triangles to be filled
 		//! @return true if sucess
-        bool                                        GetCH(physx::PxU32 numCH, Vec3<physx::PxF64> * const points, Vec3<physx::PxI32> * const triangles);     
+        bool                                        GetCH(hacd::HaU32 numCH, Vec3<hacd::HaF64> * const points, Vec3<hacd::HaI32> * const triangles);     
 		//! Computes the HACD decomposition.
 		//! @param connectCCs specifies whether to connect the mesh's Connected Components by additional edges or not
 		//! @param fullCH specifies whether to generate convex-hulls with a full or limited (i.e. < m_nVerticesPerCH) number of vertices
@@ -175,7 +175,7 @@ namespace HACD
 		//! @param a first vertex id
 		//! @param b second vertex id
 		//! @return edge's index
-		static physx::PxU64					GetEdgeIndex(physx::PxU64 a,physx::PxU64 b) 
+		static hacd::HaU64					GetEdgeIndex(hacd::HaU64 a,hacd::HaU64 b) 
 													{ 
 														if (a > b) return (a << 32) + b;
 														else	   return (b << 32) + a;
@@ -186,12 +186,12 @@ namespace HACD
 		//! @param ch the cluster's convex-hull
 		//! @param distPoints the cluster's points 
 		//! @return cluster's concavity
-		physx::PxF64										Concavity(ICHull & ch, DPointMap & distPoints);
+		hacd::HaF64										Concavity(ICHull & ch, DPointMap & distPoints);
 		//! Computes the perimeter of a cluster.
 		//! @param triIndices the cluster's triangles
 		//! @param distPoints the cluster's points 
 		//! @return cluster's perimeter
-        physx::PxF64										ComputePerimeter(const PxU32Vector & triIndices) const;
+        hacd::HaF64										ComputePerimeter(const HaU32Vector & triIndices) const;
 		//! Creates the Graph by associating to each mesh triangle a vertex in the graph and to each couple of adjacent triangles an edge in the graph.
 		//! @param connectCCs specifies whether to connect the mesh's Connected Components by additional edges or not 
         void										CreateGraph(bool connectCCs);	
@@ -199,7 +199,7 @@ namespace HACD
         void										InitializeGraph();
 		//! Computes the cost of an edge
 		//! @param e edge's id
-        void                                        ComputeEdgeCost(physx::PxU32 e);
+        void                                        ComputeEdgeCost(hacd::HaU32 e);
 		//! Initializes the priority queue
 		//! @param fast specifies whether fast mode is used
 		//! @return true if success
@@ -214,30 +214,30 @@ namespace HACD
 		void										Simplify();
 
 	private:
-		physx::PxF64										m_scale;					//>! scale factor used for NormalizeData() and DenormalizeData()
-        Vec3<physx::PxI32> *								m_triangles;				//>! pointer the triangles array
-        Vec3<physx::PxF64> *								m_points;					//>! pointer the points array
-        Vec3<physx::PxF64> *                              m_facePoints;               //>! pointer to the faces points array
-        Vec3<physx::PxF64> *                              m_faceNormals;              //>! pointer to the faces normals array
-        Vec3<physx::PxF64> *								m_normals;					//>! pointer the normals array
-        physx::PxU32										m_nTriangles;				//>! number of triangles in the original mesh
-        physx::PxU32										m_nPoints;					//>! number of vertices in the original mesh
-        physx::PxU32										m_nClusters;				//>! number of clusters
-        physx::PxU32										m_nMinClusters;				//>! minimum number of clusters
-        physx::PxF64										m_concavity;				//>! maximum concavity
-		physx::PxF64										m_alpha;					//>! compacity weigth
-        physx::PxF64                                      m_beta;                     //>! volume weigth
-        physx::PxF64										m_diag;						//>! length of the BB diagonal
-		Vec3<physx::PxF64>								m_barycenter;				//>! barycenter of the mesh
-		PxI32SetVector               m_v2T;						//!> vertex to triangle adjacency information
-        PxI32Vector                         m_cVertices;				//!> array of vertices each belonging to a different cluster
+		hacd::HaF64										m_scale;					//>! scale factor used for NormalizeData() and DenormalizeData()
+        Vec3<hacd::HaI32> *								m_triangles;				//>! pointer the triangles array
+        Vec3<hacd::HaF64> *								m_points;					//>! pointer the points array
+        Vec3<hacd::HaF64> *                              m_facePoints;               //>! pointer to the faces points array
+        Vec3<hacd::HaF64> *                              m_faceNormals;              //>! pointer to the faces normals array
+        Vec3<hacd::HaF64> *								m_normals;					//>! pointer the normals array
+        hacd::HaU32										m_nTriangles;				//>! number of triangles in the original mesh
+        hacd::HaU32										m_nPoints;					//>! number of vertices in the original mesh
+        hacd::HaU32										m_nClusters;				//>! number of clusters
+        hacd::HaU32										m_nMinClusters;				//>! minimum number of clusters
+        hacd::HaF64										m_concavity;				//>! maximum concavity
+		hacd::HaF64										m_alpha;					//>! compacity weigth
+        hacd::HaF64                                      m_beta;                     //>! volume weigth
+        hacd::HaF64										m_diag;						//>! length of the BB diagonal
+		Vec3<hacd::HaF64>								m_barycenter;				//>! barycenter of the mesh
+		HaI32SetVector               m_v2T;						//!> vertex to triangle adjacency information
+        HaI32Vector                         m_cVertices;				//!> array of vertices each belonging to a different cluster
         ICHull *                                    m_convexHulls;				//!> convex-hulls associated with the final HACD clusters
 		Graph										m_graph;					//!> simplification graph
-        physx::PxU32                                      m_nVerticesPerCH;			//!> maximum number of vertices per convex-hull
+        hacd::HaU32                                      m_nVerticesPerCH;			//!> maximum number of vertices per convex-hull
 		ReservablePriorityQueue						m_pqueue;
 		HACD(const HACD & rhs);
 		CallBackFunction							*m_callBack;					//!> call-back function
-		physx::PxI32 *										m_partition;				//!> array of size m_nTriangles where the i-th element specifies the cluster to which belong the i-th triangle
+		hacd::HaI32 *										m_partition;				//!> array of size m_nTriangles where the i-th element specifies the cluster to which belong the i-th triangle
         bool                                        m_addFacesPoints;           //>! specifies whether to add faces points or not
         bool                                        m_addExtraDistPoints;       //>! specifies whether to add extra points for concave shapes or not
 		bool										m_addNeighboursDistPoints;  //>! specifies whether to add extra points from adjacent clusters or not

@@ -6,19 +6,19 @@
 
 #pragma warning(disable:4100)
 
-static const physx::PxF32 EPSILON=0.0001f;
+static const hacd::HaF32 EPSILON=0.0001f;
 
 class QuickSortPointers
 {
 public:
-	void qsort(void **b,physx::PxI32 num)
+	void qsort(void **b,hacd::HaI32 num)
 	{
 		char *lo,*hi;
 		char *mid;
 		char *bottom, *top;
-		physx::PxI32 size;
+		hacd::HaI32 size;
 		char *lostk[30], *histk[30];
-		physx::PxI32 stkptr;
+		hacd::HaI32 stkptr;
 		char **base = (char **)b;
 
 		if (num < 2 ) return;
@@ -30,7 +30,7 @@ public:
 
 nextone:
 
-		size = (physx::PxI32)((physx::PxI32)(hi - lo) / sizeof(char**) + 1);
+		size = (hacd::HaI32)((hacd::HaI32)(hi - lo) / sizeof(char**) + 1);
 
 		mid = lo + (size / 2) * sizeof(char **);
 		swap((char **)mid,(char **)lo);
@@ -102,7 +102,7 @@ nextone:
 
 protected:
 	// -1 less, 0 equal, +1 greater.
-	virtual physx::PxI32 compare(void **p1,void **p2) = 0;
+	virtual hacd::HaI32 compare(void **p1,void **p2) = 0;
 private:
 	PX_INLINE void swap(char **a,char **b)
 	{
@@ -119,20 +119,20 @@ private:
 };
 
 
-class PxMergeConvexHulls : public MergeConvexHulls, public physx::UserAllocated, public QuickSortPointers
+class PxMergeConvexHulls : public MergeConvexHulls, public hacd::UserAllocated, public QuickSortPointers
 {
 public:
 
-	class ConvexResult : public Hull, public physx::UserAllocated
+	class ConvexResult : public Hull, public hacd::UserAllocated
 	{
 	public:
-		ConvexResult(physx::PxU32 hvcount,const physx::PxF32 *hvertices,physx::PxU32 htcount,const physx::PxU32 *hindices)
+		ConvexResult(hacd::HaU32 hvcount,const hacd::HaF32 *hvertices,hacd::HaU32 htcount,const hacd::HaU32 *hindices)
 		{
 			mVertexCount = hvcount;
 			if ( mVertexCount )
 			{
-				mVertices = (physx::PxF32 *)PX_ALLOC(mVertexCount*sizeof(physx::PxF32)*3);
-				memcpy((void *)mVertices, hvertices, sizeof(physx::PxF32)*3*mVertexCount );
+				mVertices = (hacd::HaF32 *)PX_ALLOC(mVertexCount*sizeof(hacd::HaF32)*3);
+				memcpy((void *)mVertices, hvertices, sizeof(hacd::HaF32)*3*mVertexCount );
 			}
 			else
 			{
@@ -143,8 +143,8 @@ public:
 
 			if ( mTriangleCount )
 			{
-				mIndices = (physx::PxU32 *)PX_ALLOC(sizeof(physx::PxU32)*mTriangleCount*3);
-				memcpy((void *)mIndices,hindices, sizeof(physx::PxU32)*mTriangleCount*3 );
+				mIndices = (hacd::HaU32 *)PX_ALLOC(sizeof(hacd::HaU32)*mTriangleCount*3);
+				memcpy((void *)mIndices,hindices, sizeof(hacd::HaU32)*mTriangleCount*3 );
 			}
 			else
 			{
@@ -158,8 +158,8 @@ public:
 			mVertexCount = r.mVertexCount;
 			if ( mVertexCount )
 			{
-				mVertices = (physx::PxF32 *)PX_ALLOC(mVertexCount*sizeof(physx::PxF32)*3);
-				memcpy((void *)mVertices, r.mVertices, sizeof(physx::PxF32)*3*mVertexCount );
+				mVertices = (hacd::HaF32 *)PX_ALLOC(mVertexCount*sizeof(hacd::HaF32)*3);
+				memcpy((void *)mVertices, r.mVertices, sizeof(hacd::HaF32)*3*mVertexCount );
 			}
 			else
 			{
@@ -168,8 +168,8 @@ public:
 			mTriangleCount = r.mTriangleCount;
 			if ( mTriangleCount )
 			{
-				mIndices = (physx::PxU32 *)PX_ALLOC(sizeof(physx::PxU32)*mTriangleCount*3);
-				memcpy((void *)mIndices, r.mIndices, sizeof(physx::PxU32)*mTriangleCount*3 );
+				mIndices = (hacd::HaU32 *)PX_ALLOC(sizeof(hacd::HaU32)*mTriangleCount*3);
+				memcpy((void *)mIndices, r.mIndices, sizeof(hacd::HaU32)*mTriangleCount*3 );
 			}
 			else
 			{
@@ -191,13 +191,13 @@ public:
 		CHull(const ConvexResult &result)
 		{
 			mResult = PX_NEW(ConvexResult)(result);
-			mVolume = physx::fm_computeMeshVolume( result.mVertices, result.mTriangleCount, result.mIndices );
+			mVolume = hacd::fm_computeMeshVolume( result.mVertices, result.mTriangleCount, result.mIndices );
 
-			mDiagonal = physx::fm_computeBestFitAABB( result.mVertexCount, result.mVertices, sizeof(physx::PxF32)*3, mMin, mMax );
+			mDiagonal = hacd::fm_computeBestFitAABB( result.mVertexCount, result.mVertices, sizeof(hacd::HaF32)*3, mMin, mMax );
 
-			physx::PxF32 dx = mMax[0] - mMin[0];
-			physx::PxF32 dy = mMax[1] - mMin[1];
-			physx::PxF32 dz = mMax[2] - mMin[2];
+			hacd::HaF32 dx = mMax[0] - mMin[0];
+			hacd::HaF32 dy = mMax[1] - mMin[1];
+			hacd::HaF32 dz = mMax[2] - mMin[2];
 
 			dx*=0.1f; // inflate 1/10th on each edge
 			dy*=0.1f; // inflate 1/10th on each edge
@@ -221,13 +221,13 @@ public:
 
 		bool overlap(const CHull &h) const
 		{
-			return physx::fm_intersectAABB(mMin,mMax, h.mMin, h.mMax );
+			return hacd::fm_intersectAABB(mMin,mMax, h.mMin, h.mMax );
 		}
 
-		physx::PxF32		mMin[3];
-		physx::PxF32		mMax[3];
-		physx::PxF32		mVolume;
-		physx::PxF32		mDiagonal; // long edge..
+		hacd::HaF32		mMin[3];
+		hacd::HaF32		mMax[3];
+		hacd::HaF32		mVolume;
+		hacd::HaF32		mDiagonal; // long edge..
 		ConvexResult		*mResult;
 	};
 
@@ -258,7 +258,7 @@ public:
 
 	virtual ~PxMergeConvexHulls(void)
 	{
-		for (physx::PxU32 i=0; i<mChulls.size(); i++)
+		for (hacd::HaU32 i=0; i<mChulls.size(); i++)
 		{
 			CHull *h = mChulls[i];
 			delete h;
@@ -273,13 +273,13 @@ public:
 		mChulls.push_back(hull);
 	}
 
-	virtual	physx::PxU32	performMerge(physx::PxF32 mergePercentage,physx::PxU32 maxHullVertices) 
+	virtual	hacd::HaU32	performMerge(hacd::HaF32 mergePercentage,hacd::HaU32 maxHullVertices) 
 	{
 		while ( combineHulls(mergePercentage,maxHullVertices ));
-		return (physx::PxU32)mChulls.size();
+		return (hacd::HaU32)mChulls.size();
 	}
 
-	virtual	const Hull		*getMergedHull(physx::PxU32 index)
+	virtual	const Hull		*getMergedHull(hacd::HaU32 index)
 	{
 		Hull *ret = NULL;
 		if ( index < mChulls.size() )
@@ -297,7 +297,7 @@ public:
 
 private:
 
-	virtual physx::PxI32 compare(void **p1,void **p2)
+	virtual hacd::HaI32 compare(void **p1,void **p2)
 	{
 		CHull **cp1 = (CHull **)p1;
 		CHull **cp2 = (CHull **)p2;
@@ -316,22 +316,22 @@ private:
 	void sortChulls(CHullVector & hulls)
 	{
 		CHull **hptr = &hulls[0];
-		qsort((void **)hptr,(physx::PxI32)hulls.size());
+		qsort((void **)hptr,(hacd::HaI32)hulls.size());
 	}
 
-	void getMesh(const ConvexResult &cr,physx::fm_VertexIndex *vc)
+	void getMesh(const ConvexResult &cr,hacd::fm_VertexIndex *vc)
 	{
-		const physx::PxU32 *src = cr.mIndices;
+		const hacd::HaU32 *src = cr.mIndices;
 
-		for (physx::PxU32 i=0; i<cr.mTriangleCount; i++)
+		for (hacd::HaU32 i=0; i<cr.mTriangleCount; i++)
 		{
 			size_t i1 = *src++;
 			size_t i2 = *src++;
 			size_t i3 = *src++;
 
-			const physx::PxF32 *p1 = &cr.mVertices[i1*3];
-			const physx::PxF32 *p2 = &cr.mVertices[i2*3];
-			const physx::PxF32 *p3 = &cr.mVertices[i3*3];
+			const hacd::HaF32 *p1 = &cr.mVertices[i1*3];
+			const hacd::HaF32 *p2 = &cr.mVertices[i2*3];
+			const hacd::HaF32 *p3 = &cr.mVertices[i3*3];
 			bool newPos;
 			i1 = vc->getIndex(p1,newPos);
 			i2 = vc->getIndex(p2,newPos);
@@ -340,7 +340,7 @@ private:
 	}
 
 
-	CHull * canMerge(CHull *a,CHull *b,physx::PxF32 mergePercent,physx::PxU32 maxHullVertices)
+	CHull * canMerge(CHull *a,CHull *b,hacd::HaF32 mergePercent,hacd::HaU32 maxHullVertices)
 	{
 		if ( !a->overlap(*b) ) return 0; // if their AABB's (with a little slop) don't overlap, then return.
 
@@ -354,33 +354,33 @@ private:
 		// ok..we are going to combine both meshes into a single mesh
 		// and then we are going to compute the concavity...
 
-		physx::fm_VertexIndex *vc = physx::fm_createVertexIndex((physx::PxF32)EPSILON,false);
+		hacd::fm_VertexIndex *vc = hacd::fm_createVertexIndex((hacd::HaF32)EPSILON,false);
 
 		getMesh( *a->mResult, vc);
 		getMesh( *b->mResult, vc);
 
-		physx::PxU32 vcount = vc->getVcount();
-		const physx::PxF32 *vertices = vc->getVerticesFloat();
+		hacd::HaU32 vcount = vc->getVcount();
+		const hacd::HaF32 *vertices = vc->getVerticesFloat();
 
-		physx::HullResult hresult;
-		physx::HullLibrary hl;
-		physx::HullDesc   desc;
+		hacd::HullResult hresult;
+		hacd::HullLibrary hl;
+		hacd::HullDesc   desc;
 
-		desc.SetHullFlag(physx::QF_TRIANGLES);
+		desc.SetHullFlag(hacd::QF_TRIANGLES);
 
-		desc.mVcount       = (physx::PxU32)vcount;
+		desc.mVcount       = (hacd::HaU32)vcount;
 		desc.mVertices     = vertices;
-		desc.mVertexStride = sizeof(physx::PxF32)*3;
+		desc.mVertexStride = sizeof(hacd::HaF32)*3;
 		desc.mMaxVertices = maxHullVertices;
 
-		physx::HullError hret = hl.CreateConvexHull(desc,hresult);
+		hacd::HullError hret = hl.CreateConvexHull(desc,hresult);
 
-		if ( hret == physx::QE_OK )
+		if ( hret == hacd::QE_OK )
 		{
-			physx::PxF32 combineVolume  = physx::fm_computeMeshVolume( hresult.mOutputVertices, hresult.mNumFaces, hresult.mIndices );
-			physx::PxF32 sumVolume      = a->mVolume + b->mVolume;
+			hacd::HaF32 combineVolume  = hacd::fm_computeMeshVolume( hresult.mOutputVertices, hresult.mNumFaces, hresult.mIndices );
+			hacd::HaF32 sumVolume      = a->mVolume + b->mVolume;
 
-			physx::PxF32 percent = (sumVolume*100) / combineVolume;
+			hacd::HaF32 percent = (sumVolume*100) / combineVolume;
 
 			if ( percent >= (100.0f-mergePercent)  )
 			{
@@ -395,7 +395,7 @@ private:
 
 
 
-	bool combineHulls(physx::PxF32 mergePercentage,physx::PxU32 maxHullVertices)
+	bool combineHulls(hacd::HaF32 mergePercentage,hacd::HaU32 maxHullVertices)
 	{
 
 		bool combine = false;

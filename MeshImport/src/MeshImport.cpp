@@ -17,14 +17,14 @@
 #include <string.h>
 #include <assert.h>
 
-namespace physx
+namespace hacd
 {
 
 MeshImport *gMeshImport=NULL;
 
 #ifdef WIN32
 
-static void *getMeshBindingInterface(const char *dll,PxI32 version_number) // loads the tetra maker DLL and returns the interface pointer.
+static void *getMeshBindingInterface(const char *dll,HaI32 version_number) // loads the tetra maker DLL and returns the interface pointer.
 {
   void *ret = 0;
 
@@ -38,7 +38,7 @@ static void *getMeshBindingInterface(const char *dll,PxI32 version_number) // lo
     void *proc = GetProcAddress(module,"getInterface");
     if ( proc )
     {
-		typedef void * (__cdecl * NX_GetToolkit)(PxI32 version);
+		typedef void * (__cdecl * NX_GetToolkit)(HaI32 version);
       ret = ((NX_GetToolkit)proc)(version_number);
     }
   }
@@ -58,7 +58,7 @@ static void *getMeshBindingInterface(const char *dll,PxI32 version_number) // lo
 
 #define MAXNAME 512
 
-#define MESHIMPORT_physx MESHIMPORT_##physx
+#define MESHIMPORT_physx MESHIMPORT_##hacd
 
 namespace MESHIMPORT_physx
 {
@@ -161,7 +161,7 @@ private:
 #ifdef WIN32
   WIN32_FIND_DATAA finddata;
   HANDLE hFindNext;
-  physx::PxI32 bFound;
+  hacd::HaI32 bFound;
 #endif
 #ifdef LINUX_GENERIC
   DIR      *mDir;
@@ -170,7 +170,7 @@ private:
 
 }; // end of namespace
 
-namespace physx
+namespace hacd
 {
 
 	using namespace MESHIMPORT_physx;
@@ -191,9 +191,9 @@ static const char *lastSlash(const char *foo)
   return ret;
 }
 
-physx::MeshImport * loadMeshImporters(const char * directory) // loads the mesh import library (dll) and all available importers from the same directory.
+hacd::MeshImport * loadMeshImporters(const char * directory) // loads the mesh import library (dll) and all available importers from the same directory.
 {
-  physx::MeshImport *ret = 0;
+  hacd::MeshImport *ret = 0;
 #ifdef _M_IX86
   const char *baseImporter = "MeshImport_x86.dll";
 #else
@@ -210,7 +210,7 @@ physx::MeshImport * loadMeshImporters(const char * directory) // loads the mesh 
   }
 
 #ifdef WIN32
-  ret = (physx::MeshImport *)getMeshBindingInterface(scratch,MESHIMPORT_VERSION);
+  ret = (hacd::MeshImport *)getMeshBindingInterface(scratch,MESHIMPORT_VERSION);
 #else
   ret = 0;
 #endif
@@ -218,9 +218,9 @@ physx::MeshImport * loadMeshImporters(const char * directory) // loads the mesh 
   if ( ret )
   {
 #ifdef _M_IX86
-      physx::FileFind ff(directory,"MeshImport*_x86.dll");
+      hacd::FileFind ff(directory,"MeshImport*_x86.dll");
 #else
-    physx::FileFind ff(directory,"MeshImport*_x64.dll");
+    hacd::FileFind ff(directory,"MeshImport*_x64.dll");
 #endif
     char name[MAXNAME];
     if ( ff.FindFirst(name) )
@@ -248,9 +248,9 @@ physx::MeshImport * loadMeshImporters(const char * directory) // loads the mesh 
 		  }
 
 #ifdef WIN32
-          physx::MeshImporter *imp = (physx::MeshImporter *)getMeshBindingInterface(fname,MESHIMPORT_VERSION);
+          hacd::MeshImporter *imp = (hacd::MeshImporter *)getMeshBindingInterface(fname,MESHIMPORT_VERSION);
 #else
-		  physx::MeshImporter *imp = 0;
+		  hacd::MeshImporter *imp = 0;
 #endif
           if ( imp )
           {

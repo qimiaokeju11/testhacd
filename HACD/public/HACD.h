@@ -2,7 +2,7 @@
 
 #define HACD_H
 
-#include <PxSimpleTypes.h>
+#include "PlatformConfig.h"
 #include <stdlib.h>
 
 namespace HACD
@@ -15,8 +15,18 @@ public:
 	class UserCallback
 	{
 	public:
-		virtual bool hacdProgressUpdate(const char *message, physx::PxF32 progress, physx::PxF32 concavity, physx::PxU32 nVertices) = 0;
+		virtual bool hacdProgressUpdate(const char *message, hacd::HaF32 progress, hacd::HaF32 concavity, hacd::HaU32 nVertices) = 0;
 	};
+
+	class Constraint
+	{
+	public:
+		hacd::HaU32	mFrom;			// The 'parent' hull
+		hacd::HaU32	mTo;			// The 'child' hull
+		hacd::HaF32	mNormal[3];		// the surface normal where the two hulls are joined
+		hacd::HaF32	mIntersect[3];	// the world space intersection point where the two hulls are joined.
+	};
+
 	class Desc
 	{
 	public:
@@ -26,14 +36,14 @@ public:
 		}
 
 		UserCallback		*mCallback;
-		physx::PxU32		mTriangleCount;
-		physx::PxU32		mVertexCount;
-		const physx::PxF32	*mVertices;
-		const physx::PxU32	*mIndices;
-		physx::PxU32		mMinHullCount;
-		physx::PxF32		mConcavity;
-		physx::PxU32		mMaxHullVertices;
-		physx::PxF32		mMergePercentage;
+		hacd::HaU32		mTriangleCount;
+		hacd::HaU32		mVertexCount;
+		const hacd::HaF32	*mVertices;
+		const hacd::HaU32	*mIndices;
+		hacd::HaU32		mMinHullCount;
+		hacd::HaF32		mConcavity;
+		hacd::HaU32		mMaxHullVertices;
+		hacd::HaF32		mMergePercentage;
 		void init(void)
 		{
 			mMergePercentage = 0;
@@ -51,15 +61,20 @@ public:
 	class Hull
 	{
 	public:
-		physx::PxU32			mTriangleCount;
-		physx::PxU32			mVertexCount;
-		const physx::PxF32		*mVertices;
-		const physx::PxU32		*mIndices;
+		hacd::HaU32			mTriangleCount;
+		hacd::HaU32			mVertexCount;
+		const hacd::HaF32		*mVertices;
+		const hacd::HaU32		*mIndices;
 	};
 
-	virtual physx::PxU32	performHACD(const Desc &desc) = 0;
-	virtual const Hull		*getHull(physx::PxU32 index) = 0;
+	virtual hacd::HaU32	performHACD(const Desc &desc) = 0;
+	virtual hacd::HaU32	getHullCount(void) = 0;
+	virtual const Hull		*getHull(hacd::HaU32 index) const = 0;
 	virtual void			releaseHACD(void) = 0; // release memory associated with the last HACD request
+	virtual hacd::HaU32	generateConstraints(void) = 0;
+	virtual hacd::HaU32	getConstraintCount(void) = 0;
+
+	virtual const Constraint		*getConstraint(hacd::HaU32 index)const  = 0;
 
 
 	virtual void release(void) = 0; // release the HACD_API interface

@@ -36,7 +36,7 @@
 
 #include "StanHull.h"
 
-namespace physx
+namespace hacd
 {
 
 //*****************************************************
@@ -47,25 +47,25 @@ template <class Type> class ArrayRet;
 template <class Type> class StanArray
 {
 	public:
-				StanArray(PxI32 s=0);
+				StanArray(HaI32 s=0);
 				StanArray(StanArray<Type> &array);
 				StanArray(ArrayRet<Type> &array);
 				~StanArray();
-	void		allocate(PxI32 s);
-	void		SetSize(PxI32 s);
+	void		allocate(HaI32 s);
+	void		SetSize(HaI32 s);
 	void		Pack();
 	Type&		Add(Type);
 	void		AddUnique(Type);
-	PxI32 		Contains(Type);
-	void		Insert(Type,PxI32);
-	PxI32	    IndexOf(Type);
+	HaI32 		Contains(Type);
+	void		Insert(Type,HaI32);
+	HaI32	    IndexOf(Type);
 	void		Remove(Type);
-	void		DelIndex(PxI32 i);
+	void		DelIndex(HaI32 i);
 	Type *		element;
-	PxI32			count;
-	PxI32			array_size;
-	const Type	&operator[](PxI32 i) const { PX_ASSERT(i>=0 && i<count);  return element[i]; }
-	Type		&operator[](PxI32 i)  { PX_ASSERT(i>=0 && i<count);  return element[i]; }
+	HaI32			count;
+	HaI32			array_size;
+	const Type	&operator[](HaI32 i) const { PX_ASSERT(i>=0 && i<count);  return element[i]; }
+	Type		&operator[](HaI32 i)  { PX_ASSERT(i>=0 && i<count);  return element[i]; }
 	Type		&Pop() { PX_ASSERT(count); count--;  return element[count]; }
 	StanArray<Type> &operator=(StanArray<Type> &array);
 	StanArray<Type> &operator=(ArrayRet<Type> &array);
@@ -76,7 +76,7 @@ template <class Type> class ArrayRet:public StanArray<Type>
 {
 };
 
-template <class Type> StanArray<Type>::StanArray(PxI32 s)
+template <class Type> StanArray<Type>::StanArray(HaI32 s)
 {
 	count=0;
 	array_size = 0;
@@ -93,7 +93,7 @@ template <class Type> StanArray<Type>::StanArray(StanArray<Type> &array)
 	count=0;
 	array_size = 0;
 	element = NULL;
-	for(PxI32 i=0;i<array.count;i++)
+	for(HaI32 i=0;i<array.count;i++)
 	{
 		Add(array[i]);
 	}
@@ -119,7 +119,7 @@ template <class Type> StanArray<Type> &StanArray<Type>::operator=(ArrayRet<Type>
 template <class Type> StanArray<Type> &StanArray<Type>::operator=(StanArray<Type> &array)
 {
 	count=0;
-	for(PxI32 i=0;i<array.count;i++)
+	for(HaI32 i=0;i<array.count;i++)
 	{
 		Add(array[i]);
 	}
@@ -135,7 +135,7 @@ template <class Type> StanArray<Type>::~StanArray()
 	count=0;array_size=0;element=NULL;
 }
 
-template <class Type> void StanArray<Type>::allocate(PxI32 s)
+template <class Type> void StanArray<Type>::allocate(HaI32 s)
 {
 	PX_ASSERT(s>0);
 	PX_ASSERT(s>=count);
@@ -143,7 +143,7 @@ template <class Type> void StanArray<Type>::allocate(PxI32 s)
 	array_size =s;
 	element = (Type *) PX_ALLOC( sizeof(Type)*array_size );
 	PX_ASSERT(element);
-	for(PxI32 i=0;i<count;i++)
+	for(HaI32 i=0;i<count;i++)
 	{
 		element[i]=old[i];
 	}
@@ -153,7 +153,7 @@ template <class Type> void StanArray<Type>::allocate(PxI32 s)
 	}
 }
 
-template <class Type> void StanArray<Type>::SetSize(PxI32 s)
+template <class Type> void StanArray<Type>::SetSize(HaI32 s)
 {
 	if(s==0)
 	{
@@ -187,10 +187,10 @@ template <class Type> Type& StanArray<Type>::Add(Type t)
 	return element[count-1];
 }
 
-template <class Type> PxI32 StanArray<Type>::Contains(Type t)
+template <class Type> HaI32 StanArray<Type>::Contains(Type t)
 {
-	PxI32 i;
-	PxI32 found=0;
+	HaI32 i;
+	HaI32 found=0;
 	for(i=0;i<count;i++)
 	{
 		if(element[i] == t) found++;
@@ -204,7 +204,7 @@ template <class Type> void StanArray<Type>::AddUnique(Type t)
 }
 
 
-template <class Type> void StanArray<Type>::DelIndex(PxI32 i)
+template <class Type> void StanArray<Type>::DelIndex(HaI32 i)
 {
 	PX_ASSERT(i<count);
 	count--;
@@ -217,7 +217,7 @@ template <class Type> void StanArray<Type>::DelIndex(PxI32 i)
 
 template <class Type> void StanArray<Type>::Remove(Type t)
 {
-	PxI32 i;
+	HaI32 i;
 	for(i=0;i<count;i++)
 	{
 		if(element[i] == t)
@@ -233,9 +233,9 @@ template <class Type> void StanArray<Type>::Remove(Type t)
 	}
 }
 
-template <class Type> void StanArray<Type>::Insert(Type t,PxI32 k)
+template <class Type> void StanArray<Type>::Insert(Type t,HaI32 k)
 {
-	PxI32 i=count;
+	HaI32 i=count;
 	Add(t); // to allocate space
 	while(i>k)
 	{
@@ -247,9 +247,9 @@ template <class Type> void StanArray<Type>::Insert(Type t,PxI32 k)
 }
 
 
-template <class Type> PxI32 StanArray<Type>::IndexOf(Type t)
+template <class Type> HaI32 StanArray<Type>::IndexOf(Type t)
 {
-	PxI32 i;
+	HaI32 i;
 	for(i=0;i<count;i++)
 	{
 		if(element[i] == t)
@@ -273,11 +273,11 @@ template <class Type> PxI32 StanArray<Type>::IndexOf(Type t)
 
 
 
-PxI32    argmin(PxF32 a[],PxI32 n);
-PxF32  sqr(PxF32 a); 
-PxF32  clampf(PxF32 a) ;
-PxF32  Round(PxF32 a,PxF32 precision);
-PxF32  Interpolate(const PxF32 &f0,const PxF32 &f1,PxF32 alpha) ;
+HaI32    argmin(HaF32 a[],HaI32 n);
+HaF32  sqr(HaF32 a); 
+HaF32  clampf(HaF32 a) ;
+HaF32  Round(HaF32 a,HaF32 precision);
+HaF32  Interpolate(const HaF32 &f0,const HaF32 &f1,HaF32 alpha) ;
 
 template <class T>
 void Swap(T &a,T &b) 
@@ -303,112 +303,112 @@ T Min(const T &a,const T &b)
 
 //----------------------------------
 
-class int3  : public physx::UserAllocated
+class int3  : public hacd::UserAllocated
 {
 public:
-	PxI32 x,y,z;
+	HaI32 x,y,z;
 	int3(){};
-	int3(PxI32 _x,PxI32 _y, PxI32 _z){x=_x;y=_y;z=_z;}
-	const PxI32& operator[](PxI32 i) const {return (&x)[i];}
-	PxI32& operator[](PxI32 i) {return (&x)[i];}
+	int3(HaI32 _x,HaI32 _y, HaI32 _z){x=_x;y=_y;z=_z;}
+	const HaI32& operator[](HaI32 i) const {return (&x)[i];}
+	HaI32& operator[](HaI32 i) {return (&x)[i];}
 };
 
 
 //-------- 2D --------
 
-class float2  : public physx::UserAllocated
+class float2  : public hacd::UserAllocated
 {
 public:
-	PxF32 x,y;
+	HaF32 x,y;
 	float2(){x=0;y=0;};
-	float2(PxF32 _x,PxF32 _y){x=_x;y=_y;}
-	PxF32& operator[](PxI32 i) {PX_ASSERT(i>=0&&i<2);return ((PxF32*)this)[i];}
-	const PxF32& operator[](PxI32 i) const {PX_ASSERT(i>=0&&i<2);return ((PxF32*)this)[i];}
+	float2(HaF32 _x,HaF32 _y){x=_x;y=_y;}
+	HaF32& operator[](HaI32 i) {PX_ASSERT(i>=0&&i<2);return ((HaF32*)this)[i];}
+	const HaF32& operator[](HaI32 i) const {PX_ASSERT(i>=0&&i<2);return ((HaF32*)this)[i];}
 };
 inline float2 operator-( const float2& a, const float2& b ){return float2(a.x-b.x,a.y-b.y);}
 inline float2 operator+( const float2& a, const float2& b ){return float2(a.x+b.x,a.y+b.y);}
 
 //--------- 3D ---------
 
-class float3  : public physx::UserAllocated // 3D
+class float3  : public hacd::UserAllocated // 3D
 {
 	public:
-	PxF32 x,y,z;
+	HaF32 x,y,z;
 	float3(){x=0;y=0;z=0;};
-	float3(PxF32 _x,PxF32 _y,PxF32 _z){x=_x;y=_y;z=_z;};
-	//operator PxF32 *() { return &x;};
-	PxF32& operator[](PxI32 i) {PX_ASSERT(i>=0&&i<3);return ((PxF32*)this)[i];}
-	const PxF32& operator[](PxI32 i) const {PX_ASSERT(i>=0&&i<3);return ((PxF32*)this)[i];}
+	float3(HaF32 _x,HaF32 _y,HaF32 _z){x=_x;y=_y;z=_z;};
+	//operator HaF32 *() { return &x;};
+	HaF32& operator[](HaI32 i) {PX_ASSERT(i>=0&&i<3);return ((HaF32*)this)[i];}
+	const HaF32& operator[](HaI32 i) const {PX_ASSERT(i>=0&&i<3);return ((HaF32*)this)[i];}
 };
 
 
 float3& operator+=( float3 &a, const float3& b );
 float3& operator-=( float3 &a ,const float3& b );
-float3& operator*=( float3 &v ,const PxF32 s );
-float3& operator/=( float3 &v, const PxF32 s );
+float3& operator*=( float3 &v ,const HaF32 s );
+float3& operator/=( float3 &v, const HaF32 s );
 
-PxF32  magnitude( const float3& v );
+HaF32  magnitude( const float3& v );
 float3 normalize( const float3& v );
 float3 safenormalize(const float3 &v);
 float3 vabs(const float3 &v);
 float3 operator+( const float3& a, const float3& b );
 float3 operator-( const float3& a, const float3& b );
 float3 operator-( const float3& v );
-float3 operator*( const float3& v, const PxF32 s );
-float3 operator*( const PxF32 s, const float3& v );
-float3 operator/( const float3& v, const PxF32 s );
-inline PxI32 operator==( const float3 &a, const float3 &b ) { return (a.x==b.x && a.y==b.y && a.z==b.z); }
-inline PxI32 operator!=( const float3 &a, const float3 &b ) { return (a.x!=b.x || a.y!=b.y || a.z!=b.z); }
+float3 operator*( const float3& v, const HaF32 s );
+float3 operator*( const HaF32 s, const float3& v );
+float3 operator/( const float3& v, const HaF32 s );
+inline HaI32 operator==( const float3 &a, const float3 &b ) { return (a.x==b.x && a.y==b.y && a.z==b.z); }
+inline HaI32 operator!=( const float3 &a, const float3 &b ) { return (a.x!=b.x || a.y!=b.y || a.z!=b.z); }
 // due to ambiguity and inconsistent standards ther are no overloaded operators for mult such as va*vb.
-PxF32  dot( const float3& a, const float3& b );
+HaF32  dot( const float3& a, const float3& b );
 float3 cmul( const float3 &a, const float3 &b);
 float3 cross( const float3& a, const float3& b );
-float3 Interpolate(const float3 &v0,const float3 &v1,PxF32 alpha);
-float3 Round(const float3& a,PxF32 precision);
+float3 Interpolate(const float3 &v0,const float3 &v1,HaF32 alpha);
+float3 Round(const float3& a,HaF32 precision);
 float3	VectorMax(const float3 &a, const float3 &b);
 float3	VectorMin(const float3 &a, const float3 &b);
 
 
 
-class float3x3  : public physx::UserAllocated
+class float3x3  : public hacd::UserAllocated
 {
 	public:
 	float3 x,y,z;  // the 3 rows of the Matrix
 	float3x3(){}
-	float3x3(PxF32 xx,PxF32 xy,PxF32 xz,PxF32 yx,PxF32 yy,PxF32 yz,PxF32 zx,PxF32 zy,PxF32 zz):x(xx,xy,xz),y(yx,yy,yz),z(zx,zy,zz){}
+	float3x3(HaF32 xx,HaF32 xy,HaF32 xz,HaF32 yx,HaF32 yy,HaF32 yz,HaF32 zx,HaF32 zy,HaF32 zz):x(xx,xy,xz),y(yx,yy,yz),z(zx,zy,zz){}
 	float3x3(float3 _x,float3 _y,float3 _z):x(_x),y(_y),z(_z){}
-	float3&       operator[](PxI32 i)       {PX_ASSERT(i>=0&&i<3);return (&x)[i];}
-	const float3& operator[](PxI32 i) const {PX_ASSERT(i>=0&&i<3);return (&x)[i];}
-	PxF32&        operator()(PxI32 r, PxI32 c)       {PX_ASSERT(r>=0&&r<3&&c>=0&&c<3);return ((&x)[r])[c];}
-	const PxF32&  operator()(PxI32 r, PxI32 c) const {PX_ASSERT(r>=0&&r<3&&c>=0&&c<3);return ((&x)[r])[c];}
+	float3&       operator[](HaI32 i)       {PX_ASSERT(i>=0&&i<3);return (&x)[i];}
+	const float3& operator[](HaI32 i) const {PX_ASSERT(i>=0&&i<3);return (&x)[i];}
+	HaF32&        operator()(HaI32 r, HaI32 c)       {PX_ASSERT(r>=0&&r<3&&c>=0&&c<3);return ((&x)[r])[c];}
+	const HaF32&  operator()(HaI32 r, HaI32 c) const {PX_ASSERT(r>=0&&r<3&&c>=0&&c<3);return ((&x)[r])[c];}
 }; 
 float3x3 Transpose( const float3x3& m );
 float3   operator*( const float3& v  , const float3x3& m  );
 float3   operator*( const float3x3& m , const float3& v   );
-float3x3 operator*( const float3x3& m , const PxF32& s   );
+float3x3 operator*( const float3x3& m , const HaF32& s   );
 float3x3 operator*( const float3x3& ma, const float3x3& mb );
-float3x3 operator/( const float3x3& a, const PxF32& s ) ;
+float3x3 operator/( const float3x3& a, const HaF32& s ) ;
 float3x3 operator+( const float3x3& a, const float3x3& b );
 float3x3 operator-( const float3x3& a, const float3x3& b );
 float3x3 &operator+=( float3x3& a, const float3x3& b );
 float3x3 &operator-=( float3x3& a, const float3x3& b );
-float3x3 &operator*=( float3x3& a, const PxF32& s );
-PxF32    Determinant(const float3x3& m );
+float3x3 &operator*=( float3x3& a, const HaF32& s );
+HaF32    Determinant(const float3x3& m );
 float3x3 Inverse(const float3x3& a);  // its just 3x3 so we simply do that cofactor method
 
 
 //-------- 4D Math --------
 
-class float4  : public physx::UserAllocated
+class float4  : public hacd::UserAllocated
 {
 public:
-	PxF32 x,y,z,w;
+	HaF32 x,y,z,w;
 	float4(){x=0;y=0;z=0;w=0;};
-	float4(PxF32 _x,PxF32 _y,PxF32 _z,PxF32 _w){x=_x;y=_y;z=_z;w=_w;}
-	float4(const float3 &v,PxF32 _w){x=v.x;y=v.y;z=v.z;w=_w;}
-	//operator PxF32 *() { return &x;};
-	PxF32& operator[](PxI32 i) {PX_ASSERT(i>=0&&i<4);return ((PxF32*)this)[i];}
-	const PxF32& operator[](PxI32 i) const {PX_ASSERT(i>=0&&i<4);return ((PxF32*)this)[i];}
+	float4(HaF32 _x,HaF32 _y,HaF32 _z,HaF32 _w){x=_x;y=_y;z=_z;w=_w;}
+	float4(const float3 &v,HaF32 _w){x=v.x;y=v.y;z=v.z;w=_w;}
+	//operator HaF32 *() { return &x;};
+	HaF32& operator[](HaI32 i) {PX_ASSERT(i>=0&&i<4);return ((HaF32*)this)[i];}
+	const HaF32& operator[](HaI32 i) const {PX_ASSERT(i>=0&&i<4);return ((HaF32*)this)[i];}
 	const float3& xyz() const { return *((float3*)this);}
 	float3&       xyz()       { return *((float3*)this);}
 };
@@ -416,31 +416,31 @@ public:
 
 struct D3DXMATRIX; 
 
-class float4x4  : public physx::UserAllocated
+class float4x4  : public hacd::UserAllocated
 {
 	public:
 	float4 x,y,z,w;  // the 4 rows
 	float4x4(){}
 	float4x4(const float4 &_x, const float4 &_y, const float4 &_z, const float4 &_w):x(_x),y(_y),z(_z),w(_w){}
-	float4x4(PxF32 m00, PxF32 m01, PxF32 m02, PxF32 m03, 
-						PxF32 m10, PxF32 m11, PxF32 m12, PxF32 m13, 
-				PxF32 m20, PxF32 m21, PxF32 m22, PxF32 m23, 
-				PxF32 m30, PxF32 m31, PxF32 m32, PxF32 m33 )
+	float4x4(HaF32 m00, HaF32 m01, HaF32 m02, HaF32 m03, 
+						HaF32 m10, HaF32 m11, HaF32 m12, HaF32 m13, 
+				HaF32 m20, HaF32 m21, HaF32 m22, HaF32 m23, 
+				HaF32 m30, HaF32 m31, HaF32 m32, HaF32 m33 )
 			:x(m00,m01,m02,m03),y(m10,m11,m12,m13),z(m20,m21,m22,m23),w(m30,m31,m32,m33){}
-	PxF32&       operator()(PxI32 r, PxI32 c)       {PX_ASSERT(r>=0&&r<4&&c>=0&&c<4);return ((&x)[r])[c];}
-	const PxF32& operator()(PxI32 r, PxI32 c) const {PX_ASSERT(r>=0&&r<4&&c>=0&&c<4);return ((&x)[r])[c];}
-		operator       PxF32* ()       {return &x.x;}
-		operator const PxF32* () const {return &x.x;}
+	HaF32&       operator()(HaI32 r, HaI32 c)       {PX_ASSERT(r>=0&&r<4&&c>=0&&c<4);return ((&x)[r])[c];}
+	const HaF32& operator()(HaI32 r, HaI32 c) const {PX_ASSERT(r>=0&&r<4&&c>=0&&c<4);return ((&x)[r])[c];}
+		operator       HaF32* ()       {return &x.x;}
+		operator const HaF32* () const {return &x.x;}
 	operator       struct D3DXMATRIX* ()       { return (struct D3DXMATRIX*) this;}
 	operator const struct D3DXMATRIX* () const { return (struct D3DXMATRIX*) this;}
 };
 
 
-PxI32     operator==( const float4 &a, const float4 &b );
-float4 Homogenize(const float3 &v3,const PxF32 &w=1.0f); // Turns a 3D float3 4D vector4 by appending w
+HaI32     operator==( const float4 &a, const float4 &b );
+float4 Homogenize(const float3 &v3,const HaF32 &w=1.0f); // Turns a 3D float3 4D vector4 by appending w
 float4 cmul( const float4 &a, const float4 &b);
-float4 operator*( const float4 &v, PxF32 s);
-float4 operator*( PxF32 s, const float4 &v);
+float4 operator*( const float4 &v, HaF32 s);
+float4 operator*( HaF32 s, const float4 &v);
 float4 operator+( const float4 &a, const float4 &b);
 float4 operator-( const float4 &a, const float4 &b);
 float4x4 operator*( const float4x4& a, const float4x4& b );
@@ -448,11 +448,11 @@ float4 operator*( const float4& v, const float4x4& m );
 float4x4 Inverse(const float4x4 &m);
 float4x4 MatrixRigidInverse(const float4x4 &m);
 float4x4 MatrixTranspose(const float4x4 &m);
-float4x4 MatrixPerspectiveFov(PxF32 fovy, PxF32 Aspect, PxF32 zn, PxF32 zf );
+float4x4 MatrixPerspectiveFov(HaF32 fovy, HaF32 Aspect, HaF32 zn, HaF32 zf );
 float4x4 MatrixTranslation(const float3 &t);
-float4x4 MatrixRotationZ(const PxF32 angle_radians);
+float4x4 MatrixRotationZ(const HaF32 angle_radians);
 float4x4 MatrixLookAt(const float3& eye, const float3& at, const float3& up);
-PxI32     operator==( const float4x4 &a, const float4x4 &b );
+HaI32     operator==( const float4x4 &a, const float4x4 &b );
 
 
 //-------- Quaternion ------------
@@ -461,9 +461,9 @@ class Quaternion :public float4
 {
  public:
 	Quaternion() { x = y = z = 0.0f; w = 1.0f; }
-	Quaternion( float3 v, PxF32 t ) { v = normalize(v); w = cosf(t/2.0f); v = v*sinf(t/2.0f); x = v.x; y = v.y; z = v.z; }
-	Quaternion(PxF32 _x, PxF32 _y, PxF32 _z, PxF32 _w){x=_x;y=_y;z=_z;w=_w;}
-	PxF32 angle() const { return acosf(w)*2.0f; }
+	Quaternion( float3 v, HaF32 t ) { v = normalize(v); w = cosf(t/2.0f); v = v*sinf(t/2.0f); x = v.x; y = v.y; z = v.z; }
+	Quaternion(HaF32 _x, HaF32 _y, HaF32 _z, HaF32 _w){x=_x;y=_y;z=_z;w=_w;}
+	HaF32 angle() const { return acosf(w)*2.0f; }
 	float3 axis() const { float3 a(x,y,z); if(fabsf(angle())<0.0000001f) return float3(1,0,0); return a*(1/sinf(angle()/2.0f)); }
 	float3 xdir() const { return float3( 1-2*(y*y+z*z),  2*(x*y+w*z),  2*(x*z-w*y) ); }
 	float3 ydir() const { return float3(   2*(x*y-w*z),1-2*(x*x+z*z),  2*(y*z+w*x) ); }
@@ -473,16 +473,16 @@ class Quaternion :public float4
 	void Normalize();
 };
 
-Quaternion& operator*=(Quaternion& a, PxF32 s );
-Quaternion	operator*( const Quaternion& a, PxF32 s );
+Quaternion& operator*=(Quaternion& a, HaF32 s );
+Quaternion	operator*( const Quaternion& a, HaF32 s );
 Quaternion	operator*( const Quaternion& a, const Quaternion& b);
 Quaternion	operator+( const Quaternion& a, const Quaternion& b );
 Quaternion	normalize( Quaternion a );
-PxF32		dot( const Quaternion &a, const Quaternion &b );
+HaF32		dot( const Quaternion &a, const Quaternion &b );
 float3		operator*( const Quaternion& q, const float3& v );
 float3		operator*( const float3& v, const Quaternion& q );
-Quaternion	slerp( Quaternion a, const Quaternion& b, PxF32 interp );
-Quaternion  Interpolate(const Quaternion &q0,const Quaternion &q1,PxF32 alpha); 
+Quaternion	slerp( Quaternion a, const Quaternion& b, HaF32 interp );
+Quaternion  Interpolate(const Quaternion &q0,const Quaternion &q1,HaF32 alpha); 
 Quaternion  RotationArc(float3 v0, float3 v1 );  // returns quat q where q*v0=v1
 Quaternion  Inverse(const Quaternion &q);
 float4x4     MatrixFromQuatVec(const Quaternion &q, const float3 &v);
@@ -490,12 +490,12 @@ float4x4     MatrixFromQuatVec(const Quaternion &q, const float3 &v);
 
 //------ Euler Angle -----
 
-Quaternion YawPitchRoll( PxF32 yaw, PxF32 pitch, PxF32 roll );
-PxF32 Yaw( const Quaternion& q );
-PxF32 Pitch( const Quaternion& q );
-PxF32 Roll( Quaternion q );
-PxF32 Yaw( const float3& v );
-PxF32 Pitch( const float3& v );
+Quaternion YawPitchRoll( HaF32 yaw, HaF32 pitch, HaF32 roll );
+HaF32 Yaw( const Quaternion& q );
+HaF32 Pitch( const Quaternion& q );
+HaF32 Roll( Quaternion q );
+HaF32 Yaw( const float3& v );
+HaF32 Pitch( const float3& v );
 
 
 //------- Plane ----------
@@ -504,15 +504,15 @@ class Plane
 {
 	public:
 	float3	normal;
-	PxF32	dist;   // distance below origin - the D from plane equasion Ax+By+Cz+D=0
-			Plane(const float3 &n,PxF32 d):normal(n),dist(d){}
+	HaF32	dist;   // distance below origin - the D from plane equasion Ax+By+Cz+D=0
+			Plane(const float3 &n,HaF32 d):normal(n),dist(d){}
 			Plane():normal(),dist(0){}
 	void	Transform(const float3 &position, const Quaternion &orientation);
 };
 
 inline Plane PlaneFlip(const Plane &plane){return Plane(-plane.normal,-plane.dist);}
-inline PxI32 operator==( const Plane &a, const Plane &b ) { return (a.normal==b.normal && a.dist==b.dist); }
-inline PxI32 coplanar( const Plane &a, const Plane &b ) { return (a==b || a==PlaneFlip(b)); }
+inline HaI32 operator==( const Plane &a, const Plane &b ) { return (a.normal==b.normal && a.dist==b.dist); }
+inline HaI32 coplanar( const Plane &a, const Plane &b ) { return (a==b || a==PlaneFlip(b)); }
 
 
 //--------- Utility Functions ------
@@ -520,14 +520,14 @@ inline PxI32 coplanar( const Plane &a, const Plane &b ) { return (a==b || a==Pla
 float3  PlaneLineIntersection(const Plane &plane, const float3 &p0, const float3 &p1);
 float3  PlaneProject(const Plane &plane, const float3 &point);
 float3  LineProject(const float3 &p0, const float3 &p1, const float3 &a);  // projects a onto infinite line p0p1
-PxF32   LineProjectTime(const float3 &p0, const float3 &p1, const float3 &a);
+HaF32   LineProjectTime(const float3 &p0, const float3 &p1, const float3 &a);
 float3  ThreePlaneIntersection(const Plane &p0,const Plane &p1, const Plane &p2);
-PxI32     PolyHit(const float3 *vert,const PxI32 n,const float3 &v0, const float3 &v1, float3 *impact=NULL, float3 *normal=NULL);
-PxI32     BoxInside(const float3 &p,const float3 &bmin, const float3 &bmax) ;
-PxI32     BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const float3 &bmax, float3 *impact);
-PxF32   DistanceBetweenLines(const float3 &ustart, const float3 &udir, const float3 &vstart, const float3 &vdir, float3 *upoint=NULL, float3 *vpoint=NULL);
+HaI32     PolyHit(const float3 *vert,const HaI32 n,const float3 &v0, const float3 &v1, float3 *impact=NULL, float3 *normal=NULL);
+HaI32     BoxInside(const float3 &p,const float3 &bmin, const float3 &bmax) ;
+HaI32     BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const float3 &bmax, float3 *impact);
+HaF32   DistanceBetweenLines(const float3 &ustart, const float3 &udir, const float3 &vstart, const float3 &vdir, float3 *upoint=NULL, float3 *vpoint=NULL);
 float3  TriNormal(const float3 &v0, const float3 &v1, const float3 &v2);
-float3  NormalOf(const float3 *vert, const PxI32 n);
+float3  NormalOf(const float3 *vert, const HaI32 n);
 Quaternion VirtualTrackBall(const float3 &cop, const float3 &cor, const float3 &dir0, const float3 &dir1);
 
 
@@ -538,26 +538,26 @@ Quaternion VirtualTrackBall(const float3 &cop, const float3 &cor, const float3 &
 //*****************************************************
 
 
-PxF32   sqr(PxF32 a) {return a*a;}
-PxF32   clampf(PxF32 a) {return Min(1.0f,Max(0.0f,a));}
+HaF32   sqr(HaF32 a) {return a*a;}
+HaF32   clampf(HaF32 a) {return Min(1.0f,Max(0.0f,a));}
 
 
-PxF32 Round(PxF32 a,PxF32 precision)
+HaF32 Round(HaF32 a,HaF32 precision)
 {
 	return floorf(0.5f+a/precision)*precision;
 }
 
 
-PxF32 Interpolate(const PxF32 &f0,const PxF32 &f1,PxF32 alpha) 
+HaF32 Interpolate(const HaF32 &f0,const HaF32 &f1,HaF32 alpha) 
 {
 	return f0*(1-alpha) + f1*alpha;
 }
 
 
-PxI32     argmin(PxF32 a[],PxI32 n)
+HaI32     argmin(HaF32 a[],HaI32 n)
 {
-	PxI32 r=0;
-	for(PxI32 i=1;i<n;i++) 
+	HaI32 r=0;
+	for(HaI32 i=1;i<n;i++) 
 		{
 		if(a[i]<a[r]) 
 				{
@@ -591,24 +591,24 @@ float3 operator-( const float3& v )
 }
 
 
-float3 operator*( const float3& v, PxF32 s )      
+float3 operator*( const float3& v, HaF32 s )      
 {
 	return float3( v.x*s, v.y*s, v.z*s ); 
 }
 
 
-float3 operator*( PxF32 s, const float3& v )      
+float3 operator*( HaF32 s, const float3& v )      
 {
 	return float3( v.x*s, v.y*s, v.z*s ); 
 }
 
 
-float3 operator/( const float3& v, PxF32 s )
+float3 operator/( const float3& v, HaF32 s )
 { 
 	return v*(1.0f/s); 
 }
 
-PxF32  dot( const float3& a, const float3& b )    
+HaF32  dot( const float3& a, const float3& b )    
 {
 	return a.x*b.x + a.y*b.y + a.z*b.z; 
 }
@@ -647,7 +647,7 @@ float3& operator-=( float3& a , const float3& b )
 }
 
 
-float3& operator*=(float3& v , PxF32 s )
+float3& operator*=(float3& v , HaF32 s )
 {
 		v.x *= s;
 		v.y *= s;
@@ -656,9 +656,9 @@ float3& operator*=(float3& v , PxF32 s )
 }
 
 
-float3& operator/=(float3& v , PxF32 s )
+float3& operator/=(float3& v , HaF32 s )
 {
-		PxF32 sinv = 1.0f / s;
+		HaF32 sinv = 1.0f / s;
 		v.x *= sinv;
 		v.y *= sinv;
 		v.z *= sinv;
@@ -671,7 +671,7 @@ float3 vabs(const float3 &v)
 }
 
 
-PxF32 magnitude( const float3& v )
+HaF32 magnitude( const float3& v )
 {
 		return sqrtf(sqr(v.x) + sqr( v.y)+ sqr(v.z));
 }
@@ -681,7 +681,7 @@ PxF32 magnitude( const float3& v )
 float3 normalize( const float3 &v )
 {
 	// this routine, normalize, is ok, provided magnitude works!!
-		PxF32 d=magnitude(v);
+		HaF32 d=magnitude(v);
 		if (d==0) 
 		{
 		printf("Cant normalize ZERO vector\n");
@@ -701,13 +701,13 @@ float3 safenormalize(const float3 &v)
 	return normalize(v);
 }
 
-float3 Round(const float3 &a,PxF32 precision)
+float3 Round(const float3 &a,HaF32 precision)
 {
 	return float3(Round(a.x,precision),Round(a.y,precision),Round(a.z,precision));
 }
 
 
-float3 Interpolate(const float3 &v0,const float3 &v1,PxF32 alpha) 
+float3 Interpolate(const float3 &v0,const float3 &v1,HaF32 alpha) 
 {
 	return v0*(1-alpha) + v1*alpha;
 }
@@ -733,7 +733,7 @@ float3 VectorMax(const float3 &a,const float3 &b)
 
 
 //------------ float3x3 ---------------
-PxF32 Determinant(const float3x3 &m)
+HaF32 Determinant(const float3x3 &m)
 {
 	return  m.x.x*m.y.y*m.z.z + m.y.x*m.z.y*m.x.z + m.z.x*m.x.y*m.y.z 
 			 -m.x.x*m.z.y*m.y.z - m.y.x*m.x.y*m.z.z - m.z.x*m.y.y*m.x.z ;
@@ -742,16 +742,16 @@ PxF32 Determinant(const float3x3 &m)
 float3x3 Inverse(const float3x3 &a)
 {
 	float3x3 b;
-	PxF32 d=Determinant(a);
+	HaF32 d=Determinant(a);
 	PX_ASSERT(d!=0);
-	for(PxI32 i=0;i<3;i++) 
+	for(HaI32 i=0;i<3;i++) 
 		{
-		for(PxI32 j=0;j<3;j++) 
+		for(HaI32 j=0;j<3;j++) 
 				{
-			PxI32 i1=(i+1)%3;
-			PxI32 i2=(i+2)%3;
-			PxI32 j1=(j+1)%3;
-			PxI32 j2=(j+2)%3;
+			HaI32 i1=(i+1)%3;
+			HaI32 i2=(i+2)%3;
+			HaI32 j1=(j+1)%3;
+			HaI32 j2=(j+2)%3;
 			// reverse indexs i&j to take transpose
 			b[j][i] = (a[i1][j1]*a[i2][j2]-a[i1][j2]*a[i2][j1])/d;
 		}
@@ -784,13 +784,13 @@ float3x3 operator*( const float3x3& a, const float3x3& b )
 	return float3x3(a.x*b,a.y*b,a.z*b);
 }
 
-float3x3 operator*( const float3x3& a, const PxF32& s )  
+float3x3 operator*( const float3x3& a, const HaF32& s )  
 { 
 	return float3x3(a.x*s, a.y*s ,a.z*s); 
 }
-float3x3 operator/( const float3x3& a, const PxF32& s )  
+float3x3 operator/( const float3x3& a, const HaF32& s )  
 { 
-	PxF32 t=1/s;
+	HaF32 t=1/s;
 	return float3x3(a.x*t, a.y*t ,a.z*t); 
 }
 float3x3 operator+( const float3x3& a, const float3x3& b )
@@ -815,7 +815,7 @@ float3x3 &operator-=( float3x3& a, const float3x3& b )
 	a.z-=b.z;
 	return a;
 }
-float3x3 &operator*=( float3x3& a, const PxF32& s )
+float3x3 &operator*=( float3x3& a, const HaF32& s )
 {
 	a.x*=s;
 	a.y*=s;
@@ -840,7 +840,7 @@ float4   operator*( const float4&   v, const float4x4& m )
 	return v.x*m.x + v.y*m.y + v.z*m.z + v.w*m.w; // yes this actually works
 }
 
-PxI32 operator==( const float4 &a, const float4 &b ) 
+HaI32 operator==( const float4 &a, const float4 &b ) 
 {
 	return (a.x==b.x && a.y==b.y && a.z==b.z && a.w==b.w);
 }
@@ -861,13 +861,13 @@ float4 cmul( const float4 &a, const float4 &b)
 }
 
 
-float4 operator*( const float4 &v, PxF32 s) 
+float4 operator*( const float4 &v, HaF32 s) 
 {
 	return float4(v.x*s,v.y*s,v.z*s,v.w*s);
 }
 
 
-float4 operator*( PxF32 s, const float4 &v) 
+float4 operator*( HaF32 s, const float4 &v) 
 {
 	return float4(v.x*s,v.y*s,v.z*s,v.w*s);
 }
@@ -886,7 +886,7 @@ float4 operator-( const float4 &a, const float4 &b)
 }
 
 
-float4 Homogenize(const float3 &v3,const PxF32 &w)
+float4 Homogenize(const float3 &v3,const HaF32 &w)
 {
 	return float4(v3.x,v3.y,v3.z,w);
 }
@@ -916,10 +916,10 @@ float4x4 MatrixRigidInverse(const float4x4 &m)
 }
 
 
-float4x4 MatrixPerspectiveFov(PxF32 fovy, PxF32 aspect, PxF32 zn, PxF32 zf )
+float4x4 MatrixPerspectiveFov(HaF32 fovy, HaF32 aspect, HaF32 zn, HaF32 zf )
 {
-	PxF32 h = 1.0f/tanf(fovy/2.0f); // view space height
-	PxF32 w = h / aspect ;  // view space width
+	HaF32 h = 1.0f/tanf(fovy/2.0f); // view space height
+	HaF32 w = h / aspect ;  // view space width
 	return float4x4(
 		w, 0, 0             ,   0,
 		0, h, 0             ,   0,
@@ -951,10 +951,10 @@ float4x4 MatrixTranslation(const float3 &t)
 }
 
 
-float4x4 MatrixRotationZ(const PxF32 angle_radians)
+float4x4 MatrixRotationZ(const HaF32 angle_radians)
 {
-	PxF32 s =  sinf(angle_radians);
-	PxF32 c =  cosf(angle_radians);
+	HaF32 s =  sinf(angle_radians);
+	HaF32 c =  cosf(angle_radians);
 	return float4x4(
 		c,  s,  0,  0,
 		-s, c,  0,  0,
@@ -964,7 +964,7 @@ float4x4 MatrixRotationZ(const PxF32 angle_radians)
 
 
 
-PxI32 operator==( const float4x4 &a, const float4x4 &b )
+HaI32 operator==( const float4x4 &a, const float4x4 &b )
 {
 	return (a.x==b.x && a.y==b.y && a.z==b.z && a.w==b.w);
 }
@@ -973,12 +973,12 @@ PxI32 operator==( const float4x4 &a, const float4x4 &b )
 float4x4 Inverse(const float4x4 &m)
 {
 	float4x4 d;
-	PxF32 *dst = &d.x.x;
-	PxF32 tmp[12]; /* temp array for pairs */
-	PxF32 src[16]; /* array of transpose source matrix */
-	PxF32 det; /* determinant */
+	HaF32 *dst = &d.x.x;
+	HaF32 tmp[12]; /* temp array for pairs */
+	HaF32 src[16]; /* array of transpose source matrix */
+	HaF32 det; /* determinant */
 	/* transpose matrix */
-	for ( PxI32 i = 0; i < 4; i++) {
+	for ( HaI32 i = 0; i < 4; i++) {
 		src[i] = m(i,0) ;
 		src[i + 4] = m(i,1);
 		src[i + 8] = m(i,2);
@@ -1048,7 +1048,7 @@ float4x4 Inverse(const float4x4 &m)
 	det=src[0]*dst[0]+src[1]*dst[1]+src[2]*dst[2]+src[3]*dst[3];
 	/* calculate matrix inverse */
 	det = 1/det;
-	for ( PxI32 j = 0; j < 16; j++)
+	for ( HaI32 j = 0; j < 16; j++)
 	dst[j] *= det;
 	return d;
 }
@@ -1067,7 +1067,7 @@ Quaternion operator*( const Quaternion& a, const Quaternion& b )
 }
 
 
-Quaternion operator*( const Quaternion& a, PxF32 b )
+Quaternion operator*( const Quaternion& a, HaF32 b )
 {
 	return Quaternion(a.x*b, a.y*b, a.z*b ,a.w*b);
 }
@@ -1077,7 +1077,7 @@ Quaternion  Inverse(const Quaternion &q)
 	return Quaternion(-q.x,-q.y,-q.z,q.w);
 }
 
-Quaternion& operator*=( Quaternion& q, const PxF32 s )
+Quaternion& operator*=( Quaternion& q, const HaF32 s )
 {
 		q.x *= s;
 		q.y *= s;
@@ -1087,7 +1087,7 @@ Quaternion& operator*=( Quaternion& q, const PxF32 s )
 }
 void Quaternion::Normalize()
 {
-	PxF32 m = sqrtf(sqr(w)+sqr(x)+sqr(y)+sqr(z));
+	HaF32 m = sqrtf(sqr(w)+sqr(x)+sqr(y)+sqr(z));
 	if(m<0.000000001f) {
 		w=1.0f;
 		x=y=z=0.0f;
@@ -1100,16 +1100,16 @@ float3 operator*( const Quaternion& q, const float3& v )
 {
 	// The following is equivalent to:   
 	//return (q.getmatrix() * v);  
-	PxF32 qx2 = q.x*q.x;
-	PxF32 qy2 = q.y*q.y;
-	PxF32 qz2 = q.z*q.z;
+	HaF32 qx2 = q.x*q.x;
+	HaF32 qy2 = q.y*q.y;
+	HaF32 qz2 = q.z*q.z;
 
-	PxF32 qxqy = q.x*q.y;
-	PxF32 qxqz = q.x*q.z;
-	PxF32 qxqw = q.x*q.w;
-	PxF32 qyqz = q.y*q.z;
-	PxF32 qyqw = q.y*q.w;
-	PxF32 qzqw = q.z*q.w;
+	HaF32 qxqy = q.x*q.y;
+	HaF32 qxqz = q.x*q.z;
+	HaF32 qxqw = q.x*q.w;
+	HaF32 qyqz = q.y*q.z;
+	HaF32 qyqw = q.y*q.w;
+	HaF32 qzqw = q.z*q.w;
 	return float3(
 		(1-2*(qy2+qz2))*v.x + (2*(qxqy-qzqw))*v.y + (2*(qxqz+qyqw))*v.z ,
 		(2*(qxqy+qzqw))*v.x + (1-2*(qx2+qz2))*v.y + (2*(qyqz-qxqw))*v.z ,
@@ -1121,14 +1121,14 @@ Quaternion operator+( const Quaternion& a, const Quaternion& b )
 	return Quaternion(a.x+b.x, a.y+b.y, a.z+b.z, a.w+b.w);
 }
 
-PxF32 dot( const Quaternion &a,const Quaternion &b )
+HaF32 dot( const Quaternion &a,const Quaternion &b )
 {
 	return  (a.w*b.w + a.x*b.x + a.y*b.y + a.z*b.z); 
 }
 
 Quaternion normalize( Quaternion a )
 {
-	PxF32 m = sqrtf(sqr(a.w)+sqr(a.x)+sqr(a.y)+sqr(a.z));
+	HaF32 m = sqrtf(sqr(a.w)+sqr(a.x)+sqr(a.y)+sqr(a.z));
 	if(m<0.000000001) 
 		{    
 		a.w=1;
@@ -1138,7 +1138,7 @@ Quaternion normalize( Quaternion a )
 	return a * (1/m);
 }
 
-Quaternion slerp( Quaternion a, const Quaternion& b, PxF32 interp )
+Quaternion slerp( Quaternion a, const Quaternion& b, HaF32 interp )
 {
 	if(dot(a,b) <0.0) 
 		{
@@ -1147,22 +1147,22 @@ Quaternion slerp( Quaternion a, const Quaternion& b, PxF32 interp )
 		a.y=-a.y;
 		a.z=-a.z;
 	}
-	PxF32 d = dot(a,b);
+	HaF32 d = dot(a,b);
 	if(d>=1.0) {
 		return a;
 	}
-	PxF32 theta = acosf(d);
+	HaF32 theta = acosf(d);
 	if(theta==0.0f) { return(a);}
 	return a*(sinf(theta-interp*theta)/sinf(theta)) + b*(sinf(interp*theta)/sinf(theta));
 }
 
 
-Quaternion Interpolate(const Quaternion &q0,const Quaternion &q1,PxF32 alpha) {
+Quaternion Interpolate(const Quaternion &q0,const Quaternion &q1,HaF32 alpha) {
 	return slerp(q0,q1,alpha);
 }
 
 
-Quaternion YawPitchRoll( PxF32 yaw, PxF32 pitch, PxF32 roll ) 
+Quaternion YawPitchRoll( HaF32 yaw, HaF32 pitch, HaF32 roll ) 
 {
 	roll  *= DEG2RAD;
 	yaw   *= DEG2RAD;
@@ -1170,33 +1170,33 @@ Quaternion YawPitchRoll( PxF32 yaw, PxF32 pitch, PxF32 roll )
 	return Quaternion(float3(0.0f,0.0f,1.0f),yaw)*Quaternion(float3(1.0f,0.0f,0.0f),pitch)*Quaternion(float3(0.0f,1.0f,0.0f),roll);
 }
 
-PxF32 Yaw( const Quaternion& q )
+HaF32 Yaw( const Quaternion& q )
 {
 	static float3 v;
 	v=q.ydir();
 	return (v.y==0.0&&v.x==0.0) ? 0.0f: atan2f(-v.x,v.y)*RAD2DEG;
 }
 
-PxF32 Pitch( const Quaternion& q )
+HaF32 Pitch( const Quaternion& q )
 {
 	static float3 v;
 	v=q.ydir();
 	return atan2f(v.z,sqrtf(sqr(v.x)+sqr(v.y)))*RAD2DEG;
 }
 
-PxF32 Roll( Quaternion q )
+HaF32 Roll( Quaternion q )
 {
 	q = Quaternion(float3(0.0f,0.0f,1.0f),-Yaw(q)*DEG2RAD)  *q;
 	q = Quaternion(float3(1.0f,0.0f,0.0f),-Pitch(q)*DEG2RAD)  *q;
 	return atan2f(-q.xdir().z,q.xdir().x)*RAD2DEG;
 }
 
-PxF32 Yaw( const float3& v )
+HaF32 Yaw( const float3& v )
 {
 	return (v.y==0.0&&v.x==0.0) ? 0.0f: atan2f(-v.x,v.y)*RAD2DEG;
 }
 
-PxF32 Pitch( const float3& v )
+HaF32 Pitch( const float3& v )
 {
 	return atan2f(v.z,sqrtf(sqr(v.x)+sqr(v.y)))*RAD2DEG;
 }
@@ -1232,9 +1232,9 @@ Quaternion RotationArc(float3 v0,float3 v1){
 	v0 = normalize(v0);  // Comment these two lines out if you know its not needed.
 	v1 = normalize(v1);  // If vector is already unit length then why do it again?
 	float3  c = cross(v0,v1);
-	PxF32   d = dot(v0,v1);
+	HaF32   d = dot(v0,v1);
 	if(d<=-1.0f) { return Quaternion(1,0,0,0);} // 180 about x axis
-	PxF32   s = sqrtf((1+d)*2);
+	HaF32   s = sqrtf((1+d)*2);
 	q.x = c.x / s;
 	q.y = c.y / s;
 	q.z = c.z / s;
@@ -1246,16 +1246,16 @@ Quaternion RotationArc(float3 v0,float3 v1){
 float4x4 MatrixFromQuatVec(const Quaternion &q, const float3 &v) 
 {
 	// builds a 4x4 transformation matrix based on orientation q and translation v 
-	PxF32 qx2 = q.x*q.x;
-	PxF32 qy2 = q.y*q.y;
-	PxF32 qz2 = q.z*q.z;
+	HaF32 qx2 = q.x*q.x;
+	HaF32 qy2 = q.y*q.y;
+	HaF32 qz2 = q.z*q.z;
 
-	PxF32 qxqy = q.x*q.y;
-	PxF32 qxqz = q.x*q.z;
-	PxF32 qxqw = q.x*q.w;
-	PxF32 qyqz = q.y*q.z;
-	PxF32 qyqw = q.y*q.w;
-	PxF32 qzqw = q.z*q.w;
+	HaF32 qxqy = q.x*q.y;
+	HaF32 qxqz = q.x*q.z;
+	HaF32 qxqw = q.x*q.w;
+	HaF32 qyqz = q.y*q.z;
+	HaF32 qyqw = q.y*q.w;
+	HaF32 qzqw = q.z*q.w;
 
 	return float4x4(
 		1-2*(qy2+qz2),  
@@ -1282,8 +1282,8 @@ float3 PlaneLineIntersection(const Plane &plane, const float3 &p0, const float3 
 	// returns the point where the line p0-p1 intersects the plane n&d
 				static float3 dif;
 		dif = p1-p0;
-				PxF32 dn= dot(plane.normal,dif);
-				PxF32 t = -(plane.dist+dot(plane.normal,p0) )/dn;
+				HaF32 dn= dot(plane.normal,dif);
+				HaF32 t = -(plane.dist+dot(plane.normal,p0) )/dn;
 				return p0 + (dif*t);
 }
 
@@ -1296,16 +1296,16 @@ float3 LineProject(const float3 &p0, const float3 &p1, const float3 &a)
 {
 	float3 w;
 	w = p1-p0;
-	PxF32 t= dot(w,(a-p0)) / (sqr(w.x)+sqr(w.y)+sqr(w.z));
+	HaF32 t= dot(w,(a-p0)) / (sqr(w.x)+sqr(w.y)+sqr(w.z));
 	return p0+ w*t;
 }
 
 
-PxF32 LineProjectTime(const float3 &p0, const float3 &p1, const float3 &a)
+HaF32 LineProjectTime(const float3 &p0, const float3 &p1, const float3 &a)
 {
 	float3 w;
 	w = p1-p0;
-	PxF32 t= dot(w,(a-p0)) / (sqr(w.x)+sqr(w.y)+sqr(w.z));
+	HaF32 t= dot(w,(a-p0)) / (sqr(w.x)+sqr(w.y)+sqr(w.z));
 	return t;
 }
 
@@ -1316,14 +1316,14 @@ float3 TriNormal(const float3 &v0, const float3 &v1, const float3 &v2)
 	// return the normal of the triangle
 	// inscribed by v0, v1, and v2
 	float3 cp=cross(v1-v0,v2-v1);
-	PxF32 m=magnitude(cp);
+	HaF32 m=magnitude(cp);
 	if(m==0) return float3(1,0,0);
 	return cp*(1.0f/m);
 }
 
 
 
-PxI32 BoxInside(const float3 &p, const float3 &bmin, const float3 &bmax) 
+HaI32 BoxInside(const float3 &p, const float3 &bmin, const float3 &bmax) 
 {
 	return (p.x >= bmin.x && p.x <=bmax.x && 
 			p.y >= bmin.y && p.y <=bmax.y && 
@@ -1331,7 +1331,7 @@ PxI32 BoxInside(const float3 &p, const float3 &bmin, const float3 &bmax)
 }
 
 
-PxI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const float3 &bmax,float3 *impact)
+HaI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const float3 &bmax,float3 *impact)
 {
 	if(BoxInside(v0,bmin,bmax))
 		{
@@ -1340,10 +1340,10 @@ PxI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const
 		}
 	if(v0.x<=bmin.x && v1.x>=bmin.x) 
 		{
-		PxF32 a = (bmin.x-v0.x)/(v1.x-v0.x);
+		HaF32 a = (bmin.x-v0.x)/(v1.x-v0.x);
 		//v.x = bmin.x;
-		PxF32 vy =  (1-a) *v0.y + a*v1.y;
-		PxF32 vz =  (1-a) *v0.z + a*v1.z;
+		HaF32 vy =  (1-a) *v0.y + a*v1.y;
+		HaF32 vz =  (1-a) *v0.z + a*v1.z;
 		if(vy>=bmin.y && vy<=bmax.y && vz>=bmin.z && vz<=bmax.z) 
 				{
 			impact->x = bmin.x;
@@ -1354,10 +1354,10 @@ PxI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const
 	}
 	else if(v0.x >= bmax.x  &&  v1.x <= bmax.x) 
 		{
-		PxF32 a = (bmax.x-v0.x)/(v1.x-v0.x);
+		HaF32 a = (bmax.x-v0.x)/(v1.x-v0.x);
 		//v.x = bmax.x;
-		PxF32 vy =  (1-a) *v0.y + a*v1.y;
-		PxF32 vz =  (1-a) *v0.z + a*v1.z;
+		HaF32 vy =  (1-a) *v0.y + a*v1.y;
+		HaF32 vz =  (1-a) *v0.z + a*v1.z;
 		if(vy>=bmin.y && vy<=bmax.y && vz>=bmin.z && vz<=bmax.z) 
 				{
 			impact->x = bmax.x;
@@ -1368,10 +1368,10 @@ PxI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const
 	}
 	if(v0.y<=bmin.y && v1.y>=bmin.y) 
 		{
-		PxF32 a = (bmin.y-v0.y)/(v1.y-v0.y);
-		PxF32 vx =  (1-a) *v0.x + a*v1.x;
+		HaF32 a = (bmin.y-v0.y)/(v1.y-v0.y);
+		HaF32 vx =  (1-a) *v0.x + a*v1.x;
 		//v.y = bmin.y;
-		PxF32 vz =  (1-a) *v0.z + a*v1.z;
+		HaF32 vz =  (1-a) *v0.z + a*v1.z;
 		if(vx>=bmin.x && vx<=bmax.x && vz>=bmin.z && vz<=bmax.z) 
 				{
 			impact->x = vx;
@@ -1382,10 +1382,10 @@ PxI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const
 	}
 	else if(v0.y >= bmax.y  &&  v1.y <= bmax.y) 
 		{
-		PxF32 a = (bmax.y-v0.y)/(v1.y-v0.y);
-		PxF32 vx =  (1-a) *v0.x + a*v1.x;
+		HaF32 a = (bmax.y-v0.y)/(v1.y-v0.y);
+		HaF32 vx =  (1-a) *v0.x + a*v1.x;
 		// vy = bmax.y;
-		PxF32 vz =  (1-a) *v0.z + a*v1.z;
+		HaF32 vz =  (1-a) *v0.z + a*v1.z;
 		if(vx>=bmin.x && vx<=bmax.x && vz>=bmin.z && vz<=bmax.z) 
 				{
 			impact->x = vx;
@@ -1396,9 +1396,9 @@ PxI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const
 	}
 	if(v0.z<=bmin.z && v1.z>=bmin.z) 
 		{
-		PxF32 a = (bmin.z-v0.z)/(v1.z-v0.z);
-		PxF32 vx =  (1-a) *v0.x + a*v1.x;
-		PxF32 vy =  (1-a) *v0.y + a*v1.y;
+		HaF32 a = (bmin.z-v0.z)/(v1.z-v0.z);
+		HaF32 vx =  (1-a) *v0.x + a*v1.x;
+		HaF32 vy =  (1-a) *v0.y + a*v1.y;
 		// v.z = bmin.z;
 		if(vy>=bmin.y && vy<=bmax.y && vx>=bmin.x && vx<=bmax.x) 
 				{
@@ -1410,9 +1410,9 @@ PxI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const
 	}
 	else if(v0.z >= bmax.z  &&  v1.z <= bmax.z) 
 		{
-		PxF32 a = (bmax.z-v0.z)/(v1.z-v0.z);
-		PxF32 vx =  (1-a) *v0.x + a*v1.x;
-		PxF32 vy =  (1-a) *v0.y + a*v1.y;
+		HaF32 a = (bmax.z-v0.z)/(v1.z-v0.z);
+		HaF32 vx =  (1-a) *v0.x + a*v1.x;
+		HaF32 vy =  (1-a) *v0.y + a*v1.y;
 		// v.z = bmax.z;
 		if(vy>=bmin.y && vy<=bmax.y && vx>=bmin.x && vx<=bmax.x) 
 				{
@@ -1426,14 +1426,14 @@ PxI32 BoxIntersect(const float3 &v0, const float3 &v1, const float3 &bmin, const
 }
 
 
-PxF32 DistanceBetweenLines(const float3 &ustart, const float3 &udir, const float3 &vstart, const float3 &vdir, float3 *upoint, float3 *vpoint)
+HaF32 DistanceBetweenLines(const float3 &ustart, const float3 &udir, const float3 &vstart, const float3 &vdir, float3 *upoint, float3 *vpoint)
 {
 	static float3 cp;
 	cp = normalize(cross(udir,vdir));
 
-	PxF32 distu = -dot(cp,ustart);
-	PxF32 distv = -dot(cp,vstart);
-	PxF32 dist = (PxF32)fabs(distu-distv);
+	HaF32 distu = -dot(cp,ustart);
+	HaF32 distv = -dot(cp,vstart);
+	HaF32 dist = (HaF32)fabs(distu-distv);
 	if(upoint) 
 		{
 		Plane plane;
@@ -1463,12 +1463,12 @@ Quaternion VirtualTrackBall(const float3 &cop, const float3 &cor, const float3 &
 	// pretend there is a sphere around cor.  Then find the points
 	// where dir1 and dir2 intersect that sphere.  Find the
 	// rotation that takes the first point to the second.
-	PxF32 m;
+	HaF32 m;
 	// compute plane 
 	float3 nrml = cor - cop;
-	PxF32 fudgefactor = 1.0f/(magnitude(nrml) * 0.25f); // since trackball proportional to distance from cop
+	HaF32 fudgefactor = 1.0f/(magnitude(nrml) * 0.25f); // since trackball proportional to distance from cop
 	nrml = normalize(nrml);
-	PxF32 dist = -dot(nrml,cor);
+	HaF32 dist = -dot(nrml,cor);
 	float3 u= PlaneLineIntersection(Plane(nrml,dist),cop,cop+dir1);
 	u=u-cor;
 	u=u*fudgefactor;
@@ -1497,27 +1497,27 @@ Quaternion VirtualTrackBall(const float3 &cop, const float3 &cor, const float3 &
 }
 
 
-PxI32 countpolyhit=0;
-PxI32 PolyHit(const float3 *vert, const PxI32 n, const float3 &v0, const float3 &v1, float3 *impact, float3 *normal)
+HaI32 countpolyhit=0;
+HaI32 PolyHit(const float3 *vert, const HaI32 n, const float3 &v0, const float3 &v1, float3 *impact, float3 *normal)
 {
 	countpolyhit++;
-	PxI32 i;
+	HaI32 i;
 	float3 nrml(0,0,0);
 	for(i=0;i<n;i++) 
 		{
-		PxI32 i1=(i+1)%n;
-		PxI32 i2=(i+2)%n;
+		HaI32 i1=(i+1)%n;
+		HaI32 i2=(i+2)%n;
 		nrml = nrml + cross(vert[i1]-vert[i],vert[i2]-vert[i1]);
 	}
 
-	PxF32 m = magnitude(nrml);
+	HaF32 m = magnitude(nrml);
 	if(m==0.0)
 		{
 				return 0;
 		}
 	nrml = nrml * (1.0f/m);
-	PxF32 dist = -dot(nrml,vert[0]);
-	PxF32 d0,d1;
+	HaF32 dist = -dot(nrml,vert[0]);
+	HaF32 d0,d1;
 	if((d0=dot(v0,nrml)+dist) <0  ||  (d1=dot(v1,nrml)+dist) >0) 
 		{        
 				return 0;
@@ -1527,12 +1527,12 @@ PxI32 PolyHit(const float3 *vert, const PxI32 n, const float3 &v0, const float3 
 	// By using the cached plane distances d0 and d1
 	// we can optimize the following:
 	//     the_point = planelineintersection(nrml,dist,v0,v1);
-	PxF32 a = d0/(d0-d1);
+	HaF32 a = d0/(d0-d1);
 	the_point = v0*(1-a) + v1*a;
 
 
-	PxI32 inside=1;
-	for(PxI32 j=0;inside && j<n;j++) 
+	HaI32 inside=1;
+	for(HaI32 j=0;inside && j<n;j++) 
 		{
 			// let inside = 0 if outside
 			float3 pp1,pp2,side;
@@ -1565,14 +1565,14 @@ public:
 		mIndices  = 0;
 	}
 
-	PxU32 mVcount;
-	PxU32 mIndexCount;
-	PxU32 mFaceCount;
-	PxF32       *mVertices;
-	PxU32 *mIndices;
+	HaU32 mVcount;
+	HaU32 mIndexCount;
+	HaU32 mFaceCount;
+	HaF32       *mVertices;
+	HaU32 *mIndices;
 };
 
-bool ComputeHull(PxU32 vcount,const PxF32 *vertices,PHullResult &result,PxU32 maxverts,PxF32 inflate);
+bool ComputeHull(HaU32 vcount,const HaF32 *vertices,PHullResult &result,HaU32 maxverts,HaF32 inflate);
 void ReleaseHull(PHullResult &result);
 
 //*****************************************************
@@ -1581,7 +1581,7 @@ void ReleaseHull(PHullResult &result);
 
 
 #define REAL3 float3
-#define REAL  PxF32
+#define REAL  HaF32
 
 #define COPLANAR   (0)
 #define UNDER      (1)
@@ -1590,29 +1590,29 @@ void ReleaseHull(PHullResult &result);
 #define PAPERWIDTH (0.001f)
 #define VOLUME_EPSILON (1e-20f)
 
-PxF32 planetestepsilon = PAPERWIDTH;
+HaF32 planetestepsilon = PAPERWIDTH;
 
-class ConvexH : public physx::UserAllocated
+class ConvexH : public hacd::UserAllocated
 {
   public:
 	class HalfEdge
 	{
 	  public:
 		short ea;         // the other half of the edge (index into edges list)
-		PxU8 v;  // the vertex at the start of this edge (index into vertices list)
-		PxU8 p;  // the facet on which this edge lies (index into facets list)
+		HaU8 v;  // the vertex at the start of this edge (index into vertices list)
+		HaU8 p;  // the facet on which this edge lies (index into facets list)
 		HalfEdge(){}
-		HalfEdge(short _ea,PxU8 _v, PxU8 _p):ea(_ea),v(_v),p(_p){}
+		HalfEdge(short _ea,HaU8 _v, HaU8 _p):ea(_ea),v(_v),p(_p){}
 	};
 	StanArray<REAL3> vertices;
 	StanArray<HalfEdge> edges;
 	StanArray<Plane>  facets;
-	ConvexH(PxI32 vertices_size,PxI32 edges_size,PxI32 facets_size);
+	ConvexH(HaI32 vertices_size,HaI32 edges_size,HaI32 facets_size);
 };
 
 typedef ConvexH::HalfEdge HalfEdge;
 
-ConvexH::ConvexH(PxI32 vertices_size,PxI32 edges_size,PxI32 facets_size)
+ConvexH::ConvexH(HaI32 vertices_size,HaI32 edges_size,HaI32 facets_size)
 	:vertices(vertices_size)
 	,edges(edges_size)
 	,facets(facets_size)
@@ -1633,15 +1633,15 @@ ConvexH *ConvexHDup(ConvexH *src)
 }
 
 
-PxI32 PlaneTest(const Plane &p, const REAL3 &v) {
+HaI32 PlaneTest(const Plane &p, const REAL3 &v) {
 	REAL a  = dot(v,p.normal)+p.dist;
-	PxI32   flag = (a>planetestepsilon)?OVER:((a<-planetestepsilon)?UNDER:COPLANAR);
+	HaI32   flag = (a>planetestepsilon)?OVER:((a<-planetestepsilon)?UNDER:COPLANAR);
 	return flag;
 }
 
-PxI32 SplitTest(ConvexH &convex,const Plane &plane) {
-	PxI32 flag=0;
-	for(PxI32 i=0;i<convex.vertices.count;i++) {
+HaI32 SplitTest(ConvexH &convex,const Plane &plane) {
+	HaI32 flag=0;
+	for(HaI32 i=0;i<convex.vertices.count;i++) {
 		flag |= PlaneTest(plane,convex.vertices[i]);
 	}
 	return flag;
@@ -1650,45 +1650,45 @@ PxI32 SplitTest(ConvexH &convex,const Plane &plane) {
 class VertFlag 
 {
 public:
-	PxU8 planetest;
-	PxU8 junk;
-	PxU8 undermap;
-	PxU8 overmap;
+	HaU8 planetest;
+	HaU8 junk;
+	HaU8 undermap;
+	HaU8 overmap;
 };
 class EdgeFlag 
 {
 public:
-	PxU8 planetest;
-	PxU8 fixes;
+	HaU8 planetest;
+	HaU8 fixes;
 	short undermap;
 	short overmap;
 };
 class PlaneFlag 
 {
 public:
-	PxU8 undermap;
-	PxU8 overmap;
+	HaU8 undermap;
+	HaU8 overmap;
 };
 class Coplanar{
 public:
 	unsigned short ea;
-	PxU8 v0;
-	PxU8 v1;
+	HaU8 v0;
+	HaU8 v1;
 };
 
-PxI32 AssertIntact(ConvexH &convex) {
-	PxI32 i;
-	PxI32 estart=0;
+HaI32 AssertIntact(ConvexH &convex) {
+	HaI32 i;
+	HaI32 estart=0;
 	for(i=0;i<convex.edges.count;i++) {
 		if(convex.edges[estart].p!= convex.edges[i].p) {
 			estart=i;
 		}
-		PxI32 inext = i+1;
+		HaI32 inext = i+1;
 		if(inext>= convex.edges.count || convex.edges[inext].p != convex.edges[i].p) {
 			inext = estart;
 		}
 		PX_ASSERT(convex.edges[inext].p == convex.edges[i].p);
-		PxI32 nb = convex.edges[i].ea;
+		HaI32 nb = convex.edges[i].ea;
 		PX_ASSERT(nb!=255);
 		if(nb==255 || nb==-1) return 0;
 		PX_ASSERT(nb!=-1);
@@ -1700,11 +1700,11 @@ PxI32 AssertIntact(ConvexH &convex) {
 		if(convex.edges[estart].p!= convex.edges[i].p) {
 			estart=i;
 		}
-		PxI32 i1 = i+1;
+		HaI32 i1 = i+1;
 		if(i1>= convex.edges.count || convex.edges[i1].p != convex.edges[i].p) {
 			i1 = estart;
 		}
-		PxI32 i2 = i1+1;
+		HaI32 i2 = i1+1;
 		if(i2>= convex.edges.count || convex.edges[i2].p != convex.edges[i].p) {
 			i2 = estart;
 		}
@@ -1720,12 +1720,12 @@ PxI32 AssertIntact(ConvexH &convex) {
 
 ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 {
-	PxI32 i;
-	PxI32 vertcountunder=0;
-	PxI32 vertcountover =0;
-	static StanArray<PxI32> vertscoplanar;  // existing vertex members of convex that are coplanar
+	HaI32 i;
+	HaI32 vertcountunder=0;
+	HaI32 vertcountover =0;
+	static StanArray<HaI32> vertscoplanar;  // existing vertex members of convex that are coplanar
 	vertscoplanar.count=0;
-	static StanArray<PxI32> edgesplit;  // existing edges that members of convex that cross the splitplane
+	static StanArray<HaI32> edgesplit;  // existing edges that members of convex that cross the splitplane
 	edgesplit.count=0;
 
 	PX_ASSERT(convex.edges.count<480);
@@ -1736,39 +1736,39 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 	HalfEdge  tmpunderedges[512];
 	Plane	  tmpunderplanes[128];
 	Coplanar coplanaredges[512];
-	PxI32 coplanaredges_num=0;
+	HaI32 coplanaredges_num=0;
 
 	StanArray<REAL3> createdverts;
 	// do the side-of-plane tests
 	for(i=0;i<convex.vertices.count;i++) {
-		vertflag[i].planetest = (PxU8)PlaneTest(slice,convex.vertices[i]);
+		vertflag[i].planetest = (HaU8)PlaneTest(slice,convex.vertices[i]);
 		if(vertflag[i].planetest == COPLANAR) {
 			// ? vertscoplanar.Add(i);
-			vertflag[i].undermap = (PxU8)vertcountunder++;
-			vertflag[i].overmap  = (PxU8)vertcountover++;
+			vertflag[i].undermap = (HaU8)vertcountunder++;
+			vertflag[i].overmap  = (HaU8)vertcountover++;
 		}
 		else if(vertflag[i].planetest == UNDER)	{
-			vertflag[i].undermap = (PxU8)vertcountunder++;
+			vertflag[i].undermap = (HaU8)vertcountunder++;
 		}
 		else {
 			PX_ASSERT(vertflag[i].planetest == OVER);
-			vertflag[i].overmap  = (PxU8)vertcountover++;
-			vertflag[i].undermap = (PxU8)-1; // for debugging purposes
+			vertflag[i].overmap  = (HaU8)vertcountover++;
+			vertflag[i].undermap = (HaU8)-1; // for debugging purposes
 		}
 	}
 
-	PxI32 under_edge_count =0;
-	PxI32 underplanescount=0;
-	PxI32 e0=0;
+	HaI32 under_edge_count =0;
+	HaI32 underplanescount=0;
+	HaI32 e0=0;
 
-	for(PxI32 currentplane=0; currentplane<convex.facets.count; currentplane++) {
-		PxI32 estart =e0;
-		PxI32 enextface=0;
-		PxI32 planeside = 0;
-		PxI32 e1 = e0+1;
-		PxI32 vout=-1;
-		PxI32 vin =-1;
-		PxI32 coplanaredge = -1;
+	for(HaI32 currentplane=0; currentplane<convex.facets.count; currentplane++) {
+		HaI32 estart =e0;
+		HaI32 enextface=0;
+		HaI32 planeside = 0;
+		HaI32 e1 = e0+1;
+		HaI32 vout=-1;
+		HaI32 vin =-1;
+		HaI32 coplanaredge = -1;
 		do{
 
 			if(e1 >= convex.edges.count || convex.edges[e1].p!=currentplane) {
@@ -1795,8 +1795,8 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 				// at least one endpoint under, the other coplanar or under
 				
 				edgeflag[e0].undermap = (short)under_edge_count;
-				tmpunderedges[under_edge_count].v = (PxU8)vertflag[edge0.v].undermap;
-				tmpunderedges[under_edge_count].p = (PxU8)underplanescount;
+				tmpunderedges[under_edge_count].v = (HaU8)vertflag[edge0.v].undermap;
+				tmpunderedges[under_edge_count].p = (HaU8)underplanescount;
 				if(edge0.ea < e0) {
 					// connect the neighbors
 					PX_ASSERT(edgeflag[edge0.ea].undermap !=-1);
@@ -1808,7 +1808,7 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 			else if((vertflag[edge0.v].planetest | vertflag[edge1.v].planetest)  == COPLANAR) {
 				// both endpoints coplanar 
 				// must check a 3rd point to see if UNDER
-				PxI32 e2 = e1+1; 
+				HaI32 e2 = e1+1; 
 				if(e2>=convex.edges.count || convex.edges[e2].p!=currentplane) {
 					e2 = estart;
 				}
@@ -1817,8 +1817,8 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 				if(vertflag[edge2.v].planetest==UNDER) {
 					
 					edgeflag[e0].undermap = (short)under_edge_count;
-					tmpunderedges[under_edge_count].v = (PxU8)vertflag[edge0.v].undermap;
-					tmpunderedges[under_edge_count].p = (PxU8)underplanescount;
+					tmpunderedges[under_edge_count].v = (HaU8)vertflag[edge0.v].undermap;
+					tmpunderedges[under_edge_count].p = (HaU8)underplanescount;
 					tmpunderedges[under_edge_count].ea = -1;
 					// make sure this edge is added to the "coplanar" list
 					coplanaredge = under_edge_count;
@@ -1834,8 +1834,8 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 				// first is under 2nd is over 
 				
 				edgeflag[e0].undermap = (short) under_edge_count;
-				tmpunderedges[under_edge_count].v = (PxU8)vertflag[edge0.v].undermap;
-				tmpunderedges[under_edge_count].p = (PxU8)underplanescount;
+				tmpunderedges[under_edge_count].v = (HaU8)vertflag[edge0.v].undermap;
+				tmpunderedges[under_edge_count].p = (HaU8)underplanescount;
 				if(edge0.ea < e0) {
 					PX_ASSERT(edgeflag[edge0.ea].undermap !=-1);
 					// connect the neighbors
@@ -1854,8 +1854,8 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 				under_edge_count++;
 				/// hmmm something to think about: i might be able to output this edge regarless of 
 				// wheter or not we know v-in yet.  ok i;ll try this now:
-				tmpunderedges[under_edge_count].v = (PxU8)vout;
-				tmpunderedges[under_edge_count].p = (PxU8)underplanescount;
+				tmpunderedges[under_edge_count].v = (HaU8)vout;
+				tmpunderedges[under_edge_count].p = (HaU8)underplanescount;
 				tmpunderedges[under_edge_count].ea = -1;
 				coplanaredge = under_edge_count;
 				under_edge_count++;
@@ -1874,15 +1874,15 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 				edgeflag[e0].undermap = -1;
 				vout = vertflag[edge0.v].undermap;
 				// I hate this but i have to make sure part of this face is UNDER before ouputting this vert
-				PxI32 k=estart;
+				HaI32 k=estart;
 				PX_ASSERT(edge0.p == currentplane);
 				while(!(planeside&UNDER) && k<convex.edges.count && convex.edges[k].p==edge0.p) {
 					planeside |= vertflag[convex.edges[k].v].planetest;
 					k++;
 				}
 				if(planeside&UNDER){
-					tmpunderedges[under_edge_count].v = (PxU8)vout;
-					tmpunderedges[under_edge_count].p = (PxU8)underplanescount;
+					tmpunderedges[under_edge_count].v = (HaU8)vout;
+					tmpunderedges[under_edge_count].p = (HaU8)underplanescount;
 					tmpunderedges[under_edge_count].ea = -1;
 					coplanaredge = under_edge_count; // hmmm should make a note of the edge # for later on
 					under_edge_count++;
@@ -1903,7 +1903,7 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 				}
 				else {
 					// find the new vertex that was created by edge[edge0.ea]
-					PxI32 nea = edgeflag[edge0.ea].undermap;
+					HaI32 nea = edgeflag[edge0.ea].undermap;
 					PX_ASSERT(tmpunderedges[nea].p==tmpunderedges[nea+1].p);
 					vin = tmpunderedges[nea+1].v;
 					PX_ASSERT(vin < vertcountunder);
@@ -1914,8 +1914,8 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 					// ADD THIS EDGE TO THE LIST OF EDGES THAT NEED NEIGHBOR ON PARTITION PLANE!!
 				}
 				// output edge
-				tmpunderedges[under_edge_count].v = (PxU8)vin;
-				tmpunderedges[under_edge_count].p = (PxU8)underplanescount;
+				tmpunderedges[under_edge_count].v = (HaU8)vin;
+				tmpunderedges[under_edge_count].p = (HaU8)underplanescount;
 				edgeflag[e0].undermap = (short)under_edge_count;
 				if(e0>edge0.ea) {
 					PX_ASSERT(edgeflag[edge0.ea].undermap !=-1);
@@ -1950,7 +1950,7 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 		} while(e0!=estart) ;
 		e0 = enextface;
 		if(planeside&UNDER) {
-			planeflag[currentplane].undermap = (PxU8)underplanescount;
+			planeflag[currentplane].undermap = (HaU8)underplanescount;
 			tmpunderplanes[underplanescount] = convex.facets[currentplane];
 			underplanescount++;
 		}
@@ -1962,8 +1962,8 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 			PX_ASSERT(coplanaredge>=0);
 			PX_ASSERT(coplanaredge!=511);
 			coplanaredges[coplanaredges_num].ea = (short)coplanaredge;
-			coplanaredges[coplanaredges_num].v0 = (PxU8)vin;
-			coplanaredges[coplanaredges_num].v1 = (PxU8)vout;
+			coplanaredges[coplanaredges_num].v0 = (HaU8)vin;
+			coplanaredges[coplanaredges_num].v1 = (HaU8)vout;
 			coplanaredges_num++;
 		}
 	}
@@ -1974,7 +1974,7 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 	}
 	for(i=0;i<coplanaredges_num-1;i++) {
 		if(coplanaredges[i].v1 != coplanaredges[i+1].v0) {
-			PxI32 j = 0;
+			HaI32 j = 0;
 			for(j=i+2;j<coplanaredges_num;j++) {
 				if(coplanaredges[i].v1 == coplanaredges[j].v0) {
 					Coplanar tmp = coplanaredges[i+1];
@@ -1993,7 +1993,7 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 	ConvexH *punder = PX_NEW(ConvexH)(vertcountunder,under_edge_count+coplanaredges_num,underplanescount);
 
 	ConvexH &under = *punder;
-	PxI32 k=0;
+	HaI32 k=0;
 	for(i=0;i<convex.vertices.count;i++) {
 		if(vertflag[i].planetest != OVER){
 			under.vertices[k++] = convex.vertices[i];
@@ -2006,7 +2006,7 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 	PX_ASSERT(i==createdverts.count);
 
 	for(i=0;i<coplanaredges_num;i++) {
-		under.edges[under_edge_count+i].p  = (PxU8)(underplanescount-1);
+		under.edges[under_edge_count+i].p  = (HaU8)(underplanescount-1);
 		under.edges[under_edge_count+i].ea = coplanaredges[i].ea;
 		tmpunderedges[coplanaredges[i].ea].ea = (short)(under_edge_count+i);
 		under.edges[under_edge_count+i].v  = coplanaredges[i].v0;
@@ -2018,24 +2018,24 @@ ConvexH *ConvexHCrop(ConvexH &convex,const Plane &slice)
 }
 
 
-PxF32 minadjangle = 3.0f;  // in degrees  - result wont have two adjacent facets within this angle of each other.
-static PxI32 candidateplane(Plane *planes,PxI32 planes_count,ConvexH *convex,PxF32 epsilon)
+HaF32 minadjangle = 3.0f;  // in degrees  - result wont have two adjacent facets within this angle of each other.
+static HaI32 candidateplane(Plane *planes,HaI32 planes_count,ConvexH *convex,HaF32 epsilon)
 {
-	PxI32 p =-1;
+	HaI32 p =-1;
 	REAL md=0;
-	PxI32 i,j;
-	PxF32 maxdot_minang = cosf(DEG2RAD*minadjangle);
+	HaI32 i,j;
+	HaF32 maxdot_minang = cosf(DEG2RAD*minadjangle);
 	for(i=0;i<planes_count;i++)
 	{
-		PxF32 d=0;
-		PxF32 dmax=0;
-		PxF32 dmin=0;
+		HaF32 d=0;
+		HaF32 dmax=0;
+		HaF32 dmin=0;
 		for(j=0;j<convex->vertices.count;j++)
 		{
 			dmax = Max(dmax,dot(convex->vertices[j],planes[i].normal)+planes[i].dist);
 			dmin = Min(dmin,dot(convex->vertices[j],planes[i].normal)+planes[i].dist);
 		}
-		PxF32 dr = dmax-dmin;
+		HaF32 dr = dmax-dmin;
 		if(dr<planetestepsilon) dr=1.0f; // shouldn't happen.
 		d = dmax /dr;
 		if(d<=md) continue;
@@ -2047,7 +2047,7 @@ static PxI32 candidateplane(Plane *planes,PxI32 planes_count,ConvexH *convex,PxF
 			}
 			if(dot(planes[i].normal,convex->facets[j].normal)>maxdot_minang)
 			{
-				for(PxI32 k=0;k<convex->edges.count;k++)
+				for(HaI32 k=0;k<convex->edges.count;k++)
 				{
 					if(convex->edges[k].p!=j) continue;
 					if(dot(convex->vertices[convex->edges[k].v],planes[i].normal)+planes[i].dist<0)
@@ -2070,11 +2070,11 @@ static PxI32 candidateplane(Plane *planes,PxI32 planes_count,ConvexH *convex,PxF
 
 
 template<class T>
-inline PxI32 maxdir(const T *p,PxI32 count,const T &dir)
+inline HaI32 maxdir(const T *p,HaI32 count,const T &dir)
 {
 	PX_ASSERT(count);
-	PxI32 m=0;
-	for(PxI32 i=1;i<count;i++)
+	HaI32 m=0;
+	for(HaI32 i=1;i<count;i++)
 	{
 		if(dot(p[i],dir)>dot(p[m],dir)) m=i;
 	}
@@ -2083,11 +2083,11 @@ inline PxI32 maxdir(const T *p,PxI32 count,const T &dir)
 
 
 template<class T>
-PxI32 maxdirfiltered(const T *p,PxI32 count,const T &dir,StanArray<PxI32> &allow)
+HaI32 maxdirfiltered(const T *p,HaI32 count,const T &dir,StanArray<HaI32> &allow)
 {
 	PX_ASSERT(count);
-	PxI32 m=-1;
-	for(PxI32 i=0;i<count;i++) if(allow[i])
+	HaI32 m=-1;
+	for(HaI32 i=0;i<count;i++) if(allow[i])
 	{
 		if(m==-1 || dot(p[i],dir)>dot(p[m],dir)) m=i;
 	}
@@ -2104,21 +2104,21 @@ float3 orth(const float3 &v)
 
 
 template<class T>
-PxI32 maxdirsterid(const T *p,PxI32 count,const T &dir,StanArray<PxI32> &allow)
+HaI32 maxdirsterid(const T *p,HaI32 count,const T &dir,StanArray<HaI32> &allow)
 {
-	PxI32 m=-1;
+	HaI32 m=-1;
 	while(m==-1)
 	{
 		m = maxdirfiltered(p,count,dir,allow);
 		if(allow[m]==3) return m;
 		T u = orth(dir);
 		T v = cross(u,dir);
-		PxI32 ma=-1;
-		for(PxF32 x = 0.0f ; x<= 360.0f ; x+= 45.0f)
+		HaI32 ma=-1;
+		for(HaF32 x = 0.0f ; x<= 360.0f ; x+= 45.0f)
 		{
-			PxF32 s = sinf(DEG2RAD*(x));
-			PxF32 c = cosf(DEG2RAD*(x));
-			PxI32 mb = maxdirfiltered(p,count,dir+(u*s+v*c)*0.025f,allow);
+			HaF32 s = sinf(DEG2RAD*(x));
+			HaF32 c = cosf(DEG2RAD*(x));
+			HaI32 mb = maxdirfiltered(p,count,dir+(u*s+v*c)*0.025f,allow);
 			if(ma==m && mb==m)
 			{
 				allow[m]=3;
@@ -2126,12 +2126,12 @@ PxI32 maxdirsterid(const T *p,PxI32 count,const T &dir,StanArray<PxI32> &allow)
 			}
 			if(ma!=-1 && ma!=mb)  // Yuck - this is really ugly
 			{
-				PxI32 mc = ma;
-				for(PxF32 xx = x-40.0f ; xx <= x ; xx+= 5.0f)
+				HaI32 mc = ma;
+				for(HaF32 xx = x-40.0f ; xx <= x ; xx+= 5.0f)
 				{
-					PxF32 s = sinf(DEG2RAD*(xx));
-					PxF32 c = cosf(DEG2RAD*(xx));
-					PxI32 md = maxdirfiltered(p,count,dir+(u*s+v*c)*0.025f,allow);
+					HaF32 s = sinf(DEG2RAD*(xx));
+					HaF32 c = cosf(DEG2RAD*(xx));
+					HaI32 md = maxdirfiltered(p,count,dir+(u*s+v*c)*0.025f,allow);
 					if(mc==m && md==m)
 					{
 						allow[m]=3;
@@ -2152,9 +2152,9 @@ PxI32 maxdirsterid(const T *p,PxI32 count,const T &dir,StanArray<PxI32> &allow)
 
 
 
-PxI32 operator ==(const int3 &a,const int3 &b) 
+HaI32 operator ==(const int3 &a,const int3 &b) 
 {
-	for(PxI32 i=0;i<3;i++) 
+	for(HaI32 i=0;i<3;i++) 
 	{
 		if(a[i]!=b[i]) return 0;
 	}
@@ -2163,44 +2163,44 @@ PxI32 operator ==(const int3 &a,const int3 &b)
 
 int3 roll3(int3 a) 
 {
-	PxI32 tmp=a[0];
+	HaI32 tmp=a[0];
 	a[0]=a[1];
 	a[1]=a[2];
 	a[2]=tmp;
 	return a;
 }
-PxI32 isa(const int3 &a,const int3 &b) 
+HaI32 isa(const int3 &a,const int3 &b) 
 {
 	return ( a==b || roll3(a)==b || a==roll3(b) );
 }
-PxI32 b2b(const int3 &a,const int3 &b) 
+HaI32 b2b(const int3 &a,const int3 &b) 
 {
 	return isa(a,int3(b[2],b[1],b[0]));
 }
-PxI32 above(float3* vertices,const int3& t, const float3 &p, PxF32 epsilon) 
+HaI32 above(float3* vertices,const int3& t, const float3 &p, HaF32 epsilon) 
 {
 	float3 n=TriNormal(vertices[t[0]],vertices[t[1]],vertices[t[2]]);
 	return (dot(n,p-vertices[t[0]]) > epsilon); // EPSILON???
 }
-PxI32 hasedge(const int3 &t, PxI32 a,PxI32 b)
+HaI32 hasedge(const int3 &t, HaI32 a,HaI32 b)
 {
-	for(PxI32 i=0;i<3;i++)
+	for(HaI32 i=0;i<3;i++)
 	{
-		PxI32 i1= (i+1)%3;
+		HaI32 i1= (i+1)%3;
 		if(t[i]==a && t[i1]==b) return 1;
 	}
 	return 0;
 }
-PxI32 hasvert(const int3 &t, PxI32 v)
+HaI32 hasvert(const int3 &t, HaI32 v)
 {
 	return (t[0]==v || t[1]==v || t[2]==v) ;
 }
-PxI32 shareedge(const int3 &a,const int3 &b)
+HaI32 shareedge(const int3 &a,const int3 &b)
 {
-	PxI32 i;
+	HaI32 i;
 	for(i=0;i<3;i++)
 	{
-		PxI32 i1= (i+1)%3;
+		HaI32 i1= (i+1)%3;
 		if(hasedge(a,b[i1],b[i])) return 1;
 	}
 	return 0;
@@ -2214,10 +2214,10 @@ class Tri : public int3
 {
 public:
 	int3 n;
-	PxI32 id;
-	PxI32 vmax;
-	PxF32 rise;
-	Tri(PxI32 a,PxI32 b,PxI32 c):int3(a,b,c),n(-1,-1,-1)
+	HaI32 id;
+	HaI32 vmax;
+	HaF32 rise;
+	Tri(HaI32 a,HaI32 b,HaI32 c):int3(a,b,c),n(-1,-1,-1)
 	{
 		id = tris.count;
 		tris.Add(this);
@@ -2229,18 +2229,18 @@ public:
 		PX_ASSERT(tris[id]==this);
 		tris[id]=NULL;
 	}
-	PxI32 &neib(PxI32 a,PxI32 b);
+	HaI32 &neib(HaI32 a,HaI32 b);
 };
 
 
-PxI32 &Tri::neib(PxI32 a,PxI32 b)
+HaI32 &Tri::neib(HaI32 a,HaI32 b)
 {
-	static PxI32 er=-1;
-	PxI32 i;
+	static HaI32 er=-1;
+	HaI32 i;
 	for(i=0;i<3;i++) 
 	{
-		PxI32 i1=(i+1)%3;
-		PxI32 i2=(i+2)%3;
+		HaI32 i1=(i+1)%3;
+		HaI32 i2=(i+2)%3;
 		if((*this)[i]==a && (*this)[i1]==b) return n[i2];
 		if((*this)[i]==b && (*this)[i1]==a) return n[i2];
 	}
@@ -2249,13 +2249,13 @@ PxI32 &Tri::neib(PxI32 a,PxI32 b)
 }
 void b2bfix(Tri* s,Tri*t)
 {
-	PxI32 i;
+	HaI32 i;
 	for(i=0;i<3;i++) 
 	{
-		PxI32 i1=(i+1)%3;
-		PxI32 i2=(i+2)%3;
-		PxI32 a = (*s)[i1];
-		PxI32 b = (*s)[i2];
+		HaI32 i1=(i+1)%3;
+		HaI32 i2=(i+2)%3;
+		HaI32 a = (*s)[i1];
+		HaI32 b = (*s)[i2];
 		PX_ASSERT(tris[s->neib(a,b)]->neib(b,a) == s->id);
 		PX_ASSERT(tris[t->neib(a,b)]->neib(b,a) == t->id);
 		tris[s->neib(a,b)]->neib(b,a) = t->neib(b,a);
@@ -2270,10 +2270,10 @@ void removeb2b(Tri* s,Tri*t)
 	delete t;
 }
 
-void extrude(Tri *t0,PxI32 v)
+void extrude(Tri *t0,HaI32 v)
 {
 	int3 t= *t0;
-	PxI32 n = tris.count;
+	HaI32 n = tris.count;
 	Tri* ta = PX_NEW(Tri)(v,t[1],t[2]);
 	ta->n = int3(t0->n[0],n+1,n+2);
 	tris[t0->n[0]]->neib(t[1],t[2]) = n+0;
@@ -2290,9 +2290,9 @@ void extrude(Tri *t0,PxI32 v)
 
 }
 
-Tri *extrudable(PxF32 epsilon)
+Tri *extrudable(HaF32 epsilon)
 {
-	PxI32 i;
+	HaI32 i;
 	Tri *t=NULL;
 	for(i=0;i<tris.count;i++)
 	{
@@ -2307,37 +2307,37 @@ Tri *extrudable(PxF32 epsilon)
 class int4
 {
 public:
-	PxI32 x,y,z,w;
+	HaI32 x,y,z,w;
 	int4(){};
-	int4(PxI32 _x,PxI32 _y, PxI32 _z,PxI32 _w){x=_x;y=_y;z=_z;w=_w;}
-	const PxI32& operator[](PxI32 i) const {return (&x)[i];}
-	PxI32& operator[](PxI32 i) {return (&x)[i];}
+	int4(HaI32 _x,HaI32 _y, HaI32 _z,HaI32 _w){x=_x;y=_y;z=_z;w=_w;}
+	const HaI32& operator[](HaI32 i) const {return (&x)[i];}
+	HaI32& operator[](HaI32 i) {return (&x)[i];}
 };
 
 
 
-bool hasVolume(float3 *verts, PxI32 p0, PxI32 p1, PxI32 p2, PxI32 p3)
+bool hasVolume(float3 *verts, HaI32 p0, HaI32 p1, HaI32 p2, HaI32 p3)
 {
 	float3 result3 = cross(verts[p1]-verts[p0], verts[p2]-verts[p0]);
 	if (magnitude(result3) < VOLUME_EPSILON && magnitude(result3) > -VOLUME_EPSILON) // Almost collinear or otherwise very close to each other
 		return false;
-	PxF32 result = dot(normalize(result3), verts[p3]-verts[p0]);
+	HaF32 result = dot(normalize(result3), verts[p3]-verts[p0]);
 	return (result > VOLUME_EPSILON || result < -VOLUME_EPSILON); // Returns true iff volume is significantly non-zero
 }
 
-int4 FindSimplex(float3 *verts,PxI32 verts_count,StanArray<PxI32> &allow)
+int4 FindSimplex(float3 *verts,HaI32 verts_count,StanArray<HaI32> &allow)
 {
 	float3 basis[3];
 	basis[0] = float3( 0.01f, 0.02f, 1.0f );      
-	PxI32 p0 = maxdirsterid(verts,verts_count, basis[0],allow);
-	PxI32	p1 = maxdirsterid(verts,verts_count,-basis[0],allow);
+	HaI32 p0 = maxdirsterid(verts,verts_count, basis[0],allow);
+	HaI32	p1 = maxdirsterid(verts,verts_count,-basis[0],allow);
 	basis[0] = verts[p0]-verts[p1];
 	if(p0==p1 || basis[0]==float3(0,0,0)) 
 		return int4(-1,-1,-1,-1);
 	basis[1] = cross(float3(     1, 0.02f, 0),basis[0]);
 	basis[2] = cross(float3(-0.02f,     1, 0),basis[0]);
 	basis[1] = normalize( (magnitude(basis[1])>magnitude(basis[2])) ? basis[1]:basis[2]);
-	PxI32 p2 = maxdirsterid(verts,verts_count,basis[1],allow);
+	HaI32 p2 = maxdirsterid(verts,verts_count,basis[1],allow);
 	if(p2 == p0 || p2 == p1)
 	{
 		p2 = maxdirsterid(verts,verts_count,-basis[1],allow);
@@ -2346,7 +2346,7 @@ int4 FindSimplex(float3 *verts,PxI32 verts_count,StanArray<PxI32> &allow)
 		return int4(-1,-1,-1,-1);
 	basis[1] = verts[p2] - verts[p0];
 	basis[2] = normalize(cross(basis[1],basis[0]));
-	PxI32 p3 = maxdirsterid(verts,verts_count,basis[2],allow);
+	HaI32 p3 = maxdirsterid(verts,verts_count,basis[2],allow);
 	if(p3==p0||p3==p1||p3==p2||!hasVolume(verts, p0, p1, p2, p3)) p3 = maxdirsterid(verts,verts_count,-basis[2],allow);
 	if(p3==p0||p3==p1||p3==p2) 
 		return int4(-1,-1,-1,-1);
@@ -2356,14 +2356,14 @@ int4 FindSimplex(float3 *verts,PxI32 verts_count,StanArray<PxI32> &allow)
 }
 #pragma warning(push)
 #pragma warning(disable:4706)
-PxI32 calchullgen(float3 *verts,PxI32 verts_count, PxI32 vlimit) 
+HaI32 calchullgen(float3 *verts,HaI32 verts_count, HaI32 vlimit) 
 {
 	if(verts_count <4) return 0;
 	if(vlimit==0) vlimit=1000000000;
-	PxI32 j;
+	HaI32 j;
 	float3 bmin(*verts),bmax(*verts);
-	StanArray<PxI32> isextreme(verts_count);
-	StanArray<PxI32> allow(verts_count);
+	StanArray<HaI32> isextreme(verts_count);
+	StanArray<HaI32> allow(verts_count);
 	for(j=0;j<verts_count;j++) 
 	{
 		allow.Add(1);
@@ -2371,7 +2371,7 @@ PxI32 calchullgen(float3 *verts,PxI32 verts_count, PxI32 vlimit)
 		bmin = VectorMin(bmin,verts[j]);
 		bmax = VectorMax(bmax,verts[j]);
 	}
-	PxF32 epsilon = magnitude(bmax-bmin) * 0.001f;
+	HaF32 epsilon = magnitude(bmax-bmin) * 0.001f;
 
 
 	int4 p = FindSimplex(verts,verts_count,allow);
@@ -2400,7 +2400,7 @@ PxI32 calchullgen(float3 *verts,PxI32 verts_count, PxI32 vlimit)
 	while(vlimit >0 && (te=extrudable(epsilon)))
 	{
 		int3 ti=*te;
-		PxI32 v=te->vmax;
+		HaI32 v=te->vmax;
 		PX_ASSERT(!isextreme[v]);  // wtf we've already done this vertex
 		isextreme[v]=1;
 		//if(v==p0 || v==p1 || v==p2 || v==p3) continue; // done these already
@@ -2451,14 +2451,14 @@ PxI32 calchullgen(float3 *verts,PxI32 verts_count, PxI32 vlimit)
 }
 #pragma warning(pop)
 
-PxI32 calchull(float3 *verts,PxI32 verts_count, PxI32 *&tris_out, PxI32 &tris_count,PxI32 vlimit) 
+HaI32 calchull(float3 *verts,HaI32 verts_count, HaI32 *&tris_out, HaI32 &tris_count,HaI32 vlimit) 
 {
-	PxI32 rc=calchullgen(verts,verts_count,  vlimit) ;
+	HaI32 rc=calchullgen(verts,verts_count,  vlimit) ;
 	if(!rc) return 0;
-	StanArray<PxI32> ts;
-	for(PxI32 i=0;i<tris.count;i++)if(tris[i])
+	StanArray<HaI32> ts;
+	for(HaI32 i=0;i<tris.count;i++)if(tris[i])
 	{
-		for(PxI32 j=0;j<3;j++)ts.Add((*tris[i])[j]);
+		for(HaI32 j=0;j<3;j++)ts.Add((*tris[i])[j]);
 		delete tris[i];
 	}
 	tris_count = ts.count/3;
@@ -2469,20 +2469,20 @@ PxI32 calchull(float3 *verts,PxI32 verts_count, PxI32 *&tris_out, PxI32 &tris_co
 	return 1;
 }
 
-static PxF32 area2(const float3 &v0,const float3 &v1,const float3 &v2)
+static HaF32 area2(const float3 &v0,const float3 &v1,const float3 &v2)
 {
 	float3 cp = cross(v0-v1,v2-v0);
 	return dot(cp,cp);
 }
-PxI32 calchullpbev(float3 *verts,PxI32 verts_count,PxI32 vlimit, StanArray<Plane> &planes,PxF32 bevangle) 
+HaI32 calchullpbev(float3 *verts,HaI32 verts_count,HaI32 vlimit, StanArray<Plane> &planes,HaF32 bevangle) 
 {
-	PxI32 i,j;
+	HaI32 i,j;
 	StanArray<Plane> bplanes;
 	planes.count=0;
-	PxI32 rc = calchullgen(verts,verts_count,vlimit);
+	HaI32 rc = calchullgen(verts,verts_count,vlimit);
 	if(!rc) return 0;
-	extern PxF32 minadjangle; // default is 3.0f;  // in degrees  - result wont have two adjacent facets within this angle of each other.
-	PxF32 maxdot_minang = cosf(DEG2RAD*minadjangle);
+	extern HaF32 minadjangle; // default is 3.0f;  // in degrees  - result wont have two adjacent facets within this angle of each other.
+	HaF32 maxdot_minang = cosf(DEG2RAD*minadjangle);
 	for(i=0;i<tris.count;i++)if(tris[i])
 	{
 		Plane p;
@@ -2624,10 +2624,10 @@ ConvexH *ConvexHMakeCube(const REAL3 &bmin, const REAL3 &bmax)
 }
 
 
-static PxI32 overhull(Plane *planes,PxI32 planes_count,float3 *verts, PxI32 verts_count,PxI32 maxplanes,
-			 float3 *&verts_out, PxI32 &verts_count_out,  PxI32 *&faces_out, PxI32 &faces_count_out ,PxF32 inflate)
+static HaI32 overhull(Plane *planes,HaI32 planes_count,float3 *verts, HaI32 verts_count,HaI32 maxplanes,
+			 float3 *&verts_out, HaI32 &verts_count_out,  HaI32 *&faces_out, HaI32 &faces_count_out ,HaF32 inflate)
 {
-	PxI32 i,j;
+	HaI32 i,j;
 	if(verts_count <4) return NULL;
 	maxplanes = Min(maxplanes,planes_count);
 	float3 bmin(verts[0]),bmax(verts[0]);
@@ -2636,7 +2636,7 @@ static PxI32 overhull(Plane *planes,PxI32 planes_count,float3 *verts, PxI32 vert
 		bmin = VectorMin(bmin,verts[i]);
 		bmax = VectorMax(bmax,verts[i]);
 	}
-	PxF32 diameter = magnitude(bmax-bmin);
+	HaF32 diameter = magnitude(bmax-bmin);
 //	inflate *=diameter;   // RELATIVE INFLATION
 	bmin -= float3(inflate*2.5f,inflate*2.5f,inflate*2.5f);
 	bmax += float3(inflate*2.5f,inflate*2.5f,inflate*2.5f);
@@ -2653,11 +2653,11 @@ static PxI32 overhull(Plane *planes,PxI32 planes_count,float3 *verts, PxI32 vert
 	}
 	float3 emin = bmin; // VectorMin(bmin,float3(0,0,0));
 	float3 emax = bmax; // VectorMax(bmax,float3(0,0,0));
-	PxF32 epsilon  = 0.01f; // size of object is taken into account within candidate plane function.  Used to multiply here by magnitude(emax-emin)
+	HaF32 epsilon  = 0.01f; // size of object is taken into account within candidate plane function.  Used to multiply here by magnitude(emax-emin)
 	planetestepsilon = magnitude(emax-emin) * PAPERWIDTH;
 	// todo: add bounding cube planes to force bevel. or try instead not adding the diameter expansion ??? must think.
 	// ConvexH *convex = ConvexHMakeCube(bmin - float3(diameter,diameter,diameter),bmax+float3(diameter,diameter,diameter));
-	PxF32 maxdot_minang = cosf(DEG2RAD*minadjangle);
+	HaF32 maxdot_minang = cosf(DEG2RAD*minadjangle);
 	for(j=0;j<6;j++)
 	{
 		float3 n(0,0,0);
@@ -2672,7 +2672,7 @@ static PxI32 overhull(Plane *planes,PxI32 planes_count,float3 *verts, PxI32 vert
 		}
 	}
 	ConvexH *c = ConvexHMakeCube(REAL3(bmin),REAL3(bmax));
-	PxI32 k;
+	HaI32 k;
 	while(maxplanes-- && (k=candidateplane(planes,planes_count,c,epsilon))>=0)
 	{
 		ConvexH *tmp = c;
@@ -2684,7 +2684,7 @@ static PxI32 overhull(Plane *planes,PxI32 planes_count,float3 *verts, PxI32 vert
 
 	PX_ASSERT(AssertIntact(*c));
 	//return c;
-	faces_out = (PxI32*)PX_ALLOC(sizeof(PxI32)*(1+c->facets.count+c->edges.count));     // new PxI32[1+c->facets.count+c->edges.count];
+	faces_out = (HaI32*)PX_ALLOC(sizeof(HaI32)*(1+c->facets.count+c->edges.count));     // new HaI32[1+c->facets.count+c->edges.count];
 	faces_count_out=0;
 	i=0;
 	faces_out[faces_count_out++]=-1;
@@ -2715,13 +2715,13 @@ static PxI32 overhull(Plane *planes,PxI32 planes_count,float3 *verts, PxI32 vert
 	return 1;
 }
 
-static PxI32 overhullv(float3 *verts, PxI32 verts_count,PxI32 maxplanes,
-			 float3 *&verts_out, PxI32 &verts_count_out,  PxI32 *&faces_out, PxI32 &faces_count_out ,PxF32 inflate,PxF32 bevangle,PxI32 vlimit)
+static HaI32 overhullv(float3 *verts, HaI32 verts_count,HaI32 maxplanes,
+			 float3 *&verts_out, HaI32 &verts_count_out,  HaI32 *&faces_out, HaI32 &faces_count_out ,HaF32 inflate,HaF32 bevangle,HaI32 vlimit)
 {
 	if(!verts_count) return 0;
-	extern PxI32 calchullpbev(float3 *verts,PxI32 verts_count,PxI32 vlimit, StanArray<Plane> &planes,PxF32 bevangle) ;
+	extern HaI32 calchullpbev(float3 *verts,HaI32 verts_count,HaI32 vlimit, StanArray<Plane> &planes,HaF32 bevangle) ;
 	StanArray<Plane> planes;
-	PxI32 rc=calchullpbev(verts,verts_count,vlimit,planes,bevangle) ;
+	HaI32 rc=calchullpbev(verts,verts_count,vlimit,planes,bevangle) ;
 	if(!rc) return 0;
 	return overhull(planes.element,planes.count,verts,verts_count,maxplanes,verts_out,verts_count_out,faces_out,faces_count_out,inflate);
 }
@@ -2731,53 +2731,53 @@ static PxI32 overhullv(float3 *verts, PxI32 verts_count,PxI32 maxplanes,
 //*****************************************************
 
 
-bool ComputeHull(PxU32 vcount,const PxF32 *vertices,PHullResult &result,PxU32 vlimit,PxF32 inflate)
+bool ComputeHull(HaU32 vcount,const HaF32 *vertices,PHullResult &result,HaU32 vlimit,HaF32 inflate)
 {
 
-	PxI32 index_count;
-	PxI32 *faces;
+	HaI32 index_count;
+	HaI32 *faces;
 	float3 *verts_out;
-	PxI32     verts_count_out;
+	HaI32     verts_count_out;
 
 	if(inflate==0.0f)
 	{
-		PxI32  *tris_out;
-		PxI32    tris_count;
-		PxI32 ret = calchull( (float3 *) vertices, (PxI32) vcount, tris_out, tris_count, vlimit );
+		HaI32  *tris_out;
+		HaI32    tris_count;
+		HaI32 ret = calchull( (float3 *) vertices, (HaI32) vcount, tris_out, tris_count, vlimit );
 		if(!ret) return false;
-		result.mIndexCount = (PxU32) (tris_count*3);
-		result.mFaceCount  = (PxU32) tris_count;
-		result.mVertices   = (PxF32*) vertices;
-		result.mVcount     = (PxU32) vcount;
-		result.mIndices    = (PxU32 *) tris_out;
+		result.mIndexCount = (HaU32) (tris_count*3);
+		result.mFaceCount  = (HaU32) tris_count;
+		result.mVertices   = (HaF32*) vertices;
+		result.mVcount     = (HaU32) vcount;
+		result.mIndices    = (HaU32 *) tris_out;
 		return true;
 	}
 
-	PxI32 ret = overhullv((float3*)vertices,vcount,35,verts_out,verts_count_out,faces,index_count,inflate,120.0f,vlimit);
+	HaI32 ret = overhullv((float3*)vertices,vcount,35,verts_out,verts_count_out,faces,index_count,inflate,120.0f,vlimit);
 	if(!ret) {
 		tris.SetSize(0); //have to set the size to 0 in order to protect from a "pure virtual function call" problem
 		return false;
 	}
 
 	StanArray<int3> tris;
-	PxI32 n=faces[0];
-	PxI32 k=1;
-	for(PxI32 i=0;i<n;i++)
+	HaI32 n=faces[0];
+	HaI32 k=1;
+	for(HaI32 i=0;i<n;i++)
 	{
-		PxI32 pn = faces[k++];
-		for(PxI32 j=2;j<pn;j++) tris.Add(int3(faces[k],faces[k+j-1],faces[k+j]));
+		HaI32 pn = faces[k++];
+		for(HaI32 j=2;j<pn;j++) tris.Add(int3(faces[k],faces[k+j-1],faces[k+j]));
 		k+=pn;
 	}
 	PX_ASSERT(tris.count == index_count-1-(n*3));
 	PX_FREE(faces);	// PT: I added that. Is it ok ?
 
-	result.mIndexCount = (PxU32) (tris.count*3);
-	result.mFaceCount  = (PxU32) tris.count;
-	result.mVertices   = (PxF32*) verts_out;
-	result.mVcount     = (PxU32) verts_count_out;
-	result.mIndices    = (PxU32 *) tris.element;
+	result.mIndexCount = (HaU32) (tris.count*3);
+	result.mFaceCount  = (HaU32) tris.count;
+	result.mVertices   = (HaF32*) verts_out;
+	result.mVcount     = (HaU32) verts_count_out;
+	result.mIndices    = (HaU32 *) tris.element;
 	tris.element=NULL; tris.count = tris.array_size=0;
-	physx::tris.SetSize(0); //have to set the size to 0 in order to protect from a "pure virtual function call" problem
+	hacd::tris.SetSize(0); //have to set the size to 0 in order to protect from a "pure virtual function call" problem
 
 	return true;
 }
@@ -2807,15 +2807,15 @@ HullError HullLibrary::CreateConvexHull(const HullDesc       &desc,           //
 
 	PHullResult hr;
 
-	PxU32 vcount = desc.mVcount;
+	HaU32 vcount = desc.mVcount;
 	if ( vcount < 8 ) vcount = 8;
 
-	PxF32 *vsource  = (PxF32 *) PX_ALLOC( sizeof(PxF32)*vcount*3 );
+	HaF32 *vsource  = (HaF32 *) PX_ALLOC( sizeof(HaF32)*vcount*3 );
 
 
-	PxF32 scale[3];
+	HaF32 scale[3];
 
-	PxU32 ovcount;
+	HaU32 ovcount;
 
 	bool ok = CleanupVertices(desc.mVcount,desc.mVertices, desc.mVertexStride, ovcount, vsource, desc.mNormalEpsilon, scale ); // normalize point cloud, remove duplicates!
 
@@ -2824,16 +2824,16 @@ HullError HullLibrary::CreateConvexHull(const HullDesc       &desc,           //
 
 
 		{
-			for (PxU32 i=0; i<ovcount; i++)
+			for (HaU32 i=0; i<ovcount; i++)
 			{
-				PxF32 *v = &vsource[i*3];
+				HaF32 *v = &vsource[i*3];
 				v[0]*=scale[0];
 				v[1]*=scale[1];
 				v[2]*=scale[2];
 			}
 		}
 
-		PxF32 skinwidth = 0;
+		HaF32 skinwidth = 0;
 		if ( desc.HasHullFlag(QF_SKIN_WIDTH) ) 
 			skinwidth = desc.mSkinWidth;
 
@@ -2843,7 +2843,7 @@ HullError HullLibrary::CreateConvexHull(const HullDesc       &desc,           //
 		{
 
 			// re-index triangle mesh so it refers to only used vertices, rebuild a new vertex table.
-			PxF32 *vscratch = (PxF32 *) PX_ALLOC( sizeof(PxF32)*hr.mVcount*3);
+			HaF32 *vscratch = (HaF32 *) PX_ALLOC( sizeof(HaF32)*hr.mVcount*3);
 			BringOutYourDead(hr.mVertices,hr.mVcount, vscratch, ovcount, hr.mIndices, hr.mIndexCount );
 
 			ret = QE_OK;
@@ -2852,21 +2852,21 @@ HullError HullLibrary::CreateConvexHull(const HullDesc       &desc,           //
 			{
 				result.mPolygons          = false;
 				result.mNumOutputVertices = ovcount;
-				result.mOutputVertices    = (PxF32 *)PX_ALLOC( sizeof(PxF32)*ovcount*3);
+				result.mOutputVertices    = (HaF32 *)PX_ALLOC( sizeof(HaF32)*ovcount*3);
 				result.mNumFaces          = hr.mFaceCount;
 				result.mNumIndices        = hr.mIndexCount;
 
-				result.mIndices           = (PxU32 *) PX_ALLOC( sizeof(PxU32)*hr.mIndexCount);
+				result.mIndices           = (HaU32 *) PX_ALLOC( sizeof(HaU32)*hr.mIndexCount);
 
-				memcpy(result.mOutputVertices, vscratch, sizeof(PxF32)*3*ovcount );
+				memcpy(result.mOutputVertices, vscratch, sizeof(HaF32)*3*ovcount );
 
   			if ( desc.HasHullFlag(QF_REVERSE_ORDER) )
 				{
 
-					const PxU32 *source = hr.mIndices;
-								PxU32 *dest   = result.mIndices;
+					const HaU32 *source = hr.mIndices;
+								HaU32 *dest   = result.mIndices;
 
-					for (PxU32 i=0; i<hr.mFaceCount; i++)
+					for (HaU32 i=0; i<hr.mFaceCount; i++)
 					{
 						dest[0] = source[2];
 						dest[1] = source[1];
@@ -2878,23 +2878,23 @@ HullError HullLibrary::CreateConvexHull(const HullDesc       &desc,           //
 				}
 				else
 				{
-					memcpy(result.mIndices, hr.mIndices, sizeof(PxU32)*hr.mIndexCount);
+					memcpy(result.mIndices, hr.mIndices, sizeof(HaU32)*hr.mIndexCount);
 				}
 			}
 			else
 			{
 				result.mPolygons          = true;
 				result.mNumOutputVertices = ovcount;
-				result.mOutputVertices    = (PxF32 *)PX_ALLOC( sizeof(PxF32)*ovcount*3);
+				result.mOutputVertices    = (HaF32 *)PX_ALLOC( sizeof(HaF32)*ovcount*3);
 				result.mNumFaces          = hr.mFaceCount;
 				result.mNumIndices        = hr.mIndexCount+hr.mFaceCount;
-				result.mIndices           = (PxU32 *) PX_ALLOC( sizeof(PxU32)*result.mNumIndices);
-				memcpy(result.mOutputVertices, vscratch, sizeof(PxF32)*3*ovcount );
+				result.mIndices           = (HaU32 *) PX_ALLOC( sizeof(HaU32)*result.mNumIndices);
+				memcpy(result.mOutputVertices, vscratch, sizeof(HaF32)*3*ovcount );
 
 				{
-					const PxU32 *source = hr.mIndices;
-								PxU32 *dest   = result.mIndices;
-					for (PxU32 i=0; i<hr.mFaceCount; i++)
+					const HaU32 *source = hr.mIndices;
+								HaU32 *dest   = result.mIndices;
+					for (HaU32 i=0; i<hr.mFaceCount; i++)
 					{
 						dest[0] = 3;
 						if ( desc.HasHullFlag(QF_REVERSE_ORDER) )
@@ -2956,9 +2956,9 @@ HullError HullLibrary::ReleaseResult(HullResult &result) // release memory alloc
 }
 
 
-static void AddPoint(PxU32 &vcount,PxF32 *p,PxF32 x,PxF32 y,PxF32 z)
+static void AddPoint(HaU32 &vcount,HaF32 *p,HaF32 x,HaF32 y,HaF32 z)
 {
-	PxF32 *dest = &p[vcount*3];
+	HaF32 *dest = &p[vcount*3];
 	dest[0] = x;
 	dest[1] = y;
 	dest[2] = z;
@@ -2966,25 +2966,25 @@ static void AddPoint(PxU32 &vcount,PxF32 *p,PxF32 x,PxF32 y,PxF32 z)
 }
 
 
-PxF32 GetDist(PxF32 px,PxF32 py,PxF32 pz,const PxF32 *p2)
+HaF32 GetDist(HaF32 px,HaF32 py,HaF32 pz,const HaF32 *p2)
 {
 
-	PxF32 dx = px - p2[0];
-	PxF32 dy = py - p2[1];
-	PxF32 dz = pz - p2[2];
+	HaF32 dx = px - p2[0];
+	HaF32 dy = py - p2[1];
+	HaF32 dz = pz - p2[2];
 
 	return dx*dx+dy*dy+dz*dz;
 }
 
 
 
-bool  HullLibrary::CleanupVertices(PxU32 svcount,
-																const PxF32 *svertices,
-																PxU32 stride,
-																PxU32 &vcount,       // output number of vertices
-																PxF32 *vertices,                 // location to store the results.
-																PxF32  normalepsilon,
-																PxF32 *scale)
+bool  HullLibrary::CleanupVertices(HaU32 svcount,
+																const HaF32 *svertices,
+																HaU32 stride,
+																HaU32 &vcount,       // output number of vertices
+																HaF32 *vertices,                 // location to store the results.
+																HaF32  normalepsilon,
+																HaF32 *scale)
 {
 	if ( svcount == 0 ) return false;
 
@@ -2993,7 +2993,7 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 
 	vcount = 0;
 
-	PxF32 recip[3];
+	HaF32 recip[3];
 
 	if ( scale )
 	{
@@ -3002,19 +3002,19 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 		scale[2] = 1;
 	}
 
-	PxF32 bmin[3] = {  FLT_MAX,  FLT_MAX,  FLT_MAX };
-	PxF32 bmax[3] = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+	HaF32 bmin[3] = {  FLT_MAX,  FLT_MAX,  FLT_MAX };
+	HaF32 bmax[3] = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
 
 	const char *vtx = (const char *) svertices;
 
 	{
-		for (PxU32 i=0; i<svcount; i++)
+		for (HaU32 i=0; i<svcount; i++)
 		{
-			const PxF32 *p = (const PxF32 *) vtx;
+			const HaF32 *p = (const HaF32 *) vtx;
 
 			vtx+=stride;
 
-			for (PxI32 j=0; j<3; j++)
+			for (HaI32 j=0; j<3; j++)
 			{
 				if ( p[j] < bmin[j] ) bmin[j] = p[j];
 				if ( p[j] > bmax[j] ) bmax[j] = p[j];
@@ -3022,11 +3022,11 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 		}
 	}
 
-	PxF32 dx = bmax[0] - bmin[0];
-	PxF32 dy = bmax[1] - bmin[1];
-	PxF32 dz = bmax[2] - bmin[2];
+	HaF32 dx = bmax[0] - bmin[0];
+	HaF32 dy = bmax[1] - bmin[1];
+	HaF32 dz = bmax[2] - bmin[2];
 
-	PxF32 center[3];
+	HaF32 center[3];
 
 	center[0] = dx*0.5f + bmin[0];
 	center[1] = dy*0.5f + bmin[1];
@@ -3035,7 +3035,7 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 	if ( dx < EPSILON || dy < EPSILON || dz < EPSILON || svcount < 3 )
 	{
 
-		PxF32 len = FLT_MAX;
+		HaF32 len = FLT_MAX;
 
 		if ( dx > EPSILON && dx < len ) len = dx;
 		if ( dy > EPSILON && dy < len ) len = dy;
@@ -3052,14 +3052,14 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 			if ( dz < EPSILON ) dz = len * 0.05f;
 		}
 
-		PxF32 x1 = center[0] - dx;
-		PxF32 x2 = center[0] + dx;
+		HaF32 x1 = center[0] - dx;
+		HaF32 x2 = center[0] + dx;
 
-		PxF32 y1 = center[1] - dy;
-		PxF32 y2 = center[1] + dy;
+		HaF32 y1 = center[1] - dy;
+		HaF32 y2 = center[1] + dy;
 
-		PxF32 z1 = center[2] - dz;
-		PxF32 z2 = center[2] + dz;
+		HaF32 z1 = center[2] - dz;
+		HaF32 z2 = center[2] + dz;
 
 		AddPoint(vcount,vertices,x1,y1,z1);
 		AddPoint(vcount,vertices,x2,y1,z1);
@@ -3098,15 +3098,15 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 
 	vtx = (const char *) svertices;
 
-	for (PxU32 i=0; i<svcount; i++)
+	for (HaU32 i=0; i<svcount; i++)
 	{
 
-		const PxF32 *p = (const PxF32 *)vtx;
+		const HaF32 *p = (const HaF32 *)vtx;
 		vtx+=stride;
 
-		PxF32 px = p[0];
-		PxF32 py = p[1];
-		PxF32 pz = p[2];
+		HaF32 px = p[0];
+		HaF32 py = p[1];
+		HaF32 pz = p[2];
 
 		if ( scale )
 		{
@@ -3116,19 +3116,19 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 		}
 
 		{
-			PxU32 j;
+			HaU32 j;
 
 			for (j=0; j<vcount; j++)
 			{
-				PxF32 *v = &vertices[j*3];
+				HaF32 *v = &vertices[j*3];
 
-				PxF32 x = v[0];
-				PxF32 y = v[1];
-				PxF32 z = v[2];
+				HaF32 x = v[0];
+				HaF32 y = v[1];
+				HaF32 z = v[2];
 
-				PxF32 dx = fabsf(x - px );
-				PxF32 dy = fabsf(y - py );
-				PxF32 dz = fabsf(z - pz );
+				HaF32 dx = fabsf(x - px );
+				HaF32 dy = fabsf(y - py );
+				HaF32 dz = fabsf(z - pz );
 
 				if ( dx < normalepsilon && dy < normalepsilon && dz < normalepsilon )
 				{
@@ -3136,8 +3136,8 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 					// now let us see if it is further from the center of the point cloud than the one we already recorded.
 					// in which case we keep this one instead.
 
-					PxF32 dist1 = GetDist(px,py,pz,center);
-					PxF32 dist2 = GetDist(v[0],v[1],v[2],center);
+					HaF32 dist1 = GetDist(px,py,pz,center);
+					HaF32 dist2 = GetDist(v[0],v[1],v[2],center);
 
 					if ( dist1 > dist2 )
 					{
@@ -3152,7 +3152,7 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 
 			if ( j == vcount )
 			{
-				PxF32 *dest = &vertices[vcount*3];
+				HaF32 *dest = &vertices[vcount*3];
 				dest[0] = px;
 				dest[1] = py;
 				dest[2] = pz;
@@ -3163,30 +3163,30 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 
 	// ok..now make sure we didn't prune so many vertices it is now invalid.
 	{
-		PxF32 bmin[3] = {  FLT_MAX,  FLT_MAX,  FLT_MAX };
-		PxF32 bmax[3] = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+		HaF32 bmin[3] = {  FLT_MAX,  FLT_MAX,  FLT_MAX };
+		HaF32 bmax[3] = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
 
-		for (PxU32 i=0; i<vcount; i++)
+		for (HaU32 i=0; i<vcount; i++)
 		{
-			const PxF32 *p = &vertices[i*3];
-			for (PxI32 j=0; j<3; j++)
+			const HaF32 *p = &vertices[i*3];
+			for (HaI32 j=0; j<3; j++)
 			{
 				if ( p[j] < bmin[j] ) bmin[j] = p[j];
 				if ( p[j] > bmax[j] ) bmax[j] = p[j];
 			}
 		}
 
-		PxF32 dx = bmax[0] - bmin[0];
-		PxF32 dy = bmax[1] - bmin[1];
-		PxF32 dz = bmax[2] - bmin[2];
+		HaF32 dx = bmax[0] - bmin[0];
+		HaF32 dy = bmax[1] - bmin[1];
+		HaF32 dz = bmax[2] - bmin[2];
 
 		if ( dx < EPSILON || dy < EPSILON || dz < EPSILON || vcount < 3)
 		{
-			PxF32 cx = dx*0.5f + bmin[0];
-			PxF32 cy = dy*0.5f + bmin[1];
-			PxF32 cz = dz*0.5f + bmin[2];
+			HaF32 cx = dx*0.5f + bmin[0];
+			HaF32 cy = dy*0.5f + bmin[1];
+			HaF32 cz = dz*0.5f + bmin[2];
 
-			PxF32 len = FLT_MAX;
+			HaF32 len = FLT_MAX;
 
 			if ( dx >= EPSILON && dx < len ) len = dx;
 			if ( dy >= EPSILON && dy < len ) len = dy;
@@ -3203,14 +3203,14 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 				if ( dz < EPSILON ) dz = len * 0.05f;
 			}
 
-			PxF32 x1 = cx - dx;
-			PxF32 x2 = cx + dx;
+			HaF32 x1 = cx - dx;
+			HaF32 x2 = cx + dx;
 
-			PxF32 y1 = cy - dy;
-			PxF32 y2 = cy + dy;
+			HaF32 y1 = cy - dy;
+			HaF32 y2 = cy + dy;
 
-			PxF32 z1 = cz - dz;
-			PxF32 z2 = cz + dz;
+			HaF32 z1 = cz - dz;
+			HaF32 z2 = cz + dz;
 
 			vcount = 0; // add box
 
@@ -3230,16 +3230,16 @@ bool  HullLibrary::CleanupVertices(PxU32 svcount,
 	return true;
 }
 
-void HullLibrary::BringOutYourDead(const PxF32 *verts,PxU32 vcount, PxF32 *overts,PxU32 &ocount,PxU32 *indices,PxU32 indexcount)
+void HullLibrary::BringOutYourDead(const HaF32 *verts,HaU32 vcount, HaF32 *overts,HaU32 &ocount,HaU32 *indices,HaU32 indexcount)
 {
-	PxU32 *used = (PxU32 *)PX_ALLOC(sizeof(PxU32)*vcount);
-	memset(used,0,sizeof(PxU32)*vcount);
+	HaU32 *used = (HaU32 *)PX_ALLOC(sizeof(HaU32)*vcount);
+	memset(used,0,sizeof(HaU32)*vcount);
 
 	ocount = 0;
 
-	for (PxU32 i=0; i<indexcount; i++)
+	for (HaU32 i=0; i<indexcount; i++)
 	{
-		PxU32 v = indices[i]; // original array index
+		HaU32 v = indices[i]; // original array index
 
 		PX_ASSERT( v < vcount );
 
@@ -3273,25 +3273,25 @@ HullError HullLibrary::CreateTriangleMesh(HullResult &answer,ConvexHullTriangleI
 	HullError ret = QE_FAIL;
 
 
-	const PxF32 *p            = answer.mOutputVertices;
-	const PxU32   *idx = answer.mIndices;
-	PxU32 fcount       = answer.mNumFaces;
+	const HaF32 *p            = answer.mOutputVertices;
+	const HaU32   *idx = answer.mIndices;
+	HaU32 fcount       = answer.mNumFaces;
 
 	if ( p && idx && fcount )
 	{
 		ret = QE_OK;
 
-		for (PxU32 i=0; i<fcount; i++)
+		for (HaU32 i=0; i<fcount; i++)
 		{
-			PxU32 pcount = *idx++;
+			HaU32 pcount = *idx++;
 
-			PxU32 i1 = *idx++;
-			PxU32 i2 = *idx++;
-			PxU32 i3 = *idx++;
+			HaU32 i1 = *idx++;
+			HaU32 i2 = *idx++;
+			HaU32 i3 = *idx++;
 
-			const PxF32 *p1 = &p[i1*3];
-			const PxF32 *p2 = &p[i2*3];
-			const PxF32 *p3 = &p[i3*3];
+			const HaF32 *p1 = &p[i1*3];
+			const HaF32 *p2 = &p[i2*3];
+			const HaF32 *p3 = &p[i3*3];
 
 			AddConvexTriangle(iface,p1,p2,p3);
 
@@ -3313,7 +3313,7 @@ HullError HullLibrary::CreateTriangleMesh(HullResult &answer,ConvexHullTriangleI
 }
 
 //==================================================================================
-void HullLibrary::AddConvexTriangle(ConvexHullTriangleInterface *callback,const PxF32 *p1,const PxF32 *p2,const PxF32 *p3)
+void HullLibrary::AddConvexTriangle(ConvexHullTriangleInterface *callback,const HaF32 *p1,const HaF32 *p2,const HaF32 *p3)
 {
 	ConvexHullVertex v1,v2,v3;
 
@@ -3331,7 +3331,7 @@ void HullLibrary::AddConvexTriangle(ConvexHullTriangleInterface *callback,const 
 	v3.mPos[1] = p3[1];
 	v3.mPos[2] = p3[2];
 
-	PxF32 n[3];
+	HaF32 n[3];
 	ComputeNormal(n,p1,p2,p3);
 
 	v1.mNormal[0] = n[0];
@@ -3346,16 +3346,16 @@ void HullLibrary::AddConvexTriangle(ConvexHullTriangleInterface *callback,const 
 	v3.mNormal[1] = n[1];
 	v3.mNormal[2] = n[2];
 
-	const PxF32 *tp1 = p1;
-	const PxF32 *tp2 = p2;
-	const PxF32 *tp3 = p3;
+	const HaF32 *tp1 = p1;
+	const HaF32 *tp2 = p2;
+	const HaF32 *tp3 = p3;
 
-	PxI32 i1 = 0;
-	PxI32 i2 = 0;
+	HaI32 i1 = 0;
+	HaI32 i2 = 0;
 
-	PxF32 nx = fabsf(n[0]);
-	PxF32 ny = fabsf(n[1]);
-	PxF32 nz = fabsf(n[2]);
+	HaF32 nx = fabsf(n[0]);
+	HaF32 ny = fabsf(n[1]);
+	HaF32 nz = fabsf(n[2]);
 
 	if ( nx <= ny && nx <= nz )
 		i1 = 0;
@@ -3399,9 +3399,9 @@ void HullLibrary::AddConvexTriangle(ConvexHullTriangleInterface *callback,const 
 }
 
 //==================================================================================
-PxF32 HullLibrary::ComputeNormal(PxF32 *n,const PxF32 *A,const PxF32 *B,const PxF32 *C)
+HaF32 HullLibrary::ComputeNormal(HaF32 *n,const HaF32 *A,const HaF32 *B,const HaF32 *C)
 {
-	PxF32 vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag;
+	HaF32 vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag;
 
 	vx = (B[0] - C[0]);
 	vy = (B[1] - C[1]);

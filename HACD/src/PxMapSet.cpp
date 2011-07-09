@@ -55,7 +55,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PxMapSetInternal.h"
 
-namespace physx
+namespace hacd
 {
     // Forward declarations
     rbtree_node_base* RBTreeRotateLeft(rbtree_node_base* pNode, rbtree_node_base* pNodeRoot);
@@ -404,7 +404,7 @@ namespace physx
             // Now pNode is disconnected from the tree.
 
             pNodeSuccessor->mpNodeParent = pNode->mpNodeParent;
-            physx::swap(pNodeSuccessor->mColor, pNode->mColor);
+            hacd::swap(pNodeSuccessor->mColor, pNode->mColor);
         }
 
         // Here we do tree balancing as per the conventional red-black tree algorithm.
@@ -502,7 +502,7 @@ namespace physx
     } // RBTreeErase
 
 
-} // namespace physx
+} // namespace hacd
 
 
 

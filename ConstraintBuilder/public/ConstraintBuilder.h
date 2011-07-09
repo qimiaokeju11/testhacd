@@ -40,14 +40,16 @@
 
 #include "PlatformConfig.h"
 
+namespace hacd
+{
 
 class ConstraintBuilder;
 class ConstrainedHull;
 
-class Constraint : public physx::UserAllocated
+class Constraint : public hacd::UserAllocated
 {
 public:
-  Constraint(ConstrainedHull *parent,ConstrainedHull *child,const physx::PxF32 *sect)
+  Constraint(ConstrainedHull *parent,ConstrainedHull *child,const hacd::HaF32 *sect)
   {
     mParent = parent;
     mChild  = child;
@@ -57,17 +59,18 @@ public:
   }
   ConstrainedHull *mParent;
   ConstrainedHull *mChild;
-  physx::PxF32            mIntersect[3]; // the mean value of the joined surfaces.
+  hacd::HaF32            mIntersect[3]; // the mean value of the joined surfaces.
 };
 
 ConstraintBuilder *createConstraintBuilder(void);
 void               releaseConstraintBuilder(ConstraintBuilder *cb);
-ConstrainedHull   *addConvexHull(ConstraintBuilder *cb,physx::PxU32 vcount,const physx::PxF32 *vertices,physx::PxU32 tcount,const physx::PxU32 *indices,physx::PxF32 volume,physx::PxU32 userData);
-physx::PxU32       getUserData(ConstrainedHull *ch);
-physx::PxU32       getConstrainedHullCount(ConstraintBuilder *cb);
-ConstrainedHull   *getConstrainedHull(ConstraintBuilder *cb,physx::PxU32 index);
-physx::PxU32       buildConstraints(ConstraintBuilder *cb); // returns number of constraints in the skeleton.
-Constraint        *getConstraint(ConstraintBuilder *cb,physx::PxU32 index,physx::PxU32 &i1,physx::PxU32 &i2);
+ConstrainedHull   *addConvexHull(ConstraintBuilder *cb,hacd::HaU32 vcount,const hacd::HaF32 *vertices,hacd::HaU32 tcount,const hacd::HaU32 *indices,hacd::HaF32 volume,hacd::HaU32 userData);
+hacd::HaU32       getUserData(ConstrainedHull *ch);
+hacd::HaU32       getConstrainedHullCount(ConstraintBuilder *cb);
+ConstrainedHull   *getConstrainedHull(ConstraintBuilder *cb,hacd::HaU32 index);
+hacd::HaU32       buildConstraints(ConstraintBuilder *cb); // returns number of constraints in the skeleton.
+Constraint        *getConstraint(ConstraintBuilder *cb,hacd::HaU32 index,hacd::HaU32 &i1,hacd::HaU32 &i2);
 
+}; // end of namespace
 
 #endif

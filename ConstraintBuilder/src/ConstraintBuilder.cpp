@@ -44,6 +44,9 @@
 #include "ConstraintBuilder.h"
 #include "TriTri.h"
 
+namespace hacd
+{
+
 typedef STDNAME::vector< Constraint * > ConstraintVector;
 
 /* a = b - c */
@@ -64,11 +67,11 @@ typedef STDNAME::vector< Constraint * > ConstraintVector;
     (a)[1] = (b)[2] * (c)[0] - (c)[2] * (b)[0]; \
     (a)[2] = (b)[0] * (c)[1] - (c)[0] * (b)[1];
 
-static bool rayIntersectsTriangle(const physx::PxF32 *p,const physx::PxF32 *d,const physx::PxF32 *v0,const physx::PxF32 *v1,const physx::PxF32 *v2,physx::PxF32 &t)
+static bool rayIntersectsTriangle(const hacd::HaF32 *p,const hacd::HaF32 *d,const hacd::HaF32 *v0,const hacd::HaF32 *v1,const hacd::HaF32 *v2,hacd::HaF32 &t)
 {
 
-    physx::PxF32 e1[3],e2[3],h[3],s[3],q[3];
-    physx::PxF32 a,f,u,v;
+    hacd::HaF32 e1[3],e2[3],h[3],s[3],q[3];
+    hacd::HaF32 a,f,u,v;
 
     rayvector(e1,v1,v0);
     rayvector(e2,v2,v0);
@@ -100,23 +103,23 @@ static bool rayIntersectsTriangle(const physx::PxF32 *p,const physx::PxF32 *d,co
 }
 
 
-static bool lineIntersectsTriangle(const physx::PxF32 *rayStart,const physx::PxF32 *rayEnd,const physx::PxF32 *p1,const physx::PxF32 *p2,const physx::PxF32 *p3,physx::PxF32 *sect)
+static bool lineIntersectsTriangle(const hacd::HaF32 *rayStart,const hacd::HaF32 *rayEnd,const hacd::HaF32 *p1,const hacd::HaF32 *p2,const hacd::HaF32 *p3,hacd::HaF32 *sect)
 {
-    physx::PxF32 dir[3];
+    hacd::HaF32 dir[3];
 
   dir[0] = rayEnd[0] - rayStart[0];
   dir[1] = rayEnd[1] - rayStart[1];
   dir[2] = rayEnd[2] - rayStart[2];
 
-  physx::PxF32 d = sqrtf(dir[0]*dir[0] + dir[1]*dir[1] + dir[2]*dir[2]);
-  physx::PxF32 r = 1.0f / d;
+  hacd::HaF32 d = sqrtf(dir[0]*dir[0] + dir[1]*dir[1] + dir[2]*dir[2]);
+  hacd::HaF32 r = 1.0f / d;
 
   dir[0]*=r;
   dir[1]*=r;
   dir[2]*=r;
 
 
-  physx::PxF32 t;
+  hacd::HaF32 t;
 
     bool ret = rayIntersectsTriangle(rayStart, dir, p1, p2, p3, t );
 
@@ -138,21 +141,21 @@ static bool lineIntersectsTriangle(const physx::PxF32 *rayStart,const physx::PxF
 }
 
 
-static physx::PxF32 fm_computePlane(const physx::PxF32 *A,const physx::PxF32 *B,const physx::PxF32 *C,physx::PxF32 *n) // returns D
+static hacd::HaF32 fm_computePlane(const hacd::HaF32 *A,const hacd::HaF32 *B,const hacd::HaF32 *C,hacd::HaF32 *n) // returns D
 {
-    physx::PxF32 vx = (B[0] - C[0]);
-    physx::PxF32 vy = (B[1] - C[1]);
-    physx::PxF32 vz = (B[2] - C[2]);
+    hacd::HaF32 vx = (B[0] - C[0]);
+    hacd::HaF32 vy = (B[1] - C[1]);
+    hacd::HaF32 vz = (B[2] - C[2]);
 
-    physx::PxF32 wx = (A[0] - B[0]);
-    physx::PxF32 wy = (A[1] - B[1]);
-    physx::PxF32 wz = (A[2] - B[2]);
+    hacd::HaF32 wx = (A[0] - B[0]);
+    hacd::HaF32 wy = (A[1] - B[1]);
+    hacd::HaF32 wz = (A[2] - B[2]);
 
-    physx::PxF32 vw_x = vy * wz - vz * wy;
-    physx::PxF32 vw_y = vz * wx - vx * wz;
-    physx::PxF32 vw_z = vx * wy - vy * wx;
+    hacd::HaF32 vw_x = vy * wz - vz * wy;
+    hacd::HaF32 vw_y = vz * wx - vx * wz;
+    hacd::HaF32 vw_z = vx * wy - vy * wx;
 
-    physx::PxF32 mag = sqrtf((vw_x * vw_x) + (vw_y * vw_y) + (vw_z * vw_z));
+    hacd::HaF32 mag = sqrtf((vw_x * vw_x) + (vw_y * vw_y) + (vw_z * vw_z));
 
     if ( mag < 0.000001f )
     {
@@ -163,12 +166,12 @@ static physx::PxF32 fm_computePlane(const physx::PxF32 *A,const physx::PxF32 *B,
         mag = 1.0f/mag;
     }
 
-    physx::PxF32 x = vw_x * mag;
-    physx::PxF32 y = vw_y * mag;
-    physx::PxF32 z = vw_z * mag;
+    hacd::HaF32 x = vw_x * mag;
+    hacd::HaF32 y = vw_y * mag;
+    hacd::HaF32 z = vw_z * mag;
 
 
-    physx::PxF32 D = 0.0f - ((x*A[0])+(y*A[1])+(z*A[2]));
+    hacd::HaF32 D = 0.0f - ((x*A[0])+(y*A[1])+(z*A[2]));
 
   n[0] = x;
   n[1] = y;
@@ -178,28 +181,28 @@ static physx::PxF32 fm_computePlane(const physx::PxF32 *A,const physx::PxF32 *B,
 }
 
 
-class ConstrainedHull : public physx::UserAllocated
+class ConstrainedHull : public hacd::UserAllocated
 {
 public:
-  ConstrainedHull(physx::PxU32 vcount,const physx::PxF32 *vertices,physx::PxU32 tcount,const physx::PxU32 *indices,physx::PxF32 volume,physx::PxU32 userData)
+  ConstrainedHull(hacd::HaU32 vcount,const hacd::HaF32 *vertices,hacd::HaU32 tcount,const hacd::HaU32 *indices,hacd::HaF32 volume,hacd::HaU32 userData)
   {
     mVcount = vcount;
     mTcount = tcount;
-    mVertices = (physx::PxF32 *)PX_ALLOC(sizeof(physx::PxF32)*vcount*3);
-    mIndices  = (physx::PxU32 *)PX_ALLOC(sizeof(physx::PxU32)*tcount*3);
-    memcpy(mVertices,vertices,sizeof(physx::PxF32)*vcount*3);
-    memcpy(mIndices,indices,sizeof(physx::PxU32)*tcount*3);
+    mVertices = (hacd::HaF32 *)PX_ALLOC(sizeof(hacd::HaF32)*vcount*3);
+    mIndices  = (hacd::HaU32 *)PX_ALLOC(sizeof(hacd::HaU32)*tcount*3);
+    memcpy(mVertices,vertices,sizeof(hacd::HaF32)*vcount*3);
+    memcpy(mIndices,indices,sizeof(hacd::HaU32)*tcount*3);
     mVolume   = volume;
     mUserData = userData;
 
-    physx::PxF32 bmin[3],bmax[3];
+    hacd::HaF32 bmin[3],bmax[3];
 
     bmin[0] = bmax[0] = vertices[0];
     bmin[1] = bmax[1] = vertices[1];
     bmin[2] = bmax[2] = vertices[2];
 
-    const physx::PxF32 *scan = vertices+3;
-    for (physx::PxU32 i=1; i<vcount; i++)
+    const hacd::HaF32 *scan = vertices+3;
+    for (hacd::HaU32 i=1; i<vcount; i++)
     {
       if ( scan[0] < bmin[0] ) bmin[0] = scan[0];
       if ( scan[1] < bmin[1] ) bmin[1] = scan[1];
@@ -216,20 +219,20 @@ public:
     mCenter[1] = ((bmax[1] - bmin[1])*0.5f)+bmin[1];
     mCenter[2] = ((bmax[2] - bmin[2])*0.5f)+bmin[2];
 
-    mPlanes = (physx::PxF32 *)PX_ALLOC(sizeof(physx::PxF32)*tcount*4);
+    mPlanes = (hacd::HaF32 *)PX_ALLOC(sizeof(hacd::HaF32)*tcount*4);
 
-    physx::PxU32 *idx = mIndices;
+    hacd::HaU32 *idx = mIndices;
 
-    physx::PxF32 *plane = mPlanes;
-    for (physx::PxU32 i=0; i<mTcount; i++)
+    hacd::HaF32 *plane = mPlanes;
+    for (hacd::HaU32 i=0; i<mTcount; i++)
     {
-      physx::PxU32 i1 = *idx++;
-      physx::PxU32 i2 = *idx++;
-      physx::PxU32 i3 = *idx++;
+      hacd::HaU32 i1 = *idx++;
+      hacd::HaU32 i2 = *idx++;
+      hacd::HaU32 i3 = *idx++;
 
-      const physx::PxF32 *p1 = &mVertices[i1*3];
-      const physx::PxF32 *p2 = &mVertices[i2*3];
-      const physx::PxF32 *p3 = &mVertices[i3*3];
+      const hacd::HaF32 *p1 = &mVertices[i1*3];
+      const hacd::HaF32 *p2 = &mVertices[i2*3];
+      const hacd::HaF32 *p3 = &mVertices[i3*3];
 
       plane[3] = fm_computePlane(p1,p2,p3,plane);
 
@@ -248,37 +251,37 @@ public:
     PX_FREE(mPlanes);
   }
 
-  physx::PxU32 getUserData(void) const { return mUserData; };
+  hacd::HaU32 getUserData(void) const { return mUserData; };
 
-  bool rayCast(const physx::PxF32 *rayStart,const physx::PxF32 *rayEnd,physx::PxF32 *intersect)
+  bool rayCast(const hacd::HaF32 *rayStart,const hacd::HaF32 *rayEnd,hacd::HaF32 *intersect)
   {
     bool ret = false;
-    physx::PxF32 nearest = 1e9;
+    hacd::HaF32 nearest = 1e9;
 
-    physx::PxU32 *idx = mIndices;
+    hacd::HaU32 *idx = mIndices;
 
-    for (physx::PxU32 i=0; i<mTcount; i++)
+    for (hacd::HaU32 i=0; i<mTcount; i++)
     {
-      physx::PxU32 i1 = *idx++;
-      physx::PxU32 i2 = *idx++;
-      physx::PxU32 i3 = *idx++;
+      hacd::HaU32 i1 = *idx++;
+      hacd::HaU32 i2 = *idx++;
+      hacd::HaU32 i3 = *idx++;
 
-      const physx::PxF32 *p1 = &mVertices[i1*3];
-      const physx::PxF32 *p2 = &mVertices[i2*3];
-      const physx::PxF32 *p3 = &mVertices[i3*3];
+      const hacd::HaF32 *p1 = &mVertices[i1*3];
+      const hacd::HaF32 *p2 = &mVertices[i2*3];
+      const hacd::HaF32 *p3 = &mVertices[i3*3];
 
-      physx::PxF32 sect[3];
+      hacd::HaF32 sect[3];
 
       bool hit = lineIntersectsTriangle(rayStart,rayEnd,p1,p2,p3,sect);
 
       if ( hit )
       {
 
-        physx::PxF32 dx = sect[0] - rayStart[0];
-        physx::PxF32 dy = sect[1] - rayStart[1];
-        physx::PxF32 dz = sect[2] - rayStart[2];
+        hacd::HaF32 dx = sect[0] - rayStart[0];
+        hacd::HaF32 dy = sect[1] - rayStart[1];
+        hacd::HaF32 dz = sect[2] - rayStart[2];
 
-        physx::PxF32 dist = dx*dx+dy*dy+dz*dz;
+        hacd::HaF32 dist = dx*dx+dy*dy+dz*dz;
 
         if ( dist < nearest )
         {
@@ -293,25 +296,25 @@ public:
     return ret;
   }
 
-  bool coplaner(const physx::PxF32 *plane1,const physx::PxF32 *plane2)
+  bool coplaner(const hacd::HaF32 *plane1,const hacd::HaF32 *plane2)
   {
 
-        const physx::PxF32 PTHRESH=0.3f;
+        const hacd::HaF32 PTHRESH=0.3f;
 
     bool ret = false;
 
-    physx::PxF32 dx = fabsf(plane1[0]+plane2[0]);
-    physx::PxF32 dy = fabsf(plane1[1]+plane2[1]);
-    physx::PxF32 dz = fabsf(plane1[2]+plane2[2]);
+    hacd::HaF32 dx = fabsf(plane1[0]+plane2[0]);
+    hacd::HaF32 dy = fabsf(plane1[1]+plane2[1]);
+    hacd::HaF32 dz = fabsf(plane1[2]+plane2[2]);
 
-    physx::PxF32 diff = dx*dx+dy*dy+dz*dz;
+    hacd::HaF32 diff = dx*dx+dy*dy+dz*dz;
 
     if ( diff < (0.3f*0.3f) )
     {
-            physx::PxF32 d1 = plane1[3];
-            physx::PxF32 d2 = plane2[3];
+            hacd::HaF32 d1 = plane1[3];
+            hacd::HaF32 d2 = plane2[3];
 
-            physx::PxF32 d = fabsf(d1+d2);
+            hacd::HaF32 d = fabsf(d1+d2);
 
             if ( d < PTHRESH )
           {
@@ -322,14 +325,14 @@ public:
     return ret;
   }
 
-  void getTri(const physx::PxU32 *idx,const physx::PxF32 *verts,physx::PxF32 *t1,physx::PxF32 *t2,physx::PxF32 *t3)
+  void getTri(const hacd::HaU32 *idx,const hacd::HaF32 *verts,hacd::HaF32 *t1,hacd::HaF32 *t2,hacd::HaF32 *t3)
   {
-    physx::PxU32 i1 = *idx++;
-    physx::PxU32 i2 = *idx++;
-    physx::PxU32 i3 = *idx++;
-    const physx::PxF32 *p1 = &verts[i1*3];
-    const physx::PxF32 *p2 = &verts[i2*3];
-    const physx::PxF32 *p3 = &verts[i3*3];
+    hacd::HaU32 i1 = *idx++;
+    hacd::HaU32 i2 = *idx++;
+    hacd::HaU32 i3 = *idx++;
+    const hacd::HaF32 *p1 = &verts[i1*3];
+    const hacd::HaF32 *p2 = &verts[i2*3];
+    const hacd::HaF32 *p3 = &verts[i3*3];
 
     t1[0] = p1[0];
     t1[1] = p1[1];
@@ -344,14 +347,14 @@ public:
     t3[2] = p3[2];
   }
 
-  void copy(physx::PxF32 *dest,const physx::PxF32 *source)
+  void copy(hacd::HaF32 *dest,const hacd::HaF32 *source)
   {
     dest[0] = source[0];
     dest[1] = source[1];
     dest[2] = source[2];
   }
 
-  void include(physx::PxF32 *bmin,physx::PxF32 *bmax,physx::PxF32 *p)
+  void include(hacd::HaF32 *bmin,hacd::HaF32 *bmax,hacd::HaF32 *p)
   {
     if ( p[0] < bmin[0] ) bmin[0] = p[0];
     if ( p[1] < bmin[1] ) bmin[1] = p[1];
@@ -361,39 +364,39 @@ public:
     if ( p[2] > bmax[2] ) bmax[2] = p[2];
   }
 
-  void computeCenter(physx::PxF32 *center,const physx::PxF32 *bmin,const physx::PxF32 *bmax)
+  void computeCenter(hacd::HaF32 *center,const hacd::HaF32 *bmin,const hacd::HaF32 *bmax)
   {
     center[0] = (bmax[0]-bmin[0])*0.5f + bmin[0];
     center[1] = (bmax[1]-bmin[1])*0.5f + bmin[1];
     center[2] = (bmax[2]-bmin[2])*0.5f + bmin[2];
   }
 
-  bool sharesEdge(ConstrainedHull *parent,physx::PxF32 *sect)
+  bool sharesEdge(ConstrainedHull *parent,hacd::HaF32 *sect)
   {
     bool ret = false;
 
-    physx::PxF32 *plane = mPlanes;
-    const physx::PxU32 *idx   = mIndices;
+    hacd::HaF32 *plane = mPlanes;
+    const hacd::HaU32 *idx   = mIndices;
 
-    physx::PxF32 bmin[3];
-    physx::PxF32 bmax[3];
+    hacd::HaF32 bmin[3];
+    hacd::HaF32 bmax[3];
 
-    for (physx::PxU32 i=0; i<mTcount; i++)
+    for (hacd::HaU32 i=0; i<mTcount; i++)
     {
-      physx::PxF32 *parent_plane = parent->mPlanes;
-      const physx::PxU32 *parent_idx = parent->mIndices;
-      for (physx::PxU32 j=0; j<parent->mTcount; j++)
+      hacd::HaF32 *parent_plane = parent->mPlanes;
+      const hacd::HaU32 *parent_idx = parent->mIndices;
+      for (hacd::HaU32 j=0; j<parent->mTcount; j++)
       {
         if ( coplaner(plane,parent_plane) )
         {
 
-          physx::PxF32 p1[3],p2[3],p3[3];
-          physx::PxF32 tp1[3],tp2[3],tp3[3];
+          hacd::HaF32 p1[3],p2[3],p3[3];
+          hacd::HaF32 tp1[3],tp2[3],tp3[3];
 
           getTri(parent_idx,parent->mVertices,p1,p2,p3);
           getTri(idx,mVertices,tp1,tp2,tp3);
 
-          physx::PxI32 hit = coplanar_tri_tri3d(p1,p2,p3,tp1,tp2,tp2,parent_plane,plane);
+          hacd::HaI32 hit = coplanar_tri_tri3d(p1,p2,p3,tp1,tp2,tp2,parent_plane,plane);
 
           if ( hit )
           {
@@ -424,20 +427,20 @@ public:
   }
 
 
-  physx::PxF32         mVolume;
-  physx::PxU32  mVcount;
-  physx::PxF32        *mVertices;
-  physx::PxU32  mTcount;
-  physx::PxU32 *mIndices;
-  physx::PxU32  mUserData;
-  physx::PxF32         mCenter[3];
+  hacd::HaF32         mVolume;
+  hacd::HaU32  mVcount;
+  hacd::HaF32        *mVertices;
+  hacd::HaU32  mTcount;
+  hacd::HaU32 *mIndices;
+  hacd::HaU32  mUserData;
+  hacd::HaF32         mCenter[3];
   bool          mUsed;
-  physx::PxF32        *mPlanes;
+  hacd::HaF32        *mPlanes;
 };
 
 typedef STDNAME::vector< ConstrainedHull * > ConstrainedHullVector;
 
-class ConstraintBuilder : public physx::UserAllocated
+class ConstraintBuilder : public hacd::UserAllocated
 {
 public:
   ConstraintBuilder(void)
@@ -462,19 +465,19 @@ public:
     }
   }
 
-  ConstrainedHull * addConvexHull(physx::PxU32 vcount,const physx::PxF32 *vertices,physx::PxU32 tcount,const physx::PxU32 *indices,physx::PxF32 volume,physx::PxU32 userData)
+  ConstrainedHull * addConvexHull(hacd::HaU32 vcount,const hacd::HaF32 *vertices,hacd::HaU32 tcount,const hacd::HaU32 *indices,hacd::HaF32 volume,hacd::HaU32 userData)
   {
     ConstrainedHull *ch = PX_NEW(ConstrainedHull)(vcount,vertices,tcount,indices,volume,userData);
     mHulls.push_back(ch);
     return ch;
   }
 
-  physx::PxU32 getConstrainedHullCount(void)
+  hacd::HaU32 getConstrainedHullCount(void)
   {
-    return (physx::PxU32)mHulls.size();
+    return (hacd::HaU32)mHulls.size();
   }
 
-  ConstrainedHull * getConstrainedHull(physx::PxU32 index)
+  ConstrainedHull * getConstrainedHull(hacd::HaU32 index)
   {
     ConstrainedHull *ret = 0;
     if ( index < mHulls.size() )
@@ -485,7 +488,7 @@ public:
   ConstrainedHull * getLargestHull(void)
   {
     ConstrainedHull *ret = 0;
-    physx::PxF32 maxV = 0;
+    hacd::HaF32 maxV = 0;
 
     ConstrainedHullVector::iterator i;
     for (i=mHulls.begin(); i!=mHulls.end(); ++i)
@@ -515,7 +518,7 @@ public:
     {
       ConstrainedHull *child = (*i);
 
-      physx::PxF32 sect[3];
+      hacd::HaF32 sect[3];
 
       if ( !child->mUsed && ch->sharesEdge(child,sect) )
       {
@@ -534,7 +537,7 @@ public:
     }
   }
 
-  physx::PxU32 buildConstraints(void)
+  hacd::HaU32 buildConstraints(void)
   {
     ConstrainedHull *ch = getLargestHull();
 
@@ -546,7 +549,7 @@ public:
 
         // ok..the constraints have to be sorted now!
 
-      physx::PxU32 count = (physx::PxU32)mConstraints.size();
+      hacd::HaU32 count = (hacd::HaU32)mConstraints.size();
       char *used = (char *)PX_ALLOC(sizeof(char)*count);
       memset(used,0,sizeof(char)*count);
 
@@ -559,7 +562,7 @@ public:
         // first add all of the root nodes
         ConstrainedHull *root = slist[0]->mParent;
 
-        for (physx::PxU32 i=0; i<count; i++)
+        for (hacd::HaU32 i=0; i<count; i++)
         {
             Constraint *node =slist[i];
             if ( node->mParent == root )
@@ -570,14 +573,14 @@ public:
             }
         }
 
-        physx::PxU32 ncount = (physx::PxU32)nextlist.size();
+        hacd::HaU32 ncount = (hacd::HaU32)nextlist.size();
 
         while ( ncount )
         {
-        for (physx::PxU32 i=0; i<ncount; i++)
+        for (hacd::HaU32 i=0; i<ncount; i++)
         {
             Constraint *parent = nextlist[i];
-            for (physx::PxU32 j=0; j<count; j++)
+            for (hacd::HaU32 j=0; j<count; j++)
             {
                 if ( !used[j] ) // if not already represented...
                 {
@@ -593,15 +596,15 @@ public:
             }
             nextlist = newlist;
             newlist.clear();
-            ncount = (physx::PxU32)nextlist.size();
+            ncount = (hacd::HaU32)nextlist.size();
         }
 
         PX_FREE(used);
 
-    return (physx::PxU32)mConstraints.size();
+    return (hacd::HaU32)mConstraints.size();
   }
 
-  Constraint        *getConstraint(physx::PxU32 index,physx::PxU32 &i1,physx::PxU32 &i2)
+  Constraint        *getConstraint(hacd::HaU32 index,hacd::HaU32 &i1,hacd::HaU32 &i2)
   {
     Constraint *ret = 0;
     if ( index < mConstraints.size() )
@@ -631,34 +634,36 @@ void               releaseConstraintBuilder(ConstraintBuilder *cb)
   delete cb;
 }
 
-ConstrainedHull *  addConvexHull(ConstraintBuilder *cb,physx::PxU32 vcount,const physx::PxF32 *vertices,physx::PxU32 tcount,const physx::PxU32 *indices,physx::PxF32 volume,physx::PxU32 userData)
+ConstrainedHull *  addConvexHull(ConstraintBuilder *cb,hacd::HaU32 vcount,const hacd::HaF32 *vertices,hacd::HaU32 tcount,const hacd::HaU32 *indices,hacd::HaF32 volume,hacd::HaU32 userData)
 {
   return cb->addConvexHull(vcount,vertices,tcount,indices,volume,userData);
 }
 
-physx::PxU32             getUserData(ConstrainedHull *ch)
+hacd::HaU32             getUserData(ConstrainedHull *ch)
 {
   return ch->getUserData();
 }
 
 
-physx::PxU32       getConstrainedHullCount(ConstraintBuilder *cb)
+hacd::HaU32       getConstrainedHullCount(ConstraintBuilder *cb)
 {
   return cb->getConstrainedHullCount();
 }
 
-ConstrainedHull   *getConstrainedHull(ConstraintBuilder *cb,physx::PxU32 index)
+ConstrainedHull   *getConstrainedHull(ConstraintBuilder *cb,hacd::HaU32 index)
 {
   return cb->getConstrainedHull(index);
 }
 
 
-physx::PxU32       buildConstraints(ConstraintBuilder *cb) // returns number of constraints in the skeleton.
+hacd::HaU32       buildConstraints(ConstraintBuilder *cb) // returns number of constraints in the skeleton.
 {
   return cb->buildConstraints();
 }
 
-Constraint        *getConstraint(ConstraintBuilder *cb,physx::PxU32 index,physx::PxU32 &i1,physx::PxU32 &i2)
+Constraint        *getConstraint(ConstraintBuilder *cb,hacd::HaU32 index,hacd::HaU32 &i1,hacd::HaU32 &i2)
 {
   return cb->getConstraint(index,i1,i2);
 }
+
+}; // end of namespace

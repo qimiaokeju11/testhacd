@@ -21,7 +21,7 @@
 
 namespace HACD
 {
-//    const physx::PxF64 EPS = pow(10.0, -9.0);
+//    const hacd::HaF64 EPS = pow(10.0, -9.0);
 	//!	Vector dim 3.
 	template < typename T > class Vec3
 	{
