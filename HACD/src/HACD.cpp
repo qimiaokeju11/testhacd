@@ -1,9 +1,13 @@
 #include "HACD.h"
 #include "hacdHACD.h"
-#include "ConstraintBuilder.h"
-#include "FloatMath.h"
 #include <stdlib.h>
 #include <string.h>
+#include "PlatformConfig.h"
+
+#if USE_CONSTRAINT_BUILDER
+#include "ConstraintBuilder.h"
+#include "FloatMath.h"
+#endif
 
 #pragma warning(disable:4100 4996)
 
@@ -11,7 +15,7 @@
 namespace HACD
 {
 
-class MyHACD_API : public HACD_API, public hacd::UserAllocated, public HACD::CallBackFunction
+class MyHACD_API : public HACD_API, public UANS::UserAllocated, public HACD::CallBackFunction
 {
 public:
 	MyHACD_API(void)
@@ -164,7 +168,7 @@ public:
 	virtual hacd::HaU32	generateConstraints(void)
 	{
 		hacd::HaU32 ret = 0;
-
+#if USE_CONSTRAINT_BUILDER
 		if ( mHulls.size() != 0 )
 		{
 			hacd::ConstraintBuilder *cb = hacd::createConstraintBuilder();
@@ -186,6 +190,7 @@ public:
 			}
 			hacd::releaseConstraintBuilder(cb);
 		}
+#endif
 		return ret;
 	}
 

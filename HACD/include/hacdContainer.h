@@ -228,7 +228,7 @@ namespace HACD
 	typedef STDNAME::map<hacd::HaI32, DPoint> DPointMap;
 	typedef STDNAME::vector<CircularListElement<TMMEdge> *> CircularListElementTMMEdgeVector;
 	typedef STDNAME::vector<CircularListElement<TMMTriangle> *> CircularListElementTMMTriangleVector;
-	class ICHull : public hacd::UserAllocated
+	class ICHull : public UANS::UserAllocated
 	{
 	public:
 		//!

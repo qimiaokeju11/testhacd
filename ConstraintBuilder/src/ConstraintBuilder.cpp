@@ -181,7 +181,7 @@ static hacd::HaF32 fm_computePlane(const hacd::HaF32 *A,const hacd::HaF32 *B,con
 }
 
 
-class ConstrainedHull : public hacd::UserAllocated
+class ConstrainedHull : public UANS::UserAllocated
 {
 public:
   ConstrainedHull(hacd::HaU32 vcount,const hacd::HaF32 *vertices,hacd::HaU32 tcount,const hacd::HaU32 *indices,hacd::HaF32 volume,hacd::HaU32 userData)
@@ -440,7 +440,7 @@ public:
 
 typedef STDNAME::vector< ConstrainedHull * > ConstrainedHullVector;
 
-class ConstraintBuilder : public hacd::UserAllocated
+class ConstraintBuilder : public UANS::UserAllocated
 {
 public:
   ConstraintBuilder(void)

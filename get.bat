@@ -1,0 +1,11 @@
+cd HACD
+cd include
+copy \p4\sw\physx\shared\4\trunk\general\HACD\include\hacd*.h
+cd ..
+cd public
+copy \p4\sw\physx\shared\4\trunk\general\HACD\public\hacd*.h
+cd ..
+cd src
+copy \p4\sw\physx\shared\4\trunk\general\HACD\src\hacd*.cpp
+cd ..
+cd ..

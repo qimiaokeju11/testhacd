@@ -46,7 +46,7 @@ namespace hacd
 class ConstraintBuilder;
 class ConstrainedHull;
 
-class Constraint : public hacd::UserAllocated
+class Constraint : public UANS::UserAllocated
 {
 public:
   Constraint(ConstrainedHull *parent,ConstrainedHull *child,const hacd::HaF32 *sect)
