@@ -2,7 +2,7 @@
 
 #define TRI_TRI_H
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 
 int tri_tri_overlap_test_3d(hacd::HaF32 p1[3], hacd::HaF32 q1[3], hacd::HaF32 r1[3],
 			    hacd::HaF32 p2[3], hacd::HaF32 q2[3], hacd::HaF32 r2[3]);

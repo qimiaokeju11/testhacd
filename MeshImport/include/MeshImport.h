@@ -11,7 +11,7 @@
 #include <malloc.h>
 #endif
 #include <math.h>
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 
 #pragma warning(push)
 #pragma warning(disable:4996)

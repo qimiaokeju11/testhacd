@@ -2,7 +2,7 @@
 
 #define HACD_H
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 #include <stdlib.h>
 
 namespace HACD

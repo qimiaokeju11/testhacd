@@ -39,7 +39,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 #include <limits.h>
 #include <stddef.h>
 #include <new>

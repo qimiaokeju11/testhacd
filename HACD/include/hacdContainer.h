@@ -2,7 +2,7 @@
 
 #define HACD_CONTAINER_H
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 #include "hacdVector.h"
 
 

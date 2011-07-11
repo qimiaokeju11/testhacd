@@ -2,7 +2,7 @@
 
 #define FLOAT_MATH_LIB_H
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 
 /*
  * Copyright 2009-2011 NVIDIA Corporation.  All rights reserved.
