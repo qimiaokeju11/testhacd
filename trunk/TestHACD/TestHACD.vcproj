@@ -279,10 +279,6 @@
 					RelativePath="..\HACD\public\PlatformConfig.h"
 					>
 				</File>
-				<File
-					RelativePath="..\HACD\public\PxSimpleTypes.h"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -357,38 +353,6 @@
 				</File>
 				<File
 					RelativePath="..\FloatMath\src\FloatMath.inl"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="MergeHulls"
-			>
-			<Filter
-				Name="include"
-				>
-				<File
-					RelativePath="..\MergeHulls\include\StanHull.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="src"
-				>
-				<File
-					RelativePath="..\MergeHulls\src\MergeHulls.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\MergeHulls\src\StanHull.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="public"
-				>
-				<File
-					RelativePath="..\MergeHulls\public\MergeHulls.h"
 					>
 				</File>
 			</Filter>

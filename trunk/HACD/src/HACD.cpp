@@ -1,6 +1,5 @@
 #include "HACD.h"
 #include "hacdHACD.h"
-#include "MergeHulls.h"
 #include "ConstraintBuilder.h"
 #include "FloatMath.h"
 #include <stdlib.h>
@@ -64,6 +63,7 @@ public:
 			mHACD->SetAddFacesPoints(true);
 			mHACD->SetNVerticesPerCH(desc.mMaxHullVertices);		// max of 64 vertices per convex-hull
 			mHACD->SetConcavity(desc.mConcavity);
+			mHACD->SetConnectDist(desc.mConnectDistance);
 			mHACD->Compute();
 
 			ret = (hacd::HaU32)mHACD->GetNClusters();
@@ -73,47 +73,7 @@ public:
 				getHull(i,h);
 				mHulls.push_back(h);
 			}
-
-			if ( desc.mMergePercentage > 0 )
-			{
-				printf("Attempting to merge %d convex hulls with a merge threshold of %0.2f%%\r\n", ret, desc.mMergePercentage );
-				MergeConvexHulls *m = createMergeConvexHulls();
-				for (hacd::HaU32 i=0; i<ret; i++)
-				{
-					Hull &h = mHulls[i];
-					MergeConvexHulls::Hull hull;
-					hull.mVertexCount = h.mVertexCount;
-					hull.mTriangleCount = h.mTriangleCount;
-					hull.mVertices = h.mVertices;
-					hull.mIndices = h.mIndices;
-					m->addConvexHull(hull);
-				}
-				hacd::HaU32 mergeCount =  m->performMerge(desc.mMergePercentage,desc.mMaxHullVertices);
-				if ( mergeCount && mergeCount != ret )
-				{
-					printf("Merged %d convex hulls, output is now only %d\r\n", ret-mergeCount, mergeCount );
-					releaseHACD();
-					for (hacd::HaU32 i=0; i<ret; i++)
-					{
-						const MergeConvexHulls::Hull *h = m->getMergedHull(i);
-						if( h )
-						{
-							Hull hull;
-							hull.mVertexCount = h->mVertexCount;
-							hull.mTriangleCount = h->mTriangleCount;
-							hull.mVertices = (hacd::HaF32 *)PX_ALLOC(sizeof(hacd::HaF32)*3*hull.mVertexCount);
-							hull.mIndices = (hacd::HaU32 *)PX_ALLOC(sizeof(hacd::HaU32)*3*hull.mTriangleCount);
-							memcpy((void *)hull.mVertices,h->mVertices,sizeof(hacd::HaF32)*3*hull.mVertexCount);
-							memcpy((void *)hull.mIndices,h->mIndices,sizeof(hacd::HaU32)*3*hull.mTriangleCount);
-							mHulls.push_back(hull);
-						}
-					}
-					ret = (hacd::HaU32)mHulls.size();
-				}
-				m->release();
-			}
 		}
-
 		return ret;
 	}
 

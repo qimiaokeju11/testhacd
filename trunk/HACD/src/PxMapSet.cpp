@@ -52,7 +52,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // representations about the suitability of this software for any
 // purpose. It is provided "as is" without express or implied warranty.
 ///////////////////////////////////////////////////////////////////////////////
-
+#include "PlatformConfig.h"
 #include "PxMapSetInternal.h"
 
 namespace hacd
