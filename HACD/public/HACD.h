@@ -43,10 +43,9 @@ public:
 		hacd::HaU32		mMinHullCount;
 		hacd::HaF32		mConcavity;
 		hacd::HaU32		mMaxHullVertices;
-		hacd::HaF32		mMergePercentage;
+		hacd::HaF32		mConnectDistance;
 		void init(void)
 		{
-			mMergePercentage = 0;
 			mCallback = NULL;
 			mTriangleCount = 0;
 			mVertexCount = 0;
@@ -55,6 +54,7 @@ public:
 			mMinHullCount = 10;
 			mConcavity = 100;
 			mMaxHullVertices = 64;
+			mConnectDistance = 0;
 		}
 	};
 

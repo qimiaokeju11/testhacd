@@ -232,7 +232,7 @@ namespace HACD
 		Vec3<hacd::HaF64> s0 = (I-V0) ^ edge3;
 		Vec3<hacd::HaF64> s1 = (I-V1) ^ edge1;
 		Vec3<hacd::HaF64> s2 = (I-V2) ^ edge2;
-		if (s0*s1 >= 0.0 && s2*s1 >= 0.0)
+		if (s0*s1 >= -1e-9 && s2*s1 >= -1e-9 )
 		{
 			return 1;
 		}

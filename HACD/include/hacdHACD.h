@@ -123,6 +123,15 @@ namespace HACD
 		//! Gives the maximum allowed concavity.
 		//! @return maximum concavity
 		hacd::HaF64                                      GetConcavity() const { return m_concavity;}
+
+		//! Sets the maximum allowed distance to get CCs connected.
+		//! @param concavity maximum distance to get CCs connected
+		void										SetConnectDist(hacd::HaF64 ccConnectDist) { m_ccConnectDist = ccConnectDist;}
+		//! Gives the maximum allowed distance to get CCs connected.
+		//! @return maximum distance to get CCs connected
+		hacd::HaF64                                      GetConnectDist() const { return m_ccConnectDist;}        
+
+
         //! Sets the volume weight.
 		//! @param beta volume weight
         void										SetVolumeWeight(hacd::HaF64 beta) { m_beta = beta;}
@@ -180,8 +189,6 @@ namespace HACD
 														if (a > b) return (a << 32) + b;
 														else	   return (b << 32) + a;
 													}
-		//! Computes vertex to triangles adjacency information.
-		void										ComputeV2T();
 		//! Computes the concavity of a cluster.
 		//! @param ch the cluster's convex-hull
 		//! @param distPoints the cluster's points 
@@ -194,7 +201,7 @@ namespace HACD
         hacd::HaF64										ComputePerimeter(const HaU32Vector & triIndices) const;
 		//! Creates the Graph by associating to each mesh triangle a vertex in the graph and to each couple of adjacent triangles an edge in the graph.
 		//! @param connectCCs specifies whether to connect the mesh's Connected Components by additional edges or not 
-        void										CreateGraph(bool connectCCs);	
+        void										CreateGraph(void);	
 		//! Initializes the graph costs and computes the vertices normals
         void										InitializeGraph();
 		//! Computes the cost of an edge
@@ -224,12 +231,13 @@ namespace HACD
         hacd::HaU32										m_nPoints;					//>! number of vertices in the original mesh
         hacd::HaU32										m_nClusters;				//>! number of clusters
         hacd::HaU32										m_nMinClusters;				//>! minimum number of clusters
+		hacd::HaF64										m_ccConnectDist;			//>! maximum allowed distance to connect CCs
         hacd::HaF64										m_concavity;				//>! maximum concavity
 		hacd::HaF64										m_alpha;					//>! compacity weigth
         hacd::HaF64                                      m_beta;                     //>! volume weigth
         hacd::HaF64										m_diag;						//>! length of the BB diagonal
 		Vec3<hacd::HaF64>								m_barycenter;				//>! barycenter of the mesh
-		HaI32SetVector               m_v2T;						//!> vertex to triangle adjacency information
+//		HaI32SetVector               m_v2T;						//!> vertex to triangle adjacency information
         HaI32Vector                         m_cVertices;				//!> array of vertices each belonging to a different cluster
         ICHull *                                    m_convexHulls;				//!> convex-hulls associated with the final HACD clusters
 		Graph										m_graph;					//!> simplification graph

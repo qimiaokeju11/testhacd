@@ -21,6 +21,7 @@
 #include "hacdHACD.h"
 #include "hacdICHull.h"
 #include <string.h>
+#include <float.h>
 
 namespace HACD
 { 
@@ -100,29 +101,25 @@ static void set_symmetric_difference (const HaU64Set &a,
 		return concavity;
 	}
 
-	void HACD::ComputeV2T()
+	void HACD::CreateGraph(void)
 	{
-		m_v2T.clear();
-		m_v2T.resize(m_nPoints);
-		for(hacd::HaU32 t = 0; t < m_nTriangles; ++t)
+		STDNAME::vector< STDNAME::set< hacd::HaI32> >  vertexToTriangles;
+		vertexToTriangles.resize(m_nPoints);
+		for(size_t t = 0; t < m_nTriangles; ++t)
 		{
-			m_v2T[m_triangles[t].X()].insert(t);
-			m_v2T[m_triangles[t].Y()].insert(t);
-			m_v2T[m_triangles[t].Z()].insert(t);
+			vertexToTriangles[m_triangles[t].X()].insert(static_cast<long>(t));
+			vertexToTriangles[m_triangles[t].Y()].insert(static_cast<long>(t));
+			vertexToTriangles[m_triangles[t].Z()].insert(static_cast<long>(t));
 		}
-	}
-	void HACD::CreateGraph(bool connectCCs)
-	{
-		ComputeV2T();
 		m_graph.Clear();
-		m_graph.Allocate(m_nTriangles, 3 * m_nTriangles);
+		m_graph.Allocate(m_nTriangles, 5 * m_nTriangles);
 		hacd::HaU64 tr1[3];
 		hacd::HaU64 tr2[3];
 		hacd::HaI32 i1, j1, k1, i2, j2, k2;
 		hacd::HaI32 t1, t2;
 		for (hacd::HaU32 v = 0; v < m_nPoints; v++) 
 		{
-			HaI32Set::const_iterator it1(m_v2T[v].begin()), itEnd(m_v2T[v].end()); 
+			HaI32Set::const_iterator it1(vertexToTriangles[v].begin()), itEnd(vertexToTriangles[v].end()); 
 			for(; it1 != itEnd; ++it1)
 			{
 				t1 = *it1;
@@ -160,12 +157,63 @@ static void set_symmetric_difference (const HaU64Set &a,
 				}
 			}
 		}
-		// free memory;
-		m_v2T = HaI32SetVector();
-		
-		if (connectCCs) 
+		if (m_ccConnectDist >= 0.0)
 		{
-			m_graph.ConnectCCs();
+			m_graph.ExtractCCs();
+			if (m_graph.m_nCCs > 1) 
+			{
+				STDNAME::vector< STDNAME::set<hacd::HaI32> > cc2V;
+				cc2V.resize(m_graph.m_nCCs);
+				hacd::HaI32 cc;
+				for(hacd::HaU32 t = 0; t < m_nTriangles; ++t)
+				{
+					cc = m_graph.m_vertices[t].m_cc;
+					cc2V[cc].insert(m_triangles[t].X());
+					cc2V[cc].insert(m_triangles[t].Y());
+					cc2V[cc].insert(m_triangles[t].Z());
+				}
+
+				for(hacd::HaU32 cc1 = 0; cc1 < m_graph.m_nCCs; ++cc1)
+				{
+					for(hacd::HaU32 cc2 = cc1+1; cc2 < m_graph.m_nCCs; ++cc2)
+					{
+						STDNAME::set<hacd::HaI32>::const_iterator itV1(cc2V[cc1].begin()), itVEnd1(cc2V[cc1].end()); 
+						for(; itV1 != itVEnd1; ++itV1)
+						{
+							hacd::HaF64 distC1C2 = DBL_MAX;
+							hacd::HaF64 dist;
+							t1 = -1;
+							t2 = -1;
+							STDNAME::set<hacd::HaI32>::const_iterator itV2(cc2V[cc2].begin()), itVEnd2(cc2V[cc2].end()); 
+							for(; itV2 != itVEnd2; ++itV2)
+							{
+								dist = (m_points[*itV1] - m_points[*itV2]).GetNorm();
+								if (dist < distC1C2)
+								{
+									distC1C2 = dist;
+									t1 = *vertexToTriangles[*itV1].begin();
+
+									STDNAME::set<hacd::HaI32>::const_iterator it2(vertexToTriangles[*itV2].begin()), 
+										it2End(vertexToTriangles[*itV2].end()); 
+									t2 = -1;
+									for(; it2 != it2End; ++it2)
+									{
+										if (*it2 != t1)
+										{
+											t2 = *it2;
+											break;
+										}
+									}
+								}
+							}
+							if (distC1C2 < m_ccConnectDist && t1 > 0 && t2 > 0)
+							{
+								m_graph.AddEdge(t1, t2);                    
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	void HACD::InitializeGraph()
@@ -344,6 +392,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 		m_nMinClusters = 3;
 		m_facePoints = 0;
 		m_faceNormals = 0;
+		m_ccConnectDist = 30;
 	}																
 	HACD::~HACD(void)
 	{
@@ -539,7 +588,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 		hacd::HaF64 ptgStep = 1.0;
 		while ( (globalConcavity < m_concavity) && 
 				(m_graph.GetNVertices() > m_nMinClusters) && 
-				(m_graph.GetNEdges()> 1)) 
+				(m_graph.GetNEdges()> 0))   // Revise #125
 		{
 			progress = 100.0-m_graph.GetNVertices() * 100.0 / m_nTriangles;
 			if (fabs(progress-progressOld) > ptgStep && m_callBack)
@@ -593,7 +642,6 @@ static void set_symmetric_difference (const HaU64Set &a,
 				m_graph.m_vertices[v1].m_boudaryEdges   = m_graph.m_edges[currentEdge.m_name].m_boudaryEdges;
 				
 				// We apply the optimal ecol
-//				std::cout << "v1 " << v1 << " v2 " << v2 << std::endl;
 				m_graph.EdgeCollapse(v1, v2);
 				// recompute the adjacent edges costs
 				HaI32Set::const_iterator itE(m_graph.m_vertices[v1].m_edges.begin()), 
@@ -616,8 +664,8 @@ static void set_symmetric_difference (const HaU64Set &a,
 		}
 		
 		m_cVertices.clear();
-		m_cVertices.reserve(m_nClusters);
 		m_nClusters = m_graph.GetNVertices();
+		m_cVertices.reserve(m_nClusters);
 		for (hacd::HaU32 p=0, v = 0; v != m_graph.m_vertices.size(); ++v) 
 		{
 			if (!m_graph.m_vertices[v].m_deleted)
@@ -649,7 +697,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 		if (m_callBack) m_callBack->progressUpdate("+ Normalizing Data\n", 0.0, 0.0, nV);
 		NormalizeData();
 		if (m_callBack) m_callBack->progressUpdate("+ Creating Graph\n", 0.0, 0.0, nV);
-		CreateGraph(connectCCs);
+		CreateGraph();
 		// Compute the surfaces and perimeters of all the faces
 		if (m_callBack) m_callBack->progressUpdate("+ Initializing Graph\n", 0.0, 0.0, nV);
 		InitializeGraph();
