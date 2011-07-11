@@ -7,7 +7,7 @@
 
 #pragma warning(disable:4996 4100)
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 #include "wavefront.h"
 #include "HACD.h"
 #include "FloatMath.h"

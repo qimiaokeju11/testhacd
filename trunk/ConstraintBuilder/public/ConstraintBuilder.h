@@ -38,7 +38,7 @@
 */
 
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 
 namespace hacd
 {

@@ -38,7 +38,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PHYSX_MAP_SET_H
 #define PHYSX_MAP_SET_H
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 #include "PxMapSetInternal.h"
 
 

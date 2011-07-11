@@ -2,7 +2,7 @@
 #include "hacdHACD.h"
 #include <stdlib.h>
 #include <string.h>
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 
 #if USE_CONSTRAINT_BUILDER
 #include "ConstraintBuilder.h"

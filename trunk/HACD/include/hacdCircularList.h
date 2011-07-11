@@ -17,7 +17,7 @@
 #define HACD_CIRCULAR_LIST_H
 #include<stdlib.h>
 #include<hacdVersion.h>
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 
 namespace HACD
 {

@@ -1,7 +1,7 @@
-#ifndef PX_FOUNDATION_PSARRAY_H
-#define PX_FOUNDATION_PSARRAY_H
+#ifndef PX_FOUNDATION_VECTOR_H
+#define PX_FOUNDATION_VECTOR_H
 
-#include "PlatformConfig.h"
+#include "PlatformConfigHACD.h"
 
 namespace hacd
 {
