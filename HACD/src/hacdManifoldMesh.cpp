@@ -20,18 +20,18 @@ namespace HACD
 {    
     Material::Material(void)
     {
-        m_diffuseColor.X()  = 0.5;
-        m_diffuseColor.Y()  = 0.5;
-        m_diffuseColor.Z()  = 0.5;
-        m_specularColor.X() = 0.5;
-        m_specularColor.Y() = 0.5;
-        m_specularColor.Z() = 0.5;
-        m_ambientIntensity  = 0.4;
-        m_emissiveColor.X() = 0.0;
-        m_emissiveColor.Y() = 0.0;
-        m_emissiveColor.Z() = 0.0;
-        m_shininess         = 0.4;
-        m_transparency      = 0.0;
+        m_diffuseColor.X()  = 0.5f;
+        m_diffuseColor.Y()  = 0.5f;
+        m_diffuseColor.Z()  = 0.5f;
+        m_specularColor.X() = 0.5f;
+        m_specularColor.Y() = 0.5f;
+        m_specularColor.Z() = 0.5f;
+        m_ambientIntensity  = 0.4f;
+        m_emissiveColor.X() = 0.0f;
+        m_emissiveColor.Y() = 0.0f;
+        m_emissiveColor.Z() = 0.0f;
+        m_shininess         = 0.4f;
+        m_transparency      = 0.0f;
     }
     
 	TMMVertex::TMMVertex(void)
@@ -69,14 +69,14 @@ namespace HACD
 	}
 	TMMesh::TMMesh(void)
 	{
-		m_barycenter = Vec3<hacd::HaF64>(0.0,0.0,0.0);
+		m_barycenter = Vec3<hacd::HaF32>(0.0,0.0,0.0);
 		m_diag = 1.0;
 	}
 	TMMesh::~TMMesh(void)
 	{
 	}
 
-    void TMMesh::GetIFS(Vec3<hacd::HaF64> * const points, Vec3<hacd::HaI32> * const triangles)
+    void TMMesh::GetIFS(Vec3<hacd::HaF32> * const points, Vec3<hacd::HaI32> * const triangles)
     {
         hacd::HaU32 nV = m_vertices.GetSize();
         hacd::HaU32 nT = m_triangles.GetSize(); 
@@ -207,31 +207,31 @@ namespace HACD
         HACD_FREE(triangleMap);
         
     }
-	hacd::HaI32  IntersectRayTriangle(const Vec3<hacd::HaF64> & P0, const Vec3<hacd::HaF64> & dir, 
-							   const Vec3<hacd::HaF64> & V0, const Vec3<hacd::HaF64> & V1, 
-							   const Vec3<hacd::HaF64> & V2, hacd::HaF64 &t)
+	hacd::HaI32  IntersectRayTriangle(const Vec3<hacd::HaF32> & P0, const Vec3<hacd::HaF32> & dir, 
+							   const Vec3<hacd::HaF32> & V0, const Vec3<hacd::HaF32> & V1, 
+							   const Vec3<hacd::HaF32> & V2, hacd::HaF32 &t)
 	{
-		Vec3<hacd::HaF64> edge1, edge2, edge3;
-		hacd::HaF64 det, invDet;
+		Vec3<hacd::HaF32> edge1, edge2, edge3;
+		hacd::HaF32 det, invDet;
 		edge1 = V1 - V2;
 		edge2 = V2 - V0;
-		Vec3<hacd::HaF64> pvec = dir ^ edge2;
+		Vec3<hacd::HaF32> pvec = dir ^ edge2;
 		det = edge1 * pvec;
-		if (det == 0.0)
+		if (det == 0.0f)
 			return 0;
-		invDet = 1.0/det;
-		Vec3<hacd::HaF64> tvec = P0 - V0;
-		Vec3<hacd::HaF64> qvec = tvec ^ edge1;
+		invDet = 1.0f/det;
+		Vec3<hacd::HaF32> tvec = P0 - V0;
+		Vec3<hacd::HaF32> qvec = tvec ^ edge1;
 		t = (edge2 * qvec) * invDet;
         if (t < 0.0)
         {
             return 0;
         }
 		edge3 = V0 - V1;
-		Vec3<hacd::HaF64> I(P0 + t * dir);
-		Vec3<hacd::HaF64> s0 = (I-V0) ^ edge3;
-		Vec3<hacd::HaF64> s1 = (I-V1) ^ edge1;
-		Vec3<hacd::HaF64> s2 = (I-V2) ^ edge2;
+		Vec3<hacd::HaF32> I(P0 + t * dir);
+		Vec3<hacd::HaF32> s0 = (I-V0) ^ edge3;
+		Vec3<hacd::HaF32> s1 = (I-V1) ^ edge1;
+		Vec3<hacd::HaF32> s2 = (I-V2) ^ edge2;
 		if (s0*s1 >= -1e-9 && s2*s1 >= -1e-9 )
 		{
 			return 1;
@@ -239,14 +239,14 @@ namespace HACD
 		return 0;
 	}
 
-    bool IntersectLineLine(const Vec3<hacd::HaF64> & p1, const Vec3<hacd::HaF64> & p2, 
-                          const Vec3<hacd::HaF64> & p3, const Vec3<hacd::HaF64> & p4,
-                          Vec3<hacd::HaF64> & pa, Vec3<hacd::HaF64> & pb, 
-                          hacd::HaF64 & mua, hacd::HaF64 & mub)
+    bool IntersectLineLine(const Vec3<hacd::HaF32> & p1, const Vec3<hacd::HaF32> & p2, 
+                          const Vec3<hacd::HaF32> & p3, const Vec3<hacd::HaF32> & p4,
+                          Vec3<hacd::HaF32> & pa, Vec3<hacd::HaF32> & pb, 
+                          hacd::HaF32 & mua, hacd::HaF32 & mub)
     {
-        Vec3<hacd::HaF64> p13,p43,p21;
-        hacd::HaF64 d1343,d4321,d1321,d4343,d2121;
-        hacd::HaF64 numer,denom;
+        Vec3<hacd::HaF32> p13,p43,p21;
+        hacd::HaF32 d1343,d4321,d1321,d4343,d2121;
+        hacd::HaF32 numer,denom;
         
         p13.X() = p1.X() - p3.X();
         p13.Y() = p1.Y() - p3.Y();
@@ -286,13 +286,13 @@ namespace HACD
         return true;
     }
 
-	hacd::HaI32  IntersectRayTriangle2(const Vec3<hacd::HaF64> & P0, const Vec3<hacd::HaF64> & dir, 
-							   const Vec3<hacd::HaF64> & V0, const Vec3<hacd::HaF64> & V1, 
-							   const Vec3<hacd::HaF64> & V2, hacd::HaF64 &r)
+	hacd::HaI32  IntersectRayTriangle2(const Vec3<hacd::HaF32> & P0, const Vec3<hacd::HaF32> & dir, 
+							   const Vec3<hacd::HaF32> & V0, const Vec3<hacd::HaF32> & V1, 
+							   const Vec3<hacd::HaF32> & V2, hacd::HaF32 &r)
 	{
-		Vec3<hacd::HaF64> u, v, n;          // triangle vectors
-		Vec3<hacd::HaF64> w0, w;          // ray vectors
-		hacd::HaF64     a, b;             // params to calc ray-plane intersect
+		Vec3<hacd::HaF32> u, v, n;          // triangle vectors
+		Vec3<hacd::HaF32> w0, w;          // ray vectors
+		hacd::HaF32     a, b;             // params to calc ray-plane intersect
 
 		// get triangle edge vectors and plane normal
 		u = V1 - V0;
@@ -316,10 +316,10 @@ namespace HACD
 			return 0;                  // => no intersect
 		// for a segment, also test if (r > 1.0) => no intersect
 
-		Vec3<hacd::HaF64> I = P0 + r * dir;           // intersect point of ray and plane
+		Vec3<hacd::HaF32> I = P0 + r * dir;           // intersect point of ray and plane
 
 		// is I inside T?
-		hacd::HaF64 uu, uv, vv, wu, wv, D;
+		hacd::HaF32 uu, uv, vv, wu, wv, D;
 		uu = u * u;
 		uv = u * v;
 		vv = v * v;
@@ -329,7 +329,7 @@ namespace HACD
 		D = uv * uv - uu * vv;
 
 		// get and test parametric coords
-		hacd::HaF64 s, t;
+		hacd::HaF32 s, t;
 		s = (uv * wv - vv * wu) / D;
 		if (s < 0.0 || s > 1.0)        // I is outside T
 			return 0;
@@ -387,9 +387,9 @@ namespace HACD
 			return false;
 		}
         m_barycenter = m_vertices.GetHead()->GetData().m_pos;
-		Vec3<hacd::HaF64> min = m_barycenter;
-		Vec3<hacd::HaF64> max = m_barycenter;
-		hacd::HaF64 x, y, z;
+		Vec3<hacd::HaF32> min = m_barycenter;
+		Vec3<hacd::HaF32> max = m_barycenter;
+		hacd::HaF32 x, y, z;
         for(hacd::HaU32 v = 1; v < nV; v++)
         {
 			m_barycenter +=  m_vertices.GetHead()->GetData().m_pos;
@@ -404,10 +404,10 @@ namespace HACD
 			else if ( z > max.Z()) max.Z() = z;
 			m_vertices.Next();
         }
-		m_barycenter /= (hacd::HaF64)nV;
-        m_diag = 0.001 * (max-min).GetNorm();
-        hacd::HaF64 invDiag = 1.0 / m_diag;
-		if (m_diag != 0.0)
+		m_barycenter /= (hacd::HaF32)nV;
+        m_diag = 0.001f * (max-min).GetNorm();
+        hacd::HaF32 invDiag = 1.0f / m_diag;
+		if (m_diag != 0.0f)
 		{
 	        for(hacd::HaU32 v = 0; v < nV; v++)
 		    {

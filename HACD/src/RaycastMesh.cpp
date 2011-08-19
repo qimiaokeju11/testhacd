@@ -50,7 +50,7 @@ typedef STDNAME::vector< HaU32 > TriVector;
 		*
 		*	Should work provided:
 		*	1) the integer representation of 0.0f is 0x00000000
-		*	2) the sign bit of the HaF64 is the most significant one
+		*	2) the sign bit of the HaF32 is the most significant one
 		*
 		*	Report bugs: p.terdiman@codercorner.com
 		*
@@ -65,10 +65,10 @@ typedef STDNAME::vector< HaU32 > TriVector;
 		//! Integer representation of a RmRealing-point value.
 		#define IR(x)	((HaU32&)x)
 
-		bool intersectRayAABB(const HaF64 MinB[3],const HaF64 MaxB[3],const HaF64 origin[3],const HaF64 dir[3],HaF64 coord[3])
+		bool intersectRayAABB(const HaF32 MinB[3],const HaF32 MaxB[3],const HaF32 origin[3],const HaF32 dir[3],HaF32 coord[3])
 		{
 			bool Inside = true;
-			HaF64 MaxT[3];
+			HaF32 MaxT[3];
 			MaxT[0]=MaxT[1]=MaxT[2]=-1.0f;
 
 			// Find candidate planes.
@@ -127,7 +127,7 @@ typedef STDNAME::vector< HaU32 > TriVector;
 
 
 
-		bool intersectLineSegmentAABB(const HaF64 bmin[3],const HaF64 bmax[3],const HaF64 p1[3],const HaF64 dir[3],HaF64 &dist,HaF64 intersect[3])
+		bool intersectLineSegmentAABB(const HaF32 bmin[3],const HaF32 bmax[3],const HaF32 p1[3],const HaF32 dir[3],HaF32 &dist,HaF32 intersect[3])
 		{
 			bool ret = false;
 
@@ -136,10 +136,10 @@ typedef STDNAME::vector< HaU32 > TriVector;
 				ret = intersectRayAABB(bmin,bmax,p1,dir,intersect);
 				if ( ret )
 				{
-					HaF64 dx = p1[0]-intersect[0];
-					HaF64 dy = p1[1]-intersect[1];
-					HaF64 dz = p1[2]-intersect[2];
-					HaF64 d = dx*dx+dy*dy+dz*dz;
+					HaF32 dx = p1[0]-intersect[0];
+					HaF32 dy = p1[1]-intersect[1];
+					HaF32 dz = p1[2]-intersect[2];
+					HaF32 d = dx*dx+dy*dy+dz*dz;
 					if ( d < dist*dist )
 					{
 						dist = sqrt(d);
@@ -175,10 +175,10 @@ typedef STDNAME::vector< HaU32 > TriVector;
 	(a)[2] = (b)[0] * (c)[1] - (c)[0] * (b)[1];
 
 
-static inline bool rayIntersectsTriangle(const HaF64 *p,const HaF64 *d,const HaF64 *v0,const HaF64 *v1,const HaF64 *v2,HaF64 &t)
+static inline bool rayIntersectsTriangle(const HaF32 *p,const HaF32 *d,const HaF32 *v0,const HaF32 *v1,const HaF32 *v2,HaF32 &t)
 {
-	HaF64 e1[3],e2[3],h[3],s[3],q[3];
-	HaF64 a,f,u,v;
+	HaF32 e1[3],e2[3],h[3],s[3],q[3];
+	HaF32 a,f,u,v;
 
 	vector(e1,v1,v0);
 	vector(e2,v2,v0);
@@ -209,21 +209,21 @@ static inline bool rayIntersectsTriangle(const HaF64 *p,const HaF64 *d,const HaF
 		return (false);
 }
 
-static HaF64 computePlane(const HaF64 *A,const HaF64 *B,const HaF64 *C,HaF64 *n) // returns D
+static HaF32 computePlane(const HaF32 *A,const HaF32 *B,const HaF32 *C,HaF32 *n) // returns D
 {
-	HaF64 vx = (B[0] - C[0]);
-	HaF64 vy = (B[1] - C[1]);
-	HaF64 vz = (B[2] - C[2]);
+	HaF32 vx = (B[0] - C[0]);
+	HaF32 vy = (B[1] - C[1]);
+	HaF32 vz = (B[2] - C[2]);
 
-	HaF64 wx = (A[0] - B[0]);
-	HaF64 wy = (A[1] - B[1]);
-	HaF64 wz = (A[2] - B[2]);
+	HaF32 wx = (A[0] - B[0]);
+	HaF32 wy = (A[1] - B[1]);
+	HaF32 wz = (A[2] - B[2]);
 
-	HaF64 vw_x = vy * wz - vz * wy;
-	HaF64 vw_y = vz * wx - vx * wz;
-	HaF64 vw_z = vx * wy - vy * wx;
+	HaF32 vw_x = vy * wz - vz * wy;
+	HaF32 vw_y = vz * wx - vx * wz;
+	HaF32 vw_z = vx * wy - vy * wx;
 
-	HaF64 mag = sqrt((vw_x * vw_x) + (vw_y * vw_y) + (vw_z * vw_z));
+	HaF32 mag = sqrt((vw_x * vw_x) + (vw_y * vw_y) + (vw_z * vw_z));
 
 	if ( mag < 0.000001f )
 	{
@@ -234,12 +234,12 @@ static HaF64 computePlane(const HaF64 *A,const HaF64 *B,const HaF64 *C,HaF64 *n)
 		mag = 1.0f/mag;
 	}
 
-	HaF64 x = vw_x * mag;
-	HaF64 y = vw_y * mag;
-	HaF64 z = vw_z * mag;
+	HaF32 x = vw_x * mag;
+	HaF32 y = vw_y * mag;
+	HaF32 z = vw_z * mag;
 
 
-	HaF64 D = 0.0f - ((x*A[0])+(y*A[1])+(z*A[2]));
+	HaF32 D = 0.0f - ((x*A[0])+(y*A[1])+(z*A[2]));
 
 	n[0] = x;
 	n[1] = y;
@@ -252,8 +252,8 @@ static HaF64 computePlane(const HaF64 *A,const HaF64 *B,const HaF64 *C,HaF64 *n)
 /********************************************************/
 /* AABB-triangle overlap test code                      */
 /* by Tomas Akenine-Möller                              */
-/* Function: int triBoxOverlap(HaF64 boxcenter[3],      */
-/*          HaF64 boxhalfsize[3],HaF64 triverts[3][3]); */
+/* Function: int triBoxOverlap(HaF32 boxcenter[3],      */
+/*          HaF32 boxhalfsize[3],HaF32 triverts[3][3]); */
 /* History:                                             */
 /*   2001-03-05: released the code in its first version */
 /*   2001-06-18: changed the order of the tests, faster */
@@ -288,10 +288,10 @@ static HaF64 computePlane(const HaF64 *A,const HaF64 *B,const HaF64 *C,HaF64 *n)
 	if(x2<min) min=x2;\
 	if(x2>max) max=x2;
 
-int planeBoxOverlap(HaF64 normal[3],HaF64 d, HaF64 maxbox[3])
+int planeBoxOverlap(HaF32 normal[3],HaF32 d, HaF32 maxbox[3])
 {
 	int q;
-	HaF64 vmin[3],vmax[3];
+	HaF32 vmin[3],vmax[3];
 	for(q=X;q<=Z;q++)
 	{
 		if(normal[q]>0.0f)
@@ -358,7 +358,7 @@ int planeBoxOverlap(HaF64 normal[3],HaF64 d, HaF64 maxbox[3])
 	rad = fa * boxhalfsize[X] + fb * boxhalfsize[Y];   \
 	if(min>rad || max<-rad) return 0;
 
-int triBoxOverlap(HaF64 boxcenter[3],HaF64 boxhalfsize[3],HaF64 triverts[3][3])
+int triBoxOverlap(HaF32 boxcenter[3],HaF32 boxhalfsize[3],HaF32 triverts[3][3])
 {
 
 	/*    use separating axis theorem to test overlap between triangle and box */
@@ -368,9 +368,9 @@ int triBoxOverlap(HaF64 boxcenter[3],HaF64 boxhalfsize[3],HaF64 triverts[3][3])
 	/*    2) normal of the triangle */
 	/*    3) crossproduct(edge from tri, {x,y,z}-directin) */
 	/*       this gives 3x3=9 more tests */
-	HaF64 v0[3],v1[3],v2[3];
-	HaF64 min,max,d,p0,p1,p2,rad,fex,fey,fez;
-	HaF64 normal[3],e0[3],e1[3],e2[3];
+	HaF32 v0[3],v1[3],v2[3];
+	HaF32 min,max,d,p0,p1,p2,rad,fex,fey,fez;
+	HaF32 normal[3],e0[3],e1[3],e2[3];
 
 	/* This is the fastest branch on Sun */
 	/* move everything so that the boxcenter is in (0,0,0) */
@@ -459,35 +459,35 @@ class BoundsAABB
 public:
 
 
-	void setMin(const HaF64 *v)
+	void setMin(const HaF32 *v)
 	{
 		mMin[0] = v[0];
 		mMin[1] = v[1];
 		mMin[2] = v[2];
 	}
 
-	void setMax(const HaF64 *v)
+	void setMax(const HaF32 *v)
 	{
 		mMax[0] = v[0];
 		mMax[1] = v[1];
 		mMax[2] = v[2];
 	}
 
-	void setMin(HaF64 x,HaF64 y,HaF64 z)
+	void setMin(HaF32 x,HaF32 y,HaF32 z)
 	{
 		mMin[0] = x;
 		mMin[1] = y;
 		mMin[2] = z;
 	}
 
-	void setMax(HaF64 x,HaF64 y,HaF64 z)
+	void setMax(HaF32 x,HaF32 y,HaF32 z)
 	{
 		mMax[0] = x;
 		mMax[1] = y;
 		mMax[2] = z;
 	}
 
-	void include(const HaF64 *v)
+	void include(const HaF32 *v)
 	{
 		if ( v[0] < mMin[0] ) mMin[0] = v[0];
 		if ( v[1] < mMin[1] ) mMin[1] = v[1];
@@ -498,18 +498,18 @@ public:
 		if ( v[2] > mMax[2] ) mMax[2] = v[2];
 	}
 
-	void getCenter(HaF64 *center) const
+	void getCenter(HaF32 *center) const
 	{
 		center[0] = (mMin[0]+mMax[0])*0.5f;
 		center[1] = (mMin[1]+mMax[1])*0.5f;
 		center[2] = (mMin[2]+mMax[2])*0.5f;
 	}
 
-	bool containsTriangle(const HaF64 *p1,const HaF64 *p2,const HaF64 *p3) const
+	bool containsTriangle(const HaF32 *p1,const HaF32 *p2,const HaF32 *p3) const
 	{
-		HaF64 boxCenter[3];
-		HaF64	boxHalfSize[3];
-		HaF64 triVerts[3][3];
+		HaF32 boxCenter[3];
+		HaF32	boxHalfSize[3];
+		HaF32 triVerts[3][3];
 
 		boxCenter[0] = (mMin[0]+mMax[0])*0.5f;
 		boxCenter[1] = (mMin[1]+mMax[1])*0.5f;
@@ -547,8 +547,8 @@ public:
 
 
 
-	HaF64		mMin[3];
-	HaF64		mMax[3];
+	HaF32		mMin[3];
+	HaF32		mMax[3];
 };
 
 
@@ -558,7 +558,7 @@ class NodeInterface
 {
 public:
 	virtual NodeAABB * getNode(void) = 0;
-	virtual void getFaceNormal(HaU32 tri,HaF64 *faceNormal) = 0;
+	virtual void getFaceNormal(HaU32 tri,HaF32 *faceNormal) = 0;
 };
 
 
@@ -575,10 +575,10 @@ class NodeAABB : public UANS::UserAllocated
 			mLeafTriangleIndex= TRI_EOF;
 		}
 
-		NodeAABB(HaU32 vcount,const HaF64 *vertices,HaU32 tcount,HaU32 *indices,
+		NodeAABB(HaU32 vcount,const HaF32 *vertices,HaU32 tcount,HaU32 *indices,
 			HaU32 maxDepth,	// Maximum recursion depth for the triangle mesh.
 			HaU32 minLeafSize,	// minimum triangles to treat as a 'leaf' node.
-			HaF64	minAxisSize,
+			HaF32	minAxisSize,
 			NodeInterface *callback,
 			TriVector &leafTriangles)	// once a particular axis is less than this size, stop sub-dividing.
 
@@ -594,7 +594,7 @@ class NodeAABB : public UANS::UserAllocated
 			}
 			mBounds.setMin( vertices );
 			mBounds.setMax( vertices );
-			const HaF64 *vtx = vertices+3;
+			const HaF32 *vtx = vertices+3;
 			for (HaU32 i=1; i<vcount; i++)
 			{
 				mBounds.include( vtx );
@@ -618,24 +618,24 @@ class NodeAABB : public UANS::UserAllocated
 		// here is where we split the mesh..
 		void split(const TriVector &triangles,
 			HaU32 vcount,
-			const HaF64 *vertices,
+			const HaF32 *vertices,
 			HaU32 tcount,
 			const HaU32 *indices,
 			HaU32 depth,
 			HaU32 maxDepth,	// Maximum recursion depth for the triangle mesh.
 			HaU32 minLeafSize,	// minimum triangles to treat as a 'leaf' node.
-			HaF64	minAxisSize,
+			HaF32	minAxisSize,
 			NodeInterface *callback,
 			TriVector &leafTriangles)	// once a particular axis is less than this size, stop sub-dividing.
 
 		{
 			// Find the longest axis of the bounding volume of this node
-			HaF64 dx = mBounds.mMax[0] - mBounds.mMin[0];
-			HaF64 dy = mBounds.mMax[1] - mBounds.mMin[1];
-			HaF64 dz = mBounds.mMax[2] - mBounds.mMin[2];
+			HaF32 dx = mBounds.mMax[0] - mBounds.mMin[0];
+			HaF32 dy = mBounds.mMax[1] - mBounds.mMin[1];
+			HaF32 dz = mBounds.mMax[2] - mBounds.mMin[2];
 
 			AxisAABB axis = AABB_XAXIS;
-			HaF64 laxis = dx;
+			HaF32 laxis = dx;
 			if ( dy > dx )
 			{
 				axis = AABB_YAXIS;
@@ -665,7 +665,7 @@ class NodeAABB : public UANS::UserAllocated
 			}
 			else
 			{
-				HaF64 center[3];
+				HaF32 center[3];
 				mBounds.getCenter(center);
 				BoundsAABB b1,b2;
 				splitRect(axis,mBounds,b1,b2,center);
@@ -689,9 +689,9 @@ class NodeAABB : public UANS::UserAllocated
 						HaU32 i2 = indices[tri*3+1];
 						HaU32 i3 = indices[tri*3+2];
 
-						const HaF64 *p1 = &vertices[i1*3];
-						const HaF64 *p2 = &vertices[i2*3];
-						const HaF64 *p3 = &vertices[i3*3];
+						const HaF32 *p1 = &vertices[i1*3];
+						const HaF32 *p2 = &vertices[i2*3];
+						const HaF32 *p3 = &vertices[i3*3];
 
 						if ( b1.containsTriangle(p1,p2,p3))
 						{
@@ -742,7 +742,7 @@ class NodeAABB : public UANS::UserAllocated
 			}
 		}
 
-		void splitRect(AxisAABB axis,const BoundsAABB &source,BoundsAABB &b1,BoundsAABB &b2,const HaF64 *midpoint)
+		void splitRect(AxisAABB axis,const BoundsAABB &source,BoundsAABB &b1,BoundsAABB &b2,const HaF32 *midpoint)
 		{
 			switch ( axis )
 			{
@@ -778,22 +778,22 @@ class NodeAABB : public UANS::UserAllocated
 
 
 		virtual void raycast(bool &hit,
-							const HaF64 *from,
-							const HaF64 *to,
-							const HaF64 *dir,
-							HaF64 *hitLocation,
-							HaF64 *hitNormal,
-							HaF64 *hitDistance,
-							const HaF64 *vertices,
+							const HaF32 *from,
+							const HaF32 *to,
+							const HaF32 *dir,
+							HaF32 *hitLocation,
+							HaF32 *hitNormal,
+							HaF32 *hitDistance,
+							const HaF32 *vertices,
 							const HaU32 *indices,
-							HaF64 &nearestDistance,
+							HaF32 &nearestDistance,
 							NodeInterface *callback,
 							unsigned char *raycastTriangles,
 							unsigned char raycastFrame,
 							const TriVector &leafTriangles)
 		{
-			HaF64 sect[3];
-			HaF64 nd = nearestDistance;
+			HaF32 sect[3];
+			HaF32 nd = nearestDistance;
 			if ( !intersectLineSegmentAABB(mBounds.mMin,mBounds.mMax,from,dir,nd,sect) )
 			{
 				return;	
@@ -813,11 +813,11 @@ class NodeAABB : public UANS::UserAllocated
 						HaU32 i2 = indices[tri*3+1];
 						HaU32 i3 = indices[tri*3+2];
 
-						const HaF64 *p1 = &vertices[i1*3];
-						const HaF64 *p2 = &vertices[i2*3];
-						const HaF64 *p3 = &vertices[i3*3];
+						const HaF32 *p1 = &vertices[i1*3];
+						const HaF32 *p2 = &vertices[i2*3];
+						const HaF32 *p3 = &vertices[i3*3];
 
-						HaF64 t;
+						HaF32 t;
 						if ( rayIntersectsTriangle(from,dir,p1,p2,p3,t))
 						{
 							if ( t < nearestDistance )
@@ -866,7 +866,7 @@ class MyRaycastMesh : public RaycastMesh, public NodeInterface
 {
 public:
 
-	MyRaycastMesh(HaU32 vcount,const HaF64 *vertices,HaU32 tcount,const HaU32 *indices,HaU32 maxDepth,HaU32 minLeafSize,HaF64 minAxisSize)
+	MyRaycastMesh(HaU32 vcount,const HaF32 *vertices,HaU32 tcount,const HaU32 *indices,HaU32 maxDepth,HaU32 minLeafSize,HaF32 minAxisSize)
 	{
 		mRaycastFrame = 0;
 		if ( maxDepth < 2 )
@@ -886,8 +886,8 @@ public:
 		mNodes = HACD_NEW(NodeAABB)[mMaxNodeCount];
 		mNodeCount = 0;
 		mVcount = vcount;
-		mVertices = (HaF64 *)HACD_ALLOC(sizeof(HaF64)*3*vcount);
-		memcpy(mVertices,vertices,sizeof(HaF64)*3*vcount);
+		mVertices = (HaF32 *)HACD_ALLOC(sizeof(HaF32)*3*vcount);
+		memcpy(mVertices,vertices,sizeof(HaF32)*3*vcount);
 		mTcount = tcount;
 		mIndices = (HaU32 *)HACD_ALLOC(sizeof(HaU32)*tcount*3);
 		memcpy(mIndices,indices,sizeof(HaU32)*tcount*3);
@@ -907,35 +907,35 @@ public:
 		HACD_FREE(mRaycastTriangles);
 	}
 
-	virtual bool raycast(const HaF64 *from,const HaF64 *to,HaF64 *hitLocation,HaF64 *hitNormal,HaF64 *hitDistance)
+	virtual bool raycast(const HaF32 *from,const HaF32 *to,HaF32 *hitLocation,HaF32 *hitNormal,HaF32 *hitDistance)
 	{
 		bool ret = false;
 
-		HaF64 dir[3];
+		HaF32 dir[3];
 		dir[0] = to[0] - from[0];
 		dir[1] = to[1] - from[1];
 		dir[2] = to[2] - from[2];
-		HaF64 distance = sqrt( dir[0]*dir[0] + dir[1]*dir[1]+dir[2]*dir[2] );
+		HaF32 distance = sqrt( dir[0]*dir[0] + dir[1]*dir[1]+dir[2]*dir[2] );
 		if ( distance < 0.0000000001f ) return false;
-		HaF64 recipDistance = 1.0f / distance;
+		HaF32 recipDistance = 1.0f / distance;
 		dir[0]*=recipDistance;
 		dir[1]*=recipDistance;
 		dir[2]*=recipDistance;
 #if USE_BRUTE_FORCE
 		const HaU32 *indices = mIndices;
-		const HaF64 *vertices = mVertices;
-		HaF64 nearestDistance = distance;
+		const HaF32 *vertices = mVertices;
+		HaF32 nearestDistance = distance;
 		for (HaU32 tri=0; tri<mTcount; tri++)
 		{
 			HaU32 i1 = indices[tri*3+0];
 			HaU32 i2 = indices[tri*3+1];
 			HaU32 i3 = indices[tri*3+2];
 
-			const HaF64 *p1 = &vertices[i1*3];
-			const HaF64 *p2 = &vertices[i2*3];
-			const HaF64 *p3 = &vertices[i3*3];
+			const HaF32 *p1 = &vertices[i1*3];
+			const HaF32 *p2 = &vertices[i2*3];
+			const HaF32 *p3 = &vertices[i3*3];
 
-			HaF64 t;
+			HaF32 t;
 			if ( rayIntersectsTriangle(from,dir,p1,p2,p3,t))
 			{
 				if ( t < nearestDistance )
@@ -973,11 +973,11 @@ public:
 		delete this;
 	}
 
-	virtual const HaF64 * getBoundMin(void) const // return the minimum bounding box
+	virtual const HaF32 * getBoundMin(void) const // return the minimum bounding box
 	{
 		return mRoot->mBounds.mMin;
 	}
-	virtual const HaF64 * getBoundMax(void) const // return the maximum bounding box.
+	virtual const HaF32 * getBoundMax(void) const // return the maximum bounding box.
 	{
 		return mRoot->mBounds.mMax;
 	}
@@ -990,24 +990,24 @@ public:
 		return ret;
 	}
 
-	virtual void getFaceNormal(HaU32 tri,HaF64 *faceNormal) 
+	virtual void getFaceNormal(HaU32 tri,HaF32 *faceNormal) 
 	{
 		if ( mFaceNormals == NULL )
 		{
-			mFaceNormals = (HaF64 *)HACD_ALLOC(sizeof(HaF64)*3*mTcount);
+			mFaceNormals = (HaF32 *)HACD_ALLOC(sizeof(HaF32)*3*mTcount);
 			for (HaU32 i=0; i<mTcount; i++)
 			{
 				HaU32 i1 = mIndices[i*3+0];
 				HaU32 i2 = mIndices[i*3+1];
 				HaU32 i3 = mIndices[i*3+2];
-				const HaF64*p1 = &mVertices[i1*3];
-				const HaF64*p2 = &mVertices[i2*3];
-				const HaF64*p3 = &mVertices[i3*3];
-				HaF64 *dest = &mFaceNormals[i*3];
+				const HaF32*p1 = &mVertices[i1*3];
+				const HaF32*p2 = &mVertices[i2*3];
+				const HaF32*p3 = &mVertices[i3*3];
+				HaF32 *dest = &mFaceNormals[i*3];
 				computePlane(p3,p2,p1,dest);
 			}
 		}
-		const HaF64 *src = &mFaceNormals[tri*3];
+		const HaF32 *src = &mFaceNormals[tri*3];
 		faceNormal[0] = src[0];
 		faceNormal[1] = src[1];
 		faceNormal[2] = src[2];
@@ -1016,8 +1016,8 @@ public:
 	unsigned char	mRaycastFrame;
 	unsigned char	*mRaycastTriangles;
 	HaU32		mVcount;
-	HaF64			*mVertices;
-	HaF64			*mFaceNormals;
+	HaF32			*mVertices;
+	HaF32			*mFaceNormals;
 	HaU32		mTcount;
 	HaU32		*mIndices;
 	NodeAABB		*mRoot;
@@ -1029,12 +1029,12 @@ public:
 
 
 RaycastMesh * createRaycastMesh(HaU32 vcount,		// The number of vertices in the source triangle mesh
-								const HaF64 *vertices,		// The array of vertex positions in the format x1,y1,z1..x2,y2,z2.. etc.
+								const HaF32 *vertices,		// The array of vertex positions in the format x1,y1,z1..x2,y2,z2.. etc.
 								HaU32 tcount,		// The number of triangles in the source triangle mesh
 								const HaU32 *indices, // The triangle indices in the format of i1,i2,i3 ... i4,i5,i6, ...
 								HaU32 maxDepth,	// Maximum recursion depth for the triangle mesh.
 								HaU32 minLeafSize,	// minimum triangles to treat as a 'leaf' node.
-								HaF64	minAxisSize	// once a particular axis is less than this size, stop sub-dividing.
+								HaF32	minAxisSize	// once a particular axis is less than this size, stop sub-dividing.
 								)
 {
 	MyRaycastMesh *m = new MyRaycastMesh(vcount,vertices,tcount,indices,maxDepth,minLeafSize,minAxisSize);

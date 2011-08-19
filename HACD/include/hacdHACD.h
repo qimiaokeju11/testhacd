@@ -22,7 +22,7 @@
 
 namespace HACD
 {
-    const hacd::HaF64                                    sc_pi = 3.14159265;
+    const hacd::HaF32                                    sc_pi = 3.1415926535897932384626433832795028841971693993751f;
 	class HACD;
 
 	typedef STDNAME::set< GraphEdgePQ > GraphEdgePQSet;
@@ -48,7 +48,7 @@ namespace HACD
 		class CallBackFunction
 		{
 		public:
-			virtual bool progressUpdate(const char *message, hacd::HaF64 progress, hacd::HaF64 concavity, hacd::HaU32 nVertices) = 0;
+			virtual bool progressUpdate(const char *message, hacd::HaF32 progress, hacd::HaF32 concavity, hacd::HaU32 nVertices) = 0;
 		};
 
 
@@ -58,10 +58,10 @@ namespace HACD
 		const hacd::HaI32 * const							GetPartition() const { return m_partition;}
         //! Sets the scale factor
 		//! @param scale scale factor
-		void										SetScaleFactor(hacd::HaF64  scale) { m_scale = scale;}
+		void										SetScaleFactor(hacd::HaF32  scale) { m_scale = scale;}
 		//! Gives the scale factor
 		//! @return scale factor
-		const hacd::HaF64								GetScaleFactor() const { return m_scale;}
+		const hacd::HaF32								GetScaleFactor() const { return m_scale;}
 		//! Sets the call-back function
 		//! @param callBack pointer to the call-back function
 		void										SetCallBack(CallBackFunction  *callBack) { m_callBack = callBack;}
@@ -89,10 +89,10 @@ namespace HACD
 		const bool									GetAddNeighboursDistPoints() const { return m_addExtraDistPoints;}
         //! Sets the points of the input mesh (Remark: the input points will be scaled and shifted. Use DenormalizeData() to invert those operations)
 		//! @param points pointer to the input points
-		void										SetPoints(Vec3<hacd::HaF64>  * points) { m_points = points;}
+		void										SetPoints(Vec3<hacd::HaF32>  * points) { m_points = points;}
 		//! Gives the points of the input mesh (Remark: the input points will be scaled and shifted. Use DenormalizeData() to invert those operations)
 		//! @return pointer to the input points 
-		const Vec3<hacd::HaF64>   *                      GetPoints() const { return m_points;}
+		const Vec3<hacd::HaF32>   *                      GetPoints() const { return m_points;}
 		//! Sets the triangles of the input mesh.
 		//! @param triangles points pointer to the input points
 		void										SetTriangles(Vec3<hacd::HaI32>  * triangles) { m_triangles = triangles;}
@@ -119,31 +119,31 @@ namespace HACD
 		const hacd::HaU32								GetNClusters() const { return m_nClusters;}
 		//! Sets the maximum allowed concavity.
 		//! @param concavity maximum concavity
-		void										SetConcavity(hacd::HaF64 concavity) { m_concavity = concavity;}
+		void										SetConcavity(hacd::HaF32 concavity) { m_concavity = concavity;}
 		//! Gives the maximum allowed concavity.
 		//! @return maximum concavity
-		hacd::HaF64                                      GetConcavity() const { return m_concavity;}
+		hacd::HaF32                                      GetConcavity() const { return m_concavity;}
 
 		//! Sets the maximum allowed distance to get CCs connected.
 		//! @param concavity maximum distance to get CCs connected
-		void										SetConnectDist(hacd::HaF64 ccConnectDist) { m_ccConnectDist = ccConnectDist;}
+		void										SetConnectDist(hacd::HaF32 ccConnectDist) { m_ccConnectDist = ccConnectDist;}
 		//! Gives the maximum allowed distance to get CCs connected.
 		//! @return maximum distance to get CCs connected
-		hacd::HaF64                                      GetConnectDist() const { return m_ccConnectDist;}        
+		hacd::HaF32                                      GetConnectDist() const { return m_ccConnectDist;}        
 
 
         //! Sets the volume weight.
 		//! @param beta volume weight
-        void										SetVolumeWeight(hacd::HaF64 beta) { m_beta = beta;}
+        void										SetVolumeWeight(hacd::HaF32 beta) { m_beta = beta;}
 		//! Gives the volume weight.
 		//! @return volume weight
-        hacd::HaF64                                      GetVolumeWeight() const { return m_beta;}	
+        hacd::HaF32                                      GetVolumeWeight() const { return m_beta;}	
 		//! Sets the compacity weight (i.e. parameter alpha in ftp://ftp.elet.polimi.it/users/Stefano.Tubaro/ICIP_USB_Proceedings_v2/pdfs/0003501.pdf).
 		//! @param alpha compacity weight
-        void										SetCompacityWeight(hacd::HaF64 alpha) { m_alpha = alpha;}
+        void										SetCompacityWeight(hacd::HaF32 alpha) { m_alpha = alpha;}
 		//! Gives the compacity weight (i.e. parameter alpha in ftp://ftp.elet.polimi.it/users/Stefano.Tubaro/ICIP_USB_Proceedings_v2/pdfs/0003501.pdf).
 		//! @return compacity weight
-        hacd::HaF64                                      GetCompacityWeight() const { return m_alpha;}	
+        hacd::HaF32                                      GetCompacityWeight() const { return m_alpha;}	
 		//! Sets the maximum number of vertices for each generated convex-hull.
 		//! @param nVerticesPerCH maximum # vertices per CH
         void										SetNVerticesPerCH(hacd::HaU32 nVerticesPerCH) { m_nVerticesPerCH = nVerticesPerCH;}
@@ -162,7 +162,7 @@ namespace HACD
 		//! @param points pointer to the vector of points to be filled
 		//! @param triangles pointer to the vector of triangles to be filled
 		//! @return true if sucess
-        bool                                        GetCH(hacd::HaU32 numCH, Vec3<hacd::HaF64> * const points, Vec3<hacd::HaI32> * const triangles);     
+        bool                                        GetCH(hacd::HaU32 numCH, Vec3<hacd::HaF32> * const points, Vec3<hacd::HaI32> * const triangles);     
 		//! Computes the HACD decomposition.
 		//! @param connectCCs specifies whether to connect the mesh's Connected Components by additional edges or not
 		//! @param fullCH specifies whether to generate convex-hulls with a full or limited (i.e. < m_nVerticesPerCH) number of vertices
@@ -193,12 +193,12 @@ namespace HACD
 		//! @param ch the cluster's convex-hull
 		//! @param distPoints the cluster's points 
 		//! @return cluster's concavity
-		hacd::HaF64										Concavity(ICHull & ch, DPointMap & distPoints);
+		hacd::HaF32										Concavity(ICHull & ch, DPointMap & distPoints);
 		//! Computes the perimeter of a cluster.
 		//! @param triIndices the cluster's triangles
 		//! @param distPoints the cluster's points 
 		//! @return cluster's perimeter
-        hacd::HaF64										ComputePerimeter(const HaU32Vector & triIndices) const;
+        hacd::HaF32										ComputePerimeter(const HaU32Vector & triIndices) const;
 		//! Creates the Graph by associating to each mesh triangle a vertex in the graph and to each couple of adjacent triangles an edge in the graph.
 		//! @param connectCCs specifies whether to connect the mesh's Connected Components by additional edges or not 
         void										CreateGraph(void);	
@@ -221,22 +221,22 @@ namespace HACD
 		void										Simplify();
 
 	private:
-		hacd::HaF64										m_scale;					//>! scale factor used for NormalizeData() and DenormalizeData()
+		hacd::HaF32										m_scale;					//>! scale factor used for NormalizeData() and DenormalizeData()
         Vec3<hacd::HaI32> *								m_triangles;				//>! pointer the triangles array
-        Vec3<hacd::HaF64> *								m_points;					//>! pointer the points array
-        Vec3<hacd::HaF64> *                              m_facePoints;               //>! pointer to the faces points array
-        Vec3<hacd::HaF64> *                              m_faceNormals;              //>! pointer to the faces normals array
-        Vec3<hacd::HaF64> *								m_normals;					//>! pointer the normals array
+        Vec3<hacd::HaF32> *								m_points;					//>! pointer the points array
+        Vec3<hacd::HaF32> *                              m_facePoints;               //>! pointer to the faces points array
+        Vec3<hacd::HaF32> *                              m_faceNormals;              //>! pointer to the faces normals array
+        Vec3<hacd::HaF32> *								m_normals;					//>! pointer the normals array
         hacd::HaU32										m_nTriangles;				//>! number of triangles in the original mesh
         hacd::HaU32										m_nPoints;					//>! number of vertices in the original mesh
         hacd::HaU32										m_nClusters;				//>! number of clusters
         hacd::HaU32										m_nMinClusters;				//>! minimum number of clusters
-		hacd::HaF64										m_ccConnectDist;			//>! maximum allowed distance to connect CCs
-        hacd::HaF64										m_concavity;				//>! maximum concavity
-		hacd::HaF64										m_alpha;					//>! compacity weigth
-        hacd::HaF64                                      m_beta;                     //>! volume weigth
-        hacd::HaF64										m_diag;						//>! length of the BB diagonal
-		Vec3<hacd::HaF64>								m_barycenter;				//>! barycenter of the mesh
+		hacd::HaF32										m_ccConnectDist;			//>! maximum allowed distance to connect CCs
+        hacd::HaF32										m_concavity;				//>! maximum concavity
+		hacd::HaF32										m_alpha;					//>! compacity weigth
+        hacd::HaF32                                      m_beta;                     //>! volume weigth
+        hacd::HaF32										m_diag;						//>! length of the BB diagonal
+		Vec3<hacd::HaF32>								m_barycenter;				//>! barycenter of the mesh
 //		HaI32SetVector               m_v2T;						//!> vertex to triangle adjacency information
         HaI32Vector                         m_cVertices;				//!> array of vertices each belonging to a different cluster
         ICHull *                                    m_convexHulls;				//!> convex-hulls associated with the final HACD clusters
