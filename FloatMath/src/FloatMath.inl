@@ -2853,11 +2853,11 @@ public:
   {
     if ( mBundle == 0 )
     {
-      mBundle = PX_NEW(KdTreeNodeBundle);
+      mBundle = HACD_NEW(KdTreeNodeBundle);
     }
     if ( mBundle->isFull() )
     {
-      KdTreeNodeBundle *bundle = PX_NEW(KdTreeNodeBundle);
+      KdTreeNodeBundle *bundle = HACD_NEW(KdTreeNodeBundle);
       mBundle->mNext = bundle;
       mBundle = bundle;
     }
@@ -3178,13 +3178,13 @@ private:
 
 fm_VertexIndex * fm_createVertexIndex(HaF64 granularity,bool snapToGrid) // create an indexed vertex system for doubles
 {
-  MyVertexIndex *ret = PX_NEW(MyVertexIndex)(granularity,snapToGrid);
+  MyVertexIndex *ret = HACD_NEW(MyVertexIndex)(granularity,snapToGrid);
   return static_cast< fm_VertexIndex *>(ret);
 }
 
 fm_VertexIndex * fm_createVertexIndex(HaF32 granularity,bool snapToGrid)  // create an indexed vertext system for floats
 {
-  MyVertexIndex *ret = PX_NEW(MyVertexIndex)(granularity,snapToGrid);
+  MyVertexIndex *ret = HACD_NEW(MyVertexIndex)(granularity,snapToGrid);
   return static_cast< fm_VertexIndex *>(ret);
 }
 
@@ -3592,8 +3592,8 @@ public:
     mResults.clear();
     scount = 0;
 
-    MyLineSegment *mls   = PX_NEW(MyLineSegment)[icount];
-    MyLineSegment **mptr = (MyLineSegment **)PX_ALLOC(sizeof(MyLineSegment *)*icount);
+    MyLineSegment *mls   = HACD_NEW(MyLineSegment)[icount];
+    MyLineSegment **mptr = (MyLineSegment **)HACD_ALLOC(sizeof(MyLineSegment *)*icount);
 
     for (HaU32 i=0; i<icount; i++)
     {
@@ -3629,7 +3629,7 @@ public:
 
 
     delete []mls;
-    PX_FREE(mptr);
+    HACD_FREE(mptr);
 
     if ( !mResults.empty() )
     {
@@ -3672,7 +3672,7 @@ public:
 
 fm_LineSweep * fm_createLineSweep(void)
 {
-  MyLineSweep *mls = PX_NEW(MyLineSweep);
+  MyLineSweep *mls = HACD_NEW(MyLineSweep);
   return static_cast< fm_LineSweep *>(mls);
 }
 
@@ -4267,11 +4267,11 @@ HaU32  fm_copyUniqueVertices(HaU32 vcount,const REAL *input_vertices,REAL *outpu
 {
   HaU32 ret = 0;
 
-  REAL *vertices = (REAL *)PX_ALLOC(sizeof(REAL)*vcount*3);
+  REAL *vertices = (REAL *)HACD_ALLOC(sizeof(REAL)*vcount*3);
   memcpy(vertices,input_vertices,sizeof(REAL)*vcount*3);
   REAL *dest = output_vertices;
 
-  HaU32 *reindex = (HaU32 *)PX_ALLOC(sizeof(HaU32)*vcount);
+  HaU32 *reindex = (HaU32 *)HACD_ALLOC(sizeof(HaU32)*vcount);
   memset(reindex,0xFF,sizeof(HaU32)*vcount);
 
   HaU32 icount = tcount*3;
@@ -4298,8 +4298,8 @@ HaU32  fm_copyUniqueVertices(HaU32 vcount,const REAL *input_vertices,REAL *outpu
       *output_indices++ = reindex[index];
     }
   }
-  PX_FREE(vertices);
-  PX_FREE(reindex);
+  HACD_FREE(vertices);
+  HACD_FREE(reindex);
   return ret;
 }
 
@@ -4397,7 +4397,7 @@ public:
     if ( mVertices->isDouble() )
     {
       HaU32 vcount = mVertices->getVcount();
-      HaF64 *vertices = (HaF64 *)PX_ALLOC(sizeof(HaF64)*vcount*3);
+      HaF64 *vertices = (HaF64 *)HACD_ALLOC(sizeof(HaF64)*vcount*3);
       memcpy(vertices,mVertices->getVerticesDouble(),sizeof(HaF64)*vcount*3);
 
       for (HaU32 i=0; i<tcount; i++)
@@ -4413,12 +4413,12 @@ public:
         tesselate(p1,p2,p3,0);
 
       }
-      PX_FREE(vertices);
+      HACD_FREE(vertices);
     }
     else
     {
       HaU32 vcount = mVertices->getVcount();
-      HaF32 *vertices = (HaF32 *)PX_ALLOC(sizeof(HaF32)*vcount*3);
+      HaF32 *vertices = (HaF32 *)HACD_ALLOC(sizeof(HaF32)*vcount*3);
       memcpy(vertices,mVertices->getVerticesFloat(),sizeof(HaF32)*vcount*3);
 
 
@@ -4435,7 +4435,7 @@ public:
         tesselate(p1,p2,p3,0);
 
       }
-      PX_FREE(vertices);
+      HACD_FREE(vertices);
     }
 
     outcount = (HaU32)(mIndices.size()/3);
@@ -4597,7 +4597,7 @@ private:
 
 fm_Tesselate * fm_createTesselate(void)
 {
-  Myfm_Tesselate *m = PX_NEW(Myfm_Tesselate);
+  Myfm_Tesselate *m = HACD_NEW(Myfm_Tesselate);
   return static_cast< fm_Tesselate * >(m);
 }
 
@@ -5253,7 +5253,7 @@ void CTriangulator::_process(TU32Vector &indices)
     const HaI32 n = (const HaI32)mPoints.size();
     if (n < 3)
         return;
-    HaI32 *V = (HaI32 *)PX_ALLOC(sizeof(HaI32)*n);
+    HaI32 *V = (HaI32 *)HACD_ALLOC(sizeof(HaI32)*n);
 
 	bool flipped = false;
 
@@ -5312,7 +5312,7 @@ void CTriangulator::_process(TU32Vector &indices)
         }
     }
 
-    PX_FREE(V);
+    HACD_FREE(V);
 }
 
 ///     Returns the area of the contour
@@ -5387,8 +5387,8 @@ public:
   }
   void reset(void)
   {
-    PX_FREE(mPointsFloat);
-    PX_FREE(mPointsDouble);
+    HACD_FREE(mPointsFloat);
+    HACD_FREE(mPointsDouble);
     mPointsFloat = 0;
     mPointsDouble = 0;
   }
@@ -5402,7 +5402,7 @@ public:
   {
     reset();
 
-    HaF64 *points = (HaF64 *)PX_ALLOC(sizeof(HaF64)*pcount*3);
+    HaF64 *points = (HaF64 *)HACD_ALLOC(sizeof(HaF64)*pcount*3);
     if ( consolidate )
     {
       pcount = fm_consolidatePolygon(pcount,_points,vstride,points,1-epsilon);
@@ -5434,7 +5434,7 @@ public:
       if ( indices )
       {
         tcount = _tcount;
-        mPointsDouble = (HaF64 *)PX_ALLOC(sizeof(HaF64)*tcount*3*3);
+        mPointsDouble = (HaF64 *)HACD_ALLOC(sizeof(HaF64)*tcount*3*3);
         HaF64 *dest = mPointsDouble;
         for (HaU32 i=0; i<tcount; i++)
         {
@@ -5460,7 +5460,7 @@ public:
         }
       }
     }
-    PX_FREE(points);
+    HACD_FREE(points);
 
     return mPointsDouble;
   }
@@ -5474,7 +5474,7 @@ public:
   {
     reset();
 
-    HaF64 *temp = (HaF64 *)PX_ALLOC(sizeof(HaF64)*pcount*3);
+    HaF64 *temp = (HaF64 *)HACD_ALLOC(sizeof(HaF64)*pcount*3);
     HaF64 *dest = temp;
     for (HaU32 i=0; i<pcount; i++)
     {
@@ -5488,16 +5488,16 @@ public:
     if ( results )
     {
       HaU32 fcount = tcount*3*3;
-      mPointsFloat = (HaF32 *)PX_ALLOC(sizeof(HaF32)*tcount*3*3);
+      mPointsFloat = (HaF32 *)HACD_ALLOC(sizeof(HaF32)*tcount*3*3);
       HaF32 *dest = mPointsFloat;
       for (HaU32 i=0; i<fcount; i++)
       {
         dest[i] = (HaF32) results[i];
       }
-      PX_FREE(mPointsDouble);
+      HACD_FREE(mPointsDouble);
       mPointsDouble = 0;
     }
-    PX_FREE(temp);
+    HACD_FREE(temp);
 
     return mPointsFloat;
   }
@@ -5509,7 +5509,7 @@ private:
 
 fm_Triangulate * fm_createTriangulate(void)
 {
-  Triangulate *t = PX_NEW(Triangulate);
+  Triangulate *t = HACD_NEW(Triangulate);
   return static_cast< fm_Triangulate *>(t);
 }
 

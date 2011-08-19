@@ -197,6 +197,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 		}
 		return ICHullErrorOK;
 	}
+
     ICHullError ICHull::Process(hacd::HaU32 nPointsCH)
 	{
         hacd::HaU32 addedPoints = 0;  
@@ -332,6 +333,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 		}
 		return ICHullErrorOK;
 	}
+
     bool ICHull::FindMaxVolumePoint()
 	{
         CircularList<TMMVertex> & vertices = m_mesh.GetVertices();
@@ -374,6 +376,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
  
         return true;
     }
+
 	ICHullError ICHull::DoubleTriangle()
 	{
         // find three non colinear points
@@ -841,7 +844,11 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 			return true;
 		}
     }
-	hacd::HaF64 ICHull::ComputeDistance(hacd::HaI32 name, const Vec3<hacd::HaF64> & pt, const Vec3<hacd::HaF64> & normal, bool & insideHull, bool updateIncidentPoints)
+	hacd::HaF64 ICHull::ComputeDistance(hacd::HaI32 name,
+										const Vec3<hacd::HaF64> & pt,
+										const Vec3<hacd::HaF64> & normal,
+										bool & insideHull,
+										bool updateIncidentPoints)
 	{
 		if (m_isFlat)
 		{
@@ -913,11 +920,6 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 			for(hacd::HaU32 f = 0; f < nT; f++)
 			{
 				TMMTriangle & currentTriangle = m_mesh.m_triangles.GetHead()->GetData();
-	/*
-				if (debug) std::cout << "T " << currentTriangle.m_vertices[0]->GetData().m_name << " "
-														  << currentTriangle.m_vertices[1]->GetData().m_name << " "
-														  << currentTriangle.m_vertices[2]->GetData().m_name << std::endl;
-     */
 				if (currentTriangle.m_vertices[0]->GetData().m_name == name ||
 					currentTriangle.m_vertices[1]->GetData().m_name == name ||
 					currentTriangle.m_vertices[2]->GetData().m_name == name)
@@ -938,12 +940,6 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 					distance = dist;
 					insideHull = true;
 					face = m_mesh.m_triangles.GetHead();	
-/*
-					std::cout << name << " -> T " << currentTriangle.m_vertices[0]->GetData().m_name << " "
-												  << currentTriangle.m_vertices[1]->GetData().m_name << " "
-												  << currentTriangle.m_vertices[2]->GetData().m_name << " Dist "
-												  << dist << " P " << currentTriangle.m_normal * normal << std::endl;
-*/
 					if (dist > 0.1)
 					{
 						break;

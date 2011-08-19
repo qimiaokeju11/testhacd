@@ -31,91 +31,90 @@ namespace hacd
 
 	class PxEmpty;
 
-#define PX_SIGN_BITMASK		0x80000000
+#define HACD_SIGN_BITMASK		0x80000000
 
 	// avoid unreferenced parameter warning (why not just disable it?)
 	// PT: or why not just omit the parameter's name from the declaration????
-#define PX_FORCE_PARAMETER_REFERENCE(_P) (void)(_P);
-#define PX_UNUSED(_P) PX_FORCE_PARAMETER_REFERENCE(_P)
+#define HACD_FORCE_PARAMETER_REFERENCE(_P) (void)(_P);
+#define HACD_UNUSED(_P) HACD_FORCE_PARAMETER_REFERENCE(_P)
 
 
-#define PX_ALLOC(x) ::malloc(x)
-#define PX_FREE(x) ::free(x)
-#define PX_REALLOC(x,y) ::realloc(x,y)
+#define HACD_ALLOC(x) ::malloc(x)
+#define HACD_FREE(x) ::free(x)
 
-#define PX_ASSERT(x) assert(x)
-#define PX_ALWAYS_ASSERT() assert(0)
+#define HACD_ASSERT(x) assert(x)
+#define HACD_ALWAYS_ASSERT() assert(0)
 
-#define PX_INLINE inline
-#define PX_NOINLINE __declspec(noinline)
-#define PX_FORCE_INLINE __forceinline
-#define PX_PLACEMENT_NEW(p, T)  new(p) T
+#define HACD_INLINE inline
+#define HACD_NOINLINE __declspec(noinline)
+#define HACD_FORCE_INLINE __forceinline
+#define HACD_PLACEMENT_NEW(p, T)  new(p) T
 
 	class UserAllocated
 	{
 	public:
-		PX_INLINE void* operator new(size_t size,UserAllocated *t)
+		HACD_INLINE void* operator new(size_t size,UserAllocated *t)
 		{
-			PX_FORCE_PARAMETER_REFERENCE(size);
+			HACD_FORCE_PARAMETER_REFERENCE(size);
 			return t;
 		}
 
-		PX_INLINE void* operator new(size_t size,const char *className,const char* fileName, int lineno,size_t classSize)
+		HACD_INLINE void* operator new(size_t size,const char *className,const char* fileName, int lineno,size_t classSize)
 		{
-			PX_FORCE_PARAMETER_REFERENCE(className);
-			PX_FORCE_PARAMETER_REFERENCE(fileName);
-			PX_FORCE_PARAMETER_REFERENCE(lineno);
-			PX_FORCE_PARAMETER_REFERENCE(classSize);
-			return PX_ALLOC(size);
+			HACD_FORCE_PARAMETER_REFERENCE(className);
+			HACD_FORCE_PARAMETER_REFERENCE(fileName);
+			HACD_FORCE_PARAMETER_REFERENCE(lineno);
+			HACD_FORCE_PARAMETER_REFERENCE(classSize);
+			return HACD_ALLOC(size);
 		}
 
 		inline void* operator new[](size_t size,const char *className,const char* fileName, int lineno,size_t classSize)
 		{
-			PX_FORCE_PARAMETER_REFERENCE(className);
-			PX_FORCE_PARAMETER_REFERENCE(fileName);
-			PX_FORCE_PARAMETER_REFERENCE(lineno);
-			PX_FORCE_PARAMETER_REFERENCE(classSize);
-			return PX_ALLOC(size);
+			HACD_FORCE_PARAMETER_REFERENCE(className);
+			HACD_FORCE_PARAMETER_REFERENCE(fileName);
+			HACD_FORCE_PARAMETER_REFERENCE(lineno);
+			HACD_FORCE_PARAMETER_REFERENCE(classSize);
+			return HACD_ALLOC(size);
 		}
 
 		inline void  operator delete(void* p,UserAllocated *t)
 		{
-			PX_FORCE_PARAMETER_REFERENCE(p);
-			PX_FORCE_PARAMETER_REFERENCE(t);
-			PX_ALWAYS_ASSERT(); // should never be executed
+			HACD_FORCE_PARAMETER_REFERENCE(p);
+			HACD_FORCE_PARAMETER_REFERENCE(t);
+			HACD_ALWAYS_ASSERT(); // should never be executed
 		}
 
 		inline void  operator delete(void* p)
 		{
-			PX_FREE(p);
+			HACD_FREE(p);
 		}
 
 		inline void  operator delete[](void* p)
 		{
-			PX_FREE(p);
+			HACD_FREE(p);
 		}
 
 		inline void  operator delete(void *p,const char *className,const char* fileName, int line,size_t classSize)
 		{
-			PX_FORCE_PARAMETER_REFERENCE(className);
-			PX_FORCE_PARAMETER_REFERENCE(fileName);
-			PX_FORCE_PARAMETER_REFERENCE(line);
-			PX_FORCE_PARAMETER_REFERENCE(classSize);
-			PX_FREE(p);
+			HACD_FORCE_PARAMETER_REFERENCE(className);
+			HACD_FORCE_PARAMETER_REFERENCE(fileName);
+			HACD_FORCE_PARAMETER_REFERENCE(line);
+			HACD_FORCE_PARAMETER_REFERENCE(classSize);
+			HACD_FREE(p);
 		}
 
 		inline void  operator delete[](void *p,const char *className,const char* fileName, int line,size_t classSize)
 		{
-			PX_FORCE_PARAMETER_REFERENCE(className);
-			PX_FORCE_PARAMETER_REFERENCE(fileName);
-			PX_FORCE_PARAMETER_REFERENCE(line);
-			PX_FORCE_PARAMETER_REFERENCE(classSize);
-			PX_FREE(p);
+			HACD_FORCE_PARAMETER_REFERENCE(className);
+			HACD_FORCE_PARAMETER_REFERENCE(fileName);
+			HACD_FORCE_PARAMETER_REFERENCE(line);
+			HACD_FORCE_PARAMETER_REFERENCE(classSize);
+			HACD_FREE(p);
 		}
 
 	};
 
-#define PX_NEW(T) new(#T,__FILE__,__LINE__,sizeof(T)) T
+#define HACD_NEW(T) new(#T,__FILE__,__LINE__,sizeof(T)) T
 
 }; // end HACD namespace
 

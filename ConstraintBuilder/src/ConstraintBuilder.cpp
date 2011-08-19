@@ -188,8 +188,8 @@ public:
   {
     mVcount = vcount;
     mTcount = tcount;
-    mVertices = (hacd::HaF32 *)PX_ALLOC(sizeof(hacd::HaF32)*vcount*3);
-    mIndices  = (hacd::HaU32 *)PX_ALLOC(sizeof(hacd::HaU32)*tcount*3);
+    mVertices = (hacd::HaF32 *)HACD_ALLOC(sizeof(hacd::HaF32)*vcount*3);
+    mIndices  = (hacd::HaU32 *)HACD_ALLOC(sizeof(hacd::HaU32)*tcount*3);
     memcpy(mVertices,vertices,sizeof(hacd::HaF32)*vcount*3);
     memcpy(mIndices,indices,sizeof(hacd::HaU32)*tcount*3);
     mVolume   = volume;
@@ -219,7 +219,7 @@ public:
     mCenter[1] = ((bmax[1] - bmin[1])*0.5f)+bmin[1];
     mCenter[2] = ((bmax[2] - bmin[2])*0.5f)+bmin[2];
 
-    mPlanes = (hacd::HaF32 *)PX_ALLOC(sizeof(hacd::HaF32)*tcount*4);
+    mPlanes = (hacd::HaF32 *)HACD_ALLOC(sizeof(hacd::HaF32)*tcount*4);
 
     hacd::HaU32 *idx = mIndices;
 
@@ -246,9 +246,9 @@ public:
 
   ~ConstrainedHull(void)
   {
-    PX_FREE(mVertices);
-    PX_FREE(mIndices);
-    PX_FREE(mPlanes);
+    HACD_FREE(mVertices);
+    HACD_FREE(mIndices);
+    HACD_FREE(mPlanes);
   }
 
   hacd::HaU32 getUserData(void) const { return mUserData; };
@@ -467,7 +467,7 @@ public:
 
   ConstrainedHull * addConvexHull(hacd::HaU32 vcount,const hacd::HaF32 *vertices,hacd::HaU32 tcount,const hacd::HaU32 *indices,hacd::HaF32 volume,hacd::HaU32 userData)
   {
-    ConstrainedHull *ch = PX_NEW(ConstrainedHull)(vcount,vertices,tcount,indices,volume,userData);
+    ConstrainedHull *ch = HACD_NEW(ConstrainedHull)(vcount,vertices,tcount,indices,volume,userData);
     mHulls.push_back(ch);
     return ch;
   }
@@ -523,7 +523,7 @@ public:
       if ( !child->mUsed && ch->sharesEdge(child,sect) )
       {
 
-        Constraint *c = PX_NEW(Constraint)(ch,child,sect);
+        Constraint *c = HACD_NEW(Constraint)(ch,child,sect);
 
         children.push_back(child);
         mConstraints.push_back(c);
@@ -550,7 +550,7 @@ public:
         // ok..the constraints have to be sorted now!
 
       hacd::HaU32 count = (hacd::HaU32)mConstraints.size();
-      char *used = (char *)PX_ALLOC(sizeof(char)*count);
+      char *used = (char *)HACD_ALLOC(sizeof(char)*count);
       memset(used,0,sizeof(char)*count);
 
         ConstraintVector slist = mConstraints;
@@ -599,7 +599,7 @@ public:
             ncount = (hacd::HaU32)nextlist.size();
         }
 
-        PX_FREE(used);
+        HACD_FREE(used);
 
     return (hacd::HaU32)mConstraints.size();
   }
@@ -625,7 +625,7 @@ private:
 
 ConstraintBuilder *createConstraintBuilder(void)
 {
-  ConstraintBuilder *ret = PX_NEW(ConstraintBuilder);
+  ConstraintBuilder *ret = HACD_NEW(ConstraintBuilder);
   return ret;
 }
 

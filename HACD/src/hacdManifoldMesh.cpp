@@ -131,9 +131,9 @@ namespace HACD
         m_triangles = mesh.m_triangles;
  
         // generating mapping
-        CircularListElement<TMMVertex> ** vertexMap     = (CircularListElement<TMMVertex> **) PX_ALLOC(sizeof(CircularListElement<TMMVertex> *)*nV);
-        CircularListElement<TMMEdge> ** edgeMap         = (CircularListElement<TMMEdge> **)PX_ALLOC(sizeof(CircularListElement<TMMEdge> *)*nE);
-        CircularListElement<TMMTriangle> ** triangleMap = (CircularListElement<TMMTriangle> **) PX_ALLOC(sizeof(CircularListElement<TMMTriangle> *)*nT);
+        CircularListElement<TMMVertex> ** vertexMap     = (CircularListElement<TMMVertex> **) HACD_ALLOC(sizeof(CircularListElement<TMMVertex> *)*nV);
+        CircularListElement<TMMEdge> ** edgeMap         = (CircularListElement<TMMEdge> **)HACD_ALLOC(sizeof(CircularListElement<TMMEdge> *)*nE);
+        CircularListElement<TMMTriangle> ** triangleMap = (CircularListElement<TMMTriangle> **) HACD_ALLOC(sizeof(CircularListElement<TMMTriangle> *)*nT);
         for(hacd::HaU32 v = 0; v < nV; v++)
         {
             vertexMap[v] = m_vertices.GetHead();
@@ -202,9 +202,9 @@ namespace HACD
                 }
             }
         }
-        PX_FREE(vertexMap);
-        PX_FREE(edgeMap);
-        PX_FREE(triangleMap);
+        HACD_FREE(vertexMap);
+        HACD_FREE(edgeMap);
+        HACD_FREE(triangleMap);
         
     }
 	hacd::HaI32  IntersectRayTriangle(const Vec3<hacd::HaF64> & P0, const Vec3<hacd::HaF64> & dir, 
@@ -378,6 +378,7 @@ namespace HACD
 
 		return true;
     }
+
 	bool TMMesh::Normalize()
     {
         hacd::HaU32 nV = m_vertices.GetSize();
@@ -416,6 +417,7 @@ namespace HACD
 		}
 		return true;
 	}
+
 	bool TMMesh::Denormalize()
 	{
         hacd::HaU32 nV = m_vertices.GetSize();

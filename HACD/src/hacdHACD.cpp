@@ -220,14 +220,14 @@ static void set_symmetric_difference (const HaU64Set &a,
 	{
 		hacd::HaI32 i, j, k;
 		Vec3<hacd::HaF64> u, v, w, normal;
-		PX_FREE(m_normals);
-		m_normals = (Vec3<hacd::HaF64> *)PX_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nPoints);
+		HACD_FREE(m_normals);
+		m_normals = (Vec3<hacd::HaF64> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nPoints);
 		if (m_addFacesPoints)
 		{
-			PX_FREE(m_facePoints);
-			PX_FREE(m_faceNormals);
-			m_facePoints = (Vec3<hacd::HaF64> *)PX_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nTriangles);
-			m_faceNormals = (Vec3<hacd::HaF64> *)PX_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nTriangles);
+			HACD_FREE(m_facePoints);
+			HACD_FREE(m_faceNormals);
+			m_facePoints = (Vec3<hacd::HaF64> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nTriangles);
+			m_faceNormals = (Vec3<hacd::HaF64> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nTriangles);
 		}
 		memset(m_normals, 0, sizeof(Vec3<hacd::HaF64>) * m_nPoints);
 		for(hacd::HaU32 f = 0; f < m_nTriangles; f++)
@@ -240,7 +240,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 			m_graph.m_vertices[f].m_distPoints[j].m_distOnly = false;
 			m_graph.m_vertices[f].m_distPoints[k].m_distOnly = false;
 			
-			ICHull  * ch = PX_NEW(ICHull);
+			ICHull  * ch = HACD_NEW(ICHull);
 			m_graph.m_vertices[f].m_convexHull = ch;
 			ch->AddPoint(m_points[i], i);
 			ch->AddPoint(m_points[j], j);
@@ -396,11 +396,11 @@ static void set_symmetric_difference (const HaU64Set &a,
 	}																
 	HACD::~HACD(void)
 	{
-		PX_FREE(m_normals);
+		HACD_FREE(m_normals);
 		delete [] m_convexHulls;
-		PX_FREE(m_partition);
-		PX_FREE(m_facePoints);
-		PX_FREE(m_faceNormals);
+		HACD_FREE(m_partition);
+		HACD_FREE(m_facePoints);
+		HACD_FREE(m_faceNormals);
 	}
 	int iteration = 0;
 	void HACD::ComputeEdgeCost(hacd::HaU32 e)
@@ -421,7 +421,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 		// delete old convex-hull
 		delete gE.m_convexHull;
 		// create the edge's convex-hull
-		ICHull  * ch = PX_NEW(ICHull);
+		ICHull  * ch = HACD_NEW(ICHull);
 		gE.m_convexHull = ch;
 		(*ch) = (*gV1.m_convexHull);
 		
@@ -457,7 +457,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 		while (ch->Process() == ICHullErrorInconsistent)		// if we face problems when constructing the visual-hull. really ugly!!!!
 		{
 //			if (m_callBack) (*m_callBack)("\t Problem with convex-hull construction [HACD::ComputeEdgeCost]\n", 0.0, 0.0, 0);
-			ch = PX_NEW(ICHull);
+			ch = HACD_NEW(ICHull);
 			CircularList<TMMVertex> & verticesCH = (gE.m_convexHull)->GetMesh().m_vertices;
 			hacd::HaU32 nV = (hacd::HaU32)verticesCH.GetSize();
 			hacd::HaI32 ptIndex = 0;
@@ -710,9 +710,9 @@ static void set_symmetric_difference (const HaU64Set &a,
 		DenormalizeData();
 		if (m_callBack) m_callBack->progressUpdate("+ Computing final convex-hulls\n", 0.0, 0.0, m_nClusters);
 		delete [] m_convexHulls;
-		m_convexHulls = PX_NEW(ICHull)[m_nClusters];
-		PX_FREE(m_partition);
-		m_partition = (hacd::HaI32 *)PX_ALLOC(sizeof(hacd::HaI32)*m_nTriangles);
+		m_convexHulls = HACD_NEW(ICHull)[m_nClusters];
+		HACD_FREE(m_partition);
+		m_partition = (hacd::HaI32 *)HACD_ALLOC(sizeof(hacd::HaI32)*m_nTriangles);
 		for (hacd::HaU32 p = 0; p != m_cVertices.size(); ++p) 
 		{
 			hacd::HaU32 v = m_cVertices[p];
@@ -793,7 +793,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 
 void	ReservablePriorityQueue::reserve(hacd::HaU32 size)
 {
-	PX_FORCE_PARAMETER_REFERENCE(size);
+	HACD_FORCE_PARAMETER_REFERENCE(size);
 }
 
 void	ReservablePriorityQueue::push(const GraphEdgePQ &pq)

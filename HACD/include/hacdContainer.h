@@ -228,19 +228,35 @@ namespace HACD
 	typedef STDNAME::map<hacd::HaI32, DPoint> DPointMap;
 	typedef STDNAME::vector<CircularListElement<TMMEdge> *> CircularListElementTMMEdgeVector;
 	typedef STDNAME::vector<CircularListElement<TMMTriangle> *> CircularListElementTMMTriangleVector;
+
 	class ICHull : public UANS::UserAllocated
 	{
 	public:
 		//!
-		bool												IsFlat() { return m_isFlat;}
+		bool												IsFlat() 
+		{ 
+			return m_isFlat;
+		}
 		//! 
-		DPointMap *							GetDistPoints() const { return m_distPoints;}
+		DPointMap *							GetDistPoints() const 
+		{ 
+			return m_distPoints;
+		}
 		//!
-		void												SetDistPoints(DPointMap * distPoints) { m_distPoints = distPoints;}
+		void												SetDistPoints(DPointMap * distPoints) 
+		{ 
+			m_distPoints = distPoints;
+		}
+
 		//! Returns the computed mesh
 		TMMesh &                                            GetMesh() { return m_mesh;}
+
 		//!	Add one point to the convex-hull    
-		bool                                                AddPoint(const Vec3<hacd::HaF64> & point) {return AddPoints(&point, 1);}
+		bool                                                AddPoint(const Vec3<hacd::HaF64> & point) 
+		{
+			return AddPoints(&point, 1);
+		}
+
 		//!	Add one point to the convex-hull    
 		bool                                                AddPoint(const Vec3<hacd::HaF64> & point, hacd::HaI32 id);
 		//!	Add points to the convex-hull

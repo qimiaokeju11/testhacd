@@ -35,7 +35,7 @@ public:
 		mUserCallback = desc.mCallback;
 		if ( desc.mVertexCount )
 		{
-			mHACD = PX_NEW(HACD);
+			mHACD = HACD_NEW(HACD);
 			// convert the input data points into doubles
 			for (hacd::HaU32 i=0; i<desc.mVertexCount; i++)
 			{
@@ -83,8 +83,8 @@ public:
 
 	void releaseHull(Hull &h)
 	{
-		PX_FREE((void *)h.mIndices);
-		PX_FREE((void *)h.mVertices);
+		HACD_FREE((void *)h.mIndices);
+		HACD_FREE((void *)h.mVertices);
 		h.mIndices = NULL;
 		h.mVertices = NULL;
 	}
@@ -103,11 +103,11 @@ public:
 	{
 		h.mVertexCount = (hacd::HaU32)mHACD->GetNPointsCH(index);
 		h.mTriangleCount = (hacd::HaU32)mHACD->GetNTrianglesCH(index);
-		h.mVertices = (hacd::HaF32 *)PX_ALLOC(sizeof(hacd::HaF32)*3*h.mVertexCount);
-		h.mIndices = (hacd::HaU32 *)PX_ALLOC(sizeof(hacd::HaU32)*3*h.mTriangleCount);
+		h.mVertices = (hacd::HaF32 *)HACD_ALLOC(sizeof(hacd::HaF32)*3*h.mVertexCount);
+		h.mIndices = (hacd::HaU32 *)HACD_ALLOC(sizeof(hacd::HaU32)*3*h.mTriangleCount);
 
-		Vec3<hacd::HaF64> * pointsCH = (Vec3<hacd::HaF64> *)PX_ALLOC(sizeof(Vec3<hacd::HaF64>)*h.mVertexCount);
-		Vec3<hacd::HaI32> * trianglesCH = (Vec3<hacd::HaI32> *)PX_ALLOC(sizeof(Vec3<hacd::HaI32>)*h.mTriangleCount);
+		Vec3<hacd::HaF64> * pointsCH = (Vec3<hacd::HaF64> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF64>)*h.mVertexCount);
+		Vec3<hacd::HaI32> * trianglesCH = (Vec3<hacd::HaI32> *)HACD_ALLOC(sizeof(Vec3<hacd::HaI32>)*h.mTriangleCount);
 
 		mHACD->GetCH(index, pointsCH, trianglesCH);
 		hacd::HaF32 *hullVertices = (hacd::HaF32 *)h.mVertices;
@@ -124,8 +124,8 @@ public:
 			hullIndices[i*3+1] = trianglesCH[i].Y();
 			hullIndices[i*3+2] = trianglesCH[i].Z();
 		}
-		PX_FREE(pointsCH);
-		PX_FREE(trianglesCH);
+		HACD_FREE(pointsCH);
+		HACD_FREE(trianglesCH);
 	}
 
 	virtual void	releaseHACD(void) // release memory associated with the last HACD request
@@ -227,7 +227,7 @@ private:
 
 HACD_API * createHACD_API(void)
 {
-	MyHACD_API *m = PX_NEW(MyHACD_API);
+	MyHACD_API *m = HACD_NEW(MyHACD_API);
 	return static_cast<HACD_API *>(m);
 }
 
