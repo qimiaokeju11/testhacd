@@ -39,7 +39,7 @@ public:
 			// convert the input data points into doubles
 			for (hacd::HaU32 i=0; i<desc.mVertexCount; i++)
 			{
-				Vec3<hacd::HaF64> p;
+				Vec3<hacd::HaF32> p;
 				p.X() = desc.mVertices[i*3+0];
 				p.Y() = desc.mVertices[i*3+1];
 				p.Z() = desc.mVertices[i*3+2];
@@ -58,7 +58,7 @@ public:
 			mHACD->SetNPoints(desc.mVertexCount);
 			mHACD->SetTriangles(&mTriangles[0]);
 			mHACD->SetNTriangles(desc.mTriangleCount);
-			mHACD->SetCompacityWeight(0.1);
+			mHACD->SetCompacityWeight(0.1f);
 			mHACD->SetVolumeWeight(0);
 			mHACD->SetNClusters(desc.mMinHullCount);
 			mHACD->SetCallBack(this);
@@ -106,7 +106,7 @@ public:
 		h.mVertices = (hacd::HaF32 *)HACD_ALLOC(sizeof(hacd::HaF32)*3*h.mVertexCount);
 		h.mIndices = (hacd::HaU32 *)HACD_ALLOC(sizeof(hacd::HaU32)*3*h.mTriangleCount);
 
-		Vec3<hacd::HaF64> * pointsCH = (Vec3<hacd::HaF64> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF64>)*h.mVertexCount);
+		Vec3<hacd::HaF32> * pointsCH = (Vec3<hacd::HaF32> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF32>)*h.mVertexCount);
 		Vec3<hacd::HaI32> * trianglesCH = (Vec3<hacd::HaI32> *)HACD_ALLOC(sizeof(Vec3<hacd::HaI32>)*h.mTriangleCount);
 
 		mHACD->GetCH(index, pointsCH, trianglesCH);
@@ -151,7 +151,7 @@ public:
 		delete this;
 	}
 
-	virtual bool progressUpdate(const char * msg, hacd::HaF64 progress, hacd::HaF64 concavity, hacd::HaU32 nVertices)
+	virtual bool progressUpdate(const char * msg, hacd::HaF32 progress, hacd::HaF32 concavity, hacd::HaU32 nVertices)
 	{
 		bool ret = true;
 		if ( mUserCallback )

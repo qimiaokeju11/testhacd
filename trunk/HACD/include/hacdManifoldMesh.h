@@ -49,9 +49,9 @@ namespace HACD
 	//!    Output: *I = intersection point (when it exists)
 	//!             0 = disjoint (no intersect)
 	//!             1 = intersect in unique point I1
-	hacd::HaI32														IntersectRayTriangle( const Vec3<hacd::HaF64> & P0, const Vec3<hacd::HaF64> & dir, 
-																					  const Vec3<hacd::HaF64> & V0, const Vec3<hacd::HaF64> & V1, 
-																					  const Vec3<hacd::HaF64> & V2, hacd::HaF64 &t);
+	hacd::HaI32														IntersectRayTriangle( const Vec3<hacd::HaF32> & P0, const Vec3<hacd::HaF32> & dir, 
+																					  const Vec3<hacd::HaF32> & V0, const Vec3<hacd::HaF32> & V1, 
+																					  const Vec3<hacd::HaF32> & V2, hacd::HaF32 &t);
 
 	// intersect_RayTriangle(): intersect a ray with a 3D triangle
 	//    Input:  a ray R, and a triangle T
@@ -60,9 +60,9 @@ namespace HACD
 	//             0 = disjoint (no intersect)
 	//             1 = intersect in unique point I1
 	//             2 = are in the same plane
-	hacd::HaI32														IntersectRayTriangle2(const Vec3<hacd::HaF64> & P0, const Vec3<hacd::HaF64> & dir, 
-																					   const Vec3<hacd::HaF64> & V0, const Vec3<hacd::HaF64> & V1, 
-																					   const Vec3<hacd::HaF64> & V2, hacd::HaF64 &r);
+	hacd::HaI32														IntersectRayTriangle2(const Vec3<hacd::HaF32> & P0, const Vec3<hacd::HaF32> & dir, 
+																					   const Vec3<hacd::HaF32> & V0, const Vec3<hacd::HaF32> & V1, 
+																					   const Vec3<hacd::HaF32> & V2, hacd::HaF32 &r);
 
     /*
      Calculate the line segment PaPb that is the shortest route between
@@ -71,9 +71,9 @@ namespace HACD
      Pb = P3 + mub (P4 - P3)
      Return FALSE if no solution exists.
      */
-    bool                                                        IntersectLineLine(const Vec3<hacd::HaF64> & p1, const Vec3<hacd::HaF64> & p2, 
-                                                                                  const Vec3<hacd::HaF64> & p3, const Vec3<hacd::HaF64> & p4,
-                                                                                  Vec3<hacd::HaF64> & pa, Vec3<hacd::HaF64> & pb, 
-                                                                                  hacd::HaF64 & mua, hacd::HaF64 &mub);
+    bool                                                        IntersectLineLine(const Vec3<hacd::HaF32> & p1, const Vec3<hacd::HaF32> & p2, 
+                                                                                  const Vec3<hacd::HaF32> & p3, const Vec3<hacd::HaF32> & p4,
+                                                                                  Vec3<hacd::HaF32> & pa, Vec3<hacd::HaF32> & pb, 
+                                                                                  hacd::HaF32 & mua, hacd::HaF32 &mub);
 }
 #endif

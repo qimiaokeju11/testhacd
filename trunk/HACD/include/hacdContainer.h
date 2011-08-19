@@ -15,7 +15,7 @@ namespace HACD
 		//! Constructor
 		//! @param name edge's id
 		//! @param priority edge's priority
-		GraphEdgePQ(hacd::HaI32 name, hacd::HaF64 priority)
+		GraphEdgePQ(hacd::HaI32 name, hacd::HaF32 priority)
 		{
 			m_name = name;
 			m_priority = priority;
@@ -24,7 +24,7 @@ namespace HACD
 		~GraphEdgePQ(void){}
 	private:
 		hacd::HaI32									m_name;						//!< edge name
-		hacd::HaF64									m_priority;					//!< priority
+		hacd::HaF32									m_priority;					//!< priority
 		//! Operator < for GraphEdgePQ
 		friend bool                                 operator<(const GraphEdgePQ & lhs, const GraphEdgePQ & rhs);
 		//! Operator > for GraphEdgePQ
@@ -52,7 +52,7 @@ typedef STDNAME::set<hacd::HaI32> HaI32Set;
 typedef STDNAME::set<hacd::HaU64> HaU64Set;
 
 typedef STDNAME::vector< hacd::HaU32 > HaU32Vector;
-typedef STDNAME::vector< Vec3<hacd::HaF64> > Vec3Vector;
+typedef STDNAME::vector< Vec3<hacd::HaF32> > Vec3Vector;
 typedef STDNAME::vector< Vec3<hacd::HaI32> > TriVector;
 typedef STDNAME::vector< hacd::HaI32 > HaI32Vector;
 typedef STDNAME::vector< HaI32Set > HaI32SetVector;
@@ -75,7 +75,7 @@ namespace HACD
 		~TMMVertex(void);
 
 	private:
-		Vec3<hacd::HaF64>										m_pos;
+		Vec3<hacd::HaF32>										m_pos;
 		hacd::HaI32												m_name;
 		hacd::HaU32												m_id;
 		CircularListElement<TMMEdge> *						m_duplicate;		// pointer to incident cone edge (or NULL)
@@ -142,12 +142,12 @@ namespace HACD
 		Material(void);
 		~Material(void){}        
 		//    private:
-		Vec3<hacd::HaF64>                                            m_diffuseColor;
-		hacd::HaF64                                                  m_ambientIntensity;
-		Vec3<hacd::HaF64>                                            m_specularColor;
-		Vec3<hacd::HaF64>                                            m_emissiveColor;
-		hacd::HaF64                                                  m_shininess;
-		hacd::HaF64                                                  m_transparency;
+		Vec3<hacd::HaF32>                                            m_diffuseColor;
+		hacd::HaF32                                                  m_ambientIntensity;
+		Vec3<hacd::HaF32>                                            m_specularColor;
+		Vec3<hacd::HaF32>                                            m_emissiveColor;
+		hacd::HaF32                                                  m_shininess;
+		hacd::HaF32                                                  m_transparency;
 
 		friend class TMMesh;
 		friend class HACD;
@@ -185,7 +185,7 @@ namespace HACD
 		CircularListElement<TMMTriangle> *					AddTriangle() {return m_triangles.Add();}
 		//! Print mesh information 
 		//!
-		void                                                GetIFS(Vec3<hacd::HaF64> * const points, Vec3<hacd::HaI32> * const triangles);
+		void                                                GetIFS(Vec3<hacd::HaF32> * const points, Vec3<hacd::HaI32> * const triangles);
 		//!  
 		void												Clear();
 		//!
@@ -205,8 +205,8 @@ namespace HACD
 		CircularList<TMMVertex>								m_vertices;
 		CircularList<TMMEdge>								m_edges;
 		CircularList<TMMTriangle>							m_triangles;
-		hacd::HaF64												m_diag;						//>! length of the BB diagonal
-		Vec3<hacd::HaF64>										m_barycenter;				//>! barycenter of the mesh
+		hacd::HaF32												m_diag;						//>! length of the BB diagonal
+		Vec3<hacd::HaF32>										m_barycenter;				//>! barycenter of the mesh
 
 		// not defined
 		TMMesh(const TMMesh & rhs);
@@ -252,26 +252,26 @@ namespace HACD
 		TMMesh &                                            GetMesh() { return m_mesh;}
 
 		//!	Add one point to the convex-hull    
-		bool                                                AddPoint(const Vec3<hacd::HaF64> & point) 
+		bool                                                AddPoint(const Vec3<hacd::HaF32> & point) 
 		{
 			return AddPoints(&point, 1);
 		}
 
 		//!	Add one point to the convex-hull    
-		bool                                                AddPoint(const Vec3<hacd::HaF64> & point, hacd::HaI32 id);
+		bool                                                AddPoint(const Vec3<hacd::HaF32> & point, hacd::HaI32 id);
 		//!	Add points to the convex-hull
-		bool                                                AddPoints(const Vec3<hacd::HaF64> * points, hacd::HaU32 nPoints);	
+		bool                                                AddPoints(const Vec3<hacd::HaF32> * points, hacd::HaU32 nPoints);	
 		bool												AddPoints(Vec3Vector points);
 		//!	
 		ICHullError                                         Process();
 		//! 
 		ICHullError                                         Process(hacd::HaU32 nPointsCH);
 		//!
-		hacd::HaF64                                              ComputeVolume();
+		hacd::HaF32                                              ComputeVolume();
 		//!
-		bool                                                IsInside(const Vec3<hacd::HaF64> pt);
+		bool                                                IsInside(const Vec3<hacd::HaF32> pt);
 		//!
-		hacd::HaF64												ComputeDistance(hacd::HaI32 name, const Vec3<hacd::HaF64> & pt, const Vec3<hacd::HaF64> & normal, bool & insideHull, bool updateIncidentPoints);
+		hacd::HaF32												ComputeDistance(hacd::HaI32 name, const Vec3<hacd::HaF32> & pt, const Vec3<hacd::HaF32> & normal, bool & insideHull, bool updateIncidentPoints);
 		//!
 		const ICHull &                                      operator=(ICHull & rhs);        
 
@@ -281,7 +281,7 @@ namespace HACD
 		virtual                                             ~ICHull(void) {};
 
 	private:
-		//!	DoubleTriangle builds the initial hacd::HaF64 triangle.  It first finds 3 noncollinear points and makes two faces out of them, in opposite order. It then finds a fourth point that is not coplanar with that face.  The vertices are stored in the face structure in counterclockwise order so that the volume between the face and the point is negative. Lastly, the 3 newfaces to the fourth point are constructed and the data structures are cleaned up. 
+		//!	DoubleTriangle builds the initial hacd::HaF32 triangle.  It first finds 3 noncollinear points and makes two faces out of them, in opposite order. It then finds a fourth point that is not coplanar with that face.  The vertices are stored in the face structure in counterclockwise order so that the volume between the face and the point is negative. Lastly, the 3 newfaces to the fourth point are constructed and the data structures are cleaned up. 
 		ICHullError                                         DoubleTriangle();
 		//!	MakeFace creates a new face structure from three vertices (in ccw order).  It returns a pointer to the face.
 		CircularListElement<TMMTriangle> *                  MakeFace(CircularListElement<TMMVertex> * v0,  
@@ -293,7 +293,7 @@ namespace HACD
 		//!	
 		bool                                                ProcessPoint();
 		//!
-		bool                                                ComputePointVolume(hacd::HaF64 &totalVolume, bool markVisibleFaces);
+		bool                                                ComputePointVolume(hacd::HaF32 &totalVolume, bool markVisibleFaces);
 		//!
 		bool                                                FindMaxVolumePoint();
 		//!	
@@ -311,14 +311,14 @@ namespace HACD
 		void												Clear(); 
 	private:
 		static const hacd::HaI32                                   sc_dummyIndex;
-		static const hacd::HaF64                                 sc_distMin;
+		static const hacd::HaF32                                 sc_distMin;
 		TMMesh                                              m_mesh;
 		CircularListElementTMMEdgeVector         m_edgesToDelete;
 		CircularListElementTMMEdgeVector         m_edgesToUpdate;
 		CircularListElementTMMTriangleVector     m_trianglesToDelete; 
 		DPointMap *							m_distPoints;            
 		CircularListElement<TMMVertex> *					m_dummyVertex;
-		Vec3<hacd::HaF64>										m_normal;
+		Vec3<hacd::HaF32>										m_normal;
 		bool												m_isFlat;
 
 
@@ -330,13 +330,13 @@ namespace HACD
 	class DPoint  
 	{
 	public:       
-		DPoint(hacd::HaF64 dist=0.0, bool computed=false, bool distOnly=false)
+		DPoint(hacd::HaF32 dist=0.0, bool computed=false, bool distOnly=false)
 			:m_dist(dist),
 			m_computed(computed),
 			m_distOnly(distOnly){};
 		~DPoint(){};      
 	private:
-		hacd::HaF64													m_dist;
+		hacd::HaF32													m_dist;
 		bool													m_computed;
 		bool                                                    m_distOnly;
 		friend class TMMTriangle;
@@ -368,11 +368,11 @@ namespace HACD
 		HaU32Vector	                    m_ancestors;
 		DPointMap					m_distPoints;
 
-		hacd::HaF64                                  m_error;
-		hacd::HaF64                                  m_surf;
-		hacd::HaF64                                  m_volume;
-		hacd::HaF64                                  m_perimeter;
-		hacd::HaF64                                  m_concavity;
+		hacd::HaF32                                  m_error;
+		hacd::HaF32                                  m_surf;
+		hacd::HaF32                                  m_volume;
+		hacd::HaF32                                  m_perimeter;
+		hacd::HaF32                                  m_concavity;
 		ICHull *                                m_convexHull;
 		HaU64Set			m_boudaryEdges;
 
@@ -392,11 +392,11 @@ namespace HACD
 		hacd::HaI32                                    m_v1;
 		hacd::HaI32                                    m_v2;
 		DPointMap					m_distPoints;
-		hacd::HaF64                                  m_error;
-		hacd::HaF64                                  m_surf;
-		hacd::HaF64                                  m_volume;
-		hacd::HaF64                                  m_perimeter;
-		hacd::HaF64                                  m_concavity;
+		hacd::HaF32                                  m_error;
+		hacd::HaF32                                  m_surf;
+		hacd::HaF32                                  m_volume;
+		hacd::HaF32                                  m_perimeter;
+		hacd::HaF32                                  m_concavity;
 		ICHull *                                m_convexHull;
 		HaU64Set			m_boudaryEdges;
 		bool                                    m_deleted;

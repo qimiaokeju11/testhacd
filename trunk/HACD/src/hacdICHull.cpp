@@ -19,7 +19,7 @@
 namespace HACD
 {   
 
-static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
+static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
 {
 	return v1 > v2 ? v1 : v2;
 }
@@ -32,7 +32,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 		m_isFlat = false;
 		m_dummyVertex = 0;
     }
-	bool ICHull::AddPoints(const Vec3<hacd::HaF64> * points, hacd::HaU32 nPoints)
+	bool ICHull::AddPoints(const Vec3<hacd::HaF32> * points, hacd::HaU32 nPoints)
 	{
 		if (!points)
 		{
@@ -58,7 +58,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 		return true;
 	}
 
-    bool ICHull::AddPoint(const Vec3<hacd::HaF64> & point, hacd::HaI32 id)
+    bool ICHull::AddPoint(const Vec3<hacd::HaF32> & point, hacd::HaI32 id)
 	{
 		if (AddPoints(&point, 1))
 		{
@@ -84,9 +84,9 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 	        CircularListElement<TMMVertex> * v1 = v0->GetNext();
 	        CircularListElement<TMMVertex> * v2 = v1->GetNext();
 			// Compute the normal to the plane
-            Vec3<hacd::HaF64> p0 = v0->GetData().m_pos;
-            Vec3<hacd::HaF64> p1 = v1->GetData().m_pos;            
-            Vec3<hacd::HaF64> p2 = v2->GetData().m_pos;			
+            Vec3<hacd::HaF32> p0 = v0->GetData().m_pos;
+            Vec3<hacd::HaF32> p1 = v1->GetData().m_pos;            
+            Vec3<hacd::HaF32> p2 = v2->GetData().m_pos;			
             m_normal = (p1-p0) ^ (p2-p0);
             m_normal.Normalize();
 			t1->GetData().m_vertices[0] = v0;
@@ -214,9 +214,9 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 	        CircularListElement<TMMVertex> * v1 = v0->GetNext();
 	        CircularListElement<TMMVertex> * v2 = v1->GetNext();
 			// Compute the normal to the plane
-            Vec3<hacd::HaF64> p0 = v0->GetData().m_pos;
-            Vec3<hacd::HaF64> p1 = v1->GetData().m_pos;            
-            Vec3<hacd::HaF64> p2 = v2->GetData().m_pos;			
+            Vec3<hacd::HaF32> p0 = v0->GetData().m_pos;
+            Vec3<hacd::HaF32> p1 = v1->GetData().m_pos;            
+            Vec3<hacd::HaF32> p2 = v2->GetData().m_pos;			
             m_normal = (p1-p0) ^ (p2-p0);
             m_normal.Normalize();
 			t1->GetData().m_vertices[0] = v0;
@@ -340,8 +340,8 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
         CircularListElement<TMMVertex> * vMaxVolume = 0;
         CircularListElement<TMMVertex> * vHeadPrev = vertices.GetHead()->GetPrev();
         
-        hacd::HaF64 maxVolume = 0.0;
-        hacd::HaF64 volume = 0.0;
+        hacd::HaF32 maxVolume = 0.0;
+        hacd::HaF32 volume = 0.0;
         
         while (!vertices.GetData().m_tag) // not processed
         {
@@ -365,7 +365,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
         
         if (vMaxVolume != vHead)
         {
-            Vec3<hacd::HaF64> pos = vHead->GetData().m_pos;
+            Vec3<hacd::HaF32> pos = vHead->GetData().m_pos;
             hacd::HaI32 id = vHead->GetData().m_name;
             vHead->GetData().m_pos = vMaxVolume->GetData().m_pos;
             vHead->GetData().m_name = vMaxVolume->GetData().m_name;
@@ -405,7 +405,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
         CircularListElement<TMMVertex> * v3 = v2->GetNext();
         vertices.GetHead() = v3;
 
-		hacd::HaF64 vol = Volume(v0->GetData().m_pos, v1->GetData().m_pos, v2->GetData().m_pos, v3->GetData().m_pos);
+		hacd::HaF32 vol = Volume(v0->GetData().m_pos, v1->GetData().m_pos, v2->GetData().m_pos, v3->GetData().m_pos);
 		while (vol == 0.0 && !v3->GetNext()->GetData().m_tag)
 		{
 			v3 = v3->GetNext();
@@ -414,19 +414,19 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 		if (vol == 0.0)
 		{
 			// compute the barycenter
-			Vec3<hacd::HaF64> bary(0.0,0.0,0.0);
+			Vec3<hacd::HaF32> bary(0.0,0.0,0.0);
 			CircularListElement<TMMVertex> * vBary = v0;
 			do
 			{
 				bary += vBary->GetData().m_pos;
 			}
 			while ( (vBary = vBary->GetNext()) != v0);
-			bary /= (hacd::HaF64)vertices.GetSize();
+			bary /= (hacd::HaF32)vertices.GetSize();
 
 			// Compute the normal to the plane
-            Vec3<hacd::HaF64> p0 = v0->GetData().m_pos;
-            Vec3<hacd::HaF64> p1 = v1->GetData().m_pos;            
-            Vec3<hacd::HaF64> p2 = v2->GetData().m_pos;			
+            Vec3<hacd::HaF32> p0 = v0->GetData().m_pos;
+            Vec3<hacd::HaF32> p1 = v1->GetData().m_pos;            
+            Vec3<hacd::HaF32> p2 = v2->GetData().m_pos;			
             m_normal = (p1-p0) ^ (p2-p0);
             m_normal.Normalize();
 			// add dummy vertex placed at (bary + normal)
@@ -516,7 +516,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
         }
 		return newFace;
 	}
-    bool ICHull::ComputePointVolume(hacd::HaF64 &totalVolume, bool markVisibleFaces)
+    bool ICHull::ComputePointVolume(hacd::HaF32 &totalVolume, bool markVisibleFaces)
     {
         // mark visible faces
         CircularListElement<TMMTriangle> * fHead = m_mesh.GetTriangles().GetHead();
@@ -524,10 +524,10 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
         CircularList<TMMVertex> & vertices = m_mesh.GetVertices();
         CircularListElement<TMMVertex> * vertex0 = vertices.GetHead();
         bool visible = false;
-        Vec3<hacd::HaF64> pos0 = vertex0->GetData().m_pos;
-        hacd::HaF64 vol = 0.0;
+        Vec3<hacd::HaF32> pos0 = vertex0->GetData().m_pos;
+        hacd::HaF32 vol = 0.0;
         totalVolume = 0.0;
-		Vec3<hacd::HaF64> ver0, ver1, ver2;
+		Vec3<hacd::HaF32> ver0, ver1, ver2;
         do 
         {
 			ver0 = f->GetData().m_vertices[0]->GetData().m_pos;
@@ -568,7 +568,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
     }
 	bool ICHull::ProcessPoint()
 	{
-        hacd::HaF64 totalVolume = 0.0;
+        hacd::HaF32 totalVolume = 0.0;
         if (!ComputePointVolume(totalVolume, true))
         {
             return false;
@@ -772,25 +772,25 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
         }
         return (*this);
     }   
-    hacd::HaF64 ICHull::ComputeVolume()
+    hacd::HaF32 ICHull::ComputeVolume()
     {
         hacd::HaU32 nV = m_mesh.m_vertices.GetSize();
 		if (nV == 0 || m_isFlat)
 		{
 			return 0.0;
 		}       
-        Vec3<hacd::HaF64> bary(0.0, 0.0, 0.0);
+        Vec3<hacd::HaF32> bary(0.0, 0.0, 0.0);
 
         for(hacd::HaU32 v = 0; v < nV; v++)
         {
 			bary +=  m_mesh.m_vertices.GetHead()->GetData().m_pos;
 			m_mesh.m_vertices.Next();
         }
-		bary /= (hacd::HaF64)nV;
+		bary /= (hacd::HaF32)nV;
         
         hacd::HaU32 nT = m_mesh.m_triangles.GetSize();
-        Vec3<hacd::HaF64> ver0, ver1, ver2;
-        hacd::HaF64 totalVolume = 0.0;
+        Vec3<hacd::HaF32> ver0, ver1, ver2;
+        hacd::HaF32 totalVolume = 0.0;
         for(hacd::HaU32 t = 0; t < nT; t++)
         {
             ver0 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[0]->GetData().m_pos;
@@ -801,13 +801,13 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
         }
         return totalVolume;
     }
-    bool ICHull::IsInside(const Vec3<hacd::HaF64> pt)
+    bool ICHull::IsInside(const Vec3<hacd::HaF32> pt)
     {
 		if (m_isFlat)
 		{
 			hacd::HaU32 nT = m_mesh.m_triangles.GetSize();
-			Vec3<hacd::HaF64> ver0, ver1, ver2, a, b, c;
-			hacd::HaF64 u,v;
+			Vec3<hacd::HaF32> ver0, ver1, ver2, a, b, c;
+			hacd::HaF32 u,v;
 			for(hacd::HaU32 t = 0; t < nT; t++)
 			{
 				ver0 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[0]->GetData().m_pos;
@@ -829,7 +829,7 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 		else
 		{
 			hacd::HaU32 nT = m_mesh.m_triangles.GetSize();
-			Vec3<hacd::HaF64> ver0, ver1, ver2;
+			Vec3<hacd::HaF32> ver0, ver1, ver2;
 			for(hacd::HaU32 t = 0; t < nT; t++)
 			{
 				ver0 = m_mesh.m_triangles.GetHead()->GetData().m_vertices[0]->GetData().m_pos;
@@ -844,28 +844,28 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 			return true;
 		}
     }
-	hacd::HaF64 ICHull::ComputeDistance(hacd::HaI32 name,
-										const Vec3<hacd::HaF64> & pt,
-										const Vec3<hacd::HaF64> & normal,
+	hacd::HaF32 ICHull::ComputeDistance(hacd::HaI32 name,
+										const Vec3<hacd::HaF32> & pt,
+										const Vec3<hacd::HaF32> & normal,
 										bool & insideHull,
 										bool updateIncidentPoints)
 	{
 		if (m_isFlat)
 		{
-			hacd::HaF64 distance = 0.0;
-			Vec3<hacd::HaF64> ptNormal = normal;
+			hacd::HaF32 distance = 0.0;
+			Vec3<hacd::HaF32> ptNormal = normal;
 			ptNormal -= (ptNormal * m_normal) * m_normal;
 			if (ptNormal.GetNorm() > 0.0)
 			{
 				ptNormal.Normalize();
 				hacd::HaI32 nameVE1;
 				hacd::HaI32 nameVE2;
-				Vec3<hacd::HaF64> pa, pb, d0, d1, d2, d3;
-				Vec3<hacd::HaF64> p0 = pt;
-				Vec3<hacd::HaF64> p1 = p0 + ptNormal;
-				Vec3<hacd::HaF64> p2, p3;
-				hacd::HaF64 mua, mub, s;
-				const hacd::HaF64 EPS = 0.00000000001;
+				Vec3<hacd::HaF32> pa, pb, d0, d1, d2, d3;
+				Vec3<hacd::HaF32> p0 = pt;
+				Vec3<hacd::HaF32> p1 = p0 + ptNormal;
+				Vec3<hacd::HaF32> p2, p3;
+				hacd::HaF32 mua, mub, s;
+				const hacd::HaF32 EPS = 0.00000000001f;
 				hacd::HaU32 nE = m_mesh.GetNEdges();
 				for(hacd::HaU32 e = 0; e < nE; e++)
 				{
@@ -910,10 +910,10 @@ static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
 		}
 		else
 		{
-			Vec3<hacd::HaF64> impact;
+			Vec3<hacd::HaF32> impact;
 			hacd::HaI32 nhit;
-			hacd::HaF64 dist;
-			hacd::HaF64 distance = 0.0; 
+			hacd::HaF32 dist;
+			hacd::HaF32 distance = 0.0; 
 			hacd::HaU32 nT = m_mesh.GetNTriangles();
 			insideHull = false;
 			CircularListElement<TMMTriangle> * face = 0;

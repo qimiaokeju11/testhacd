@@ -38,9 +38,9 @@ namespace hacd
 class RaycastMesh
 {
 public:
-	virtual bool raycast(const HaF64 *from,const HaF64 *to,HaF64 *hitLocation,HaF64 *hitNormal,HaF64 *hitDistance) = 0;
-	virtual const HaF64 * getBoundMin(void) const = 0; // return the minimum bounding box
-	virtual const HaF64 * getBoundMax(void) const = 0; // return the maximum bounding box.
+	virtual bool raycast(const HaF32 *from,const HaF32 *to,HaF32 *hitLocation,HaF32 *hitNormal,HaF32 *hitDistance) = 0;
+	virtual const HaF32 * getBoundMin(void) const = 0; // return the minimum bounding box
+	virtual const HaF32 * getBoundMax(void) const = 0; // return the maximum bounding box.
 	virtual void release(void) = 0;
 protected:
 	virtual ~RaycastMesh(void) { };
@@ -48,12 +48,12 @@ protected:
 
 
 RaycastMesh * createRaycastMesh(HaU32 vcount,		// The number of vertices in the source triangle mesh
-								const HaF64 *vertices,		// The array of vertex positions in the format x1,y1,z1..x2,y2,z2.. etc.
+								const HaF32 *vertices,		// The array of vertex positions in the format x1,y1,z1..x2,y2,z2.. etc.
 								HaU32 tcount,		// The number of triangles in the source triangle mesh
 								const HaU32 *indices, // The triangle indices in the format of i1,i2,i3 ... i4,i5,i6, ...
 								HaU32 maxDepth=15,	// Maximum recursion depth for the triangle mesh.
 								HaU32 minLeafSize=4,	// minimum triangles to treat as a 'leaf' node.
-								HaF64	minAxisSize=0.01f	// once a particular axis is less than this size, stop sub-dividing.
+								HaF32	minAxisSize=0.01f	// once a particular axis is less than this size, stop sub-dividing.
 								);
 
 

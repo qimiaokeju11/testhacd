@@ -33,7 +33,7 @@ static void swap(hacd::HaI32 &v1,hacd::HaI32 &v2)
 	v2 = t;
 }
 
-static hacd::HaF64 max(hacd::HaF64 v1,hacd::HaF64 v2)
+static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
 {
 	return v1 > v2 ? v1 : v2;
 }
@@ -70,10 +70,10 @@ static void set_symmetric_difference (const HaU64Set &a,
 	}
 }
 
-	hacd::HaF64  HACD::Concavity(ICHull & ch, DPointMap & distPoints)
+	hacd::HaF32  HACD::Concavity(ICHull & ch, DPointMap & distPoints)
 	{
-		hacd::HaF64 concavity = 0.0;
-		hacd::HaF64 distance = 0.0;       
+		hacd::HaF32 concavity = 0.0;
+		hacd::HaF32 distance = 0.0;       
 		DPointMap::iterator itDP(distPoints.begin());
 		DPointMap::iterator itDPEnd(distPoints.end());
 		for(; itDP != itDPEnd; ++itDP) 
@@ -180,8 +180,8 @@ static void set_symmetric_difference (const HaU64Set &a,
 						STDNAME::set<hacd::HaI32>::const_iterator itV1(cc2V[cc1].begin()), itVEnd1(cc2V[cc1].end()); 
 						for(; itV1 != itVEnd1; ++itV1)
 						{
-							hacd::HaF64 distC1C2 = DBL_MAX;
-							hacd::HaF64 dist;
+							hacd::HaF32 distC1C2 = FLT_MAX;
+							hacd::HaF32 dist;
 							t1 = -1;
 							t2 = -1;
 							STDNAME::set<hacd::HaI32>::const_iterator itV2(cc2V[cc2].begin()), itVEnd2(cc2V[cc2].end()); 
@@ -219,17 +219,17 @@ static void set_symmetric_difference (const HaU64Set &a,
 	void HACD::InitializeGraph()
 	{
 		hacd::HaI32 i, j, k;
-		Vec3<hacd::HaF64> u, v, w, normal;
+		Vec3<hacd::HaF32> u, v, w, normal;
 		HACD_FREE(m_normals);
-		m_normals = (Vec3<hacd::HaF64> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nPoints);
+		m_normals = (Vec3<hacd::HaF32> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF32>)*m_nPoints);
 		if (m_addFacesPoints)
 		{
 			HACD_FREE(m_facePoints);
 			HACD_FREE(m_faceNormals);
-			m_facePoints = (Vec3<hacd::HaF64> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nTriangles);
-			m_faceNormals = (Vec3<hacd::HaF64> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF64>)*m_nTriangles);
+			m_facePoints = (Vec3<hacd::HaF32> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF32>)*m_nTriangles);
+			m_faceNormals = (Vec3<hacd::HaF32> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF32>)*m_nTriangles);
 		}
-		memset(m_normals, 0, sizeof(Vec3<hacd::HaF64>) * m_nPoints);
+		memset(m_normals, 0, sizeof(Vec3<hacd::HaF32>) * m_nPoints);
 		for(hacd::HaU32 f = 0; f < m_nTriangles; f++)
 		{
 			i = m_triangles[f].X();
@@ -273,12 +273,12 @@ static void set_symmetric_difference (const HaU64Set &a,
 			if (m_addExtraDistPoints)	
 			{// we need a kd-tree structure to accelerate this part!
 				hacd::HaI32 i1, j1, k1;
-				Vec3<hacd::HaF64> u1, v1, normal1;
+				Vec3<hacd::HaF32> u1, v1, normal1;
 				normal = -normal;
-				hacd::HaF64 distance = 0.0;
-				hacd::HaF64 distMin = 0.0;
+				hacd::HaF32 distance = 0.0;
+				hacd::HaF32 distMin = 0.0;
 				hacd::HaU32 faceIndex = m_nTriangles;
-				Vec3<hacd::HaF64> seedPoint((m_points[i] + m_points[j] + m_points[k]) / 3.0);
+				Vec3<hacd::HaF32> seedPoint((m_points[i] + m_points[j] + m_points[k]) / 3.0);
 				hacd::HaI32 nhit = 0;
 				for(hacd::HaU32 f1 = 0; f1 < m_nTriangles; f1++)
 				{
@@ -327,9 +327,9 @@ static void set_symmetric_difference (const HaU64Set &a,
 			return;
 		}
 		m_barycenter = m_points[0];
-		Vec3<hacd::HaF64> min = m_points[0];
-		Vec3<hacd::HaF64> max = m_points[0];
-		hacd::HaF64 x, y, z;
+		Vec3<hacd::HaF32> min = m_points[0];
+		Vec3<hacd::HaF32> max = m_points[0];
+		hacd::HaF32 x, y, z;
 		for (hacd::HaU32 v = 1; v < m_nPoints ; v++) 
 		{
 			m_barycenter += m_points[v];
@@ -343,10 +343,10 @@ static void set_symmetric_difference (const HaU64Set &a,
 			if ( z < min.Z()) min.Z() = z;
 			else if ( z > max.Z()) max.Z() = z;
 		}
-		m_barycenter /= m_nPoints;
+		m_barycenter /= (hacd::HaF32)m_nPoints;
 		m_diag = (max-min).GetNorm();
-		const hacd::HaF64 invDiag = 2.0 * m_scale / m_diag;
-		if (m_diag != 0.0)
+		const hacd::HaF32 invDiag = 2.0f * m_scale / m_diag;
+		if (m_diag != 0.0f)
 		{
 			for (hacd::HaU32 v = 0; v < m_nPoints ; v++) 
 			{
@@ -362,7 +362,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 		}
 		if (m_diag != 0.0)
 		{
-			const hacd::HaF64 diag = m_diag / (2.0 * m_scale);
+			const hacd::HaF32 diag = m_diag / (2.0f * m_scale);
 			for (hacd::HaU32 v = 0; v < m_nPoints ; v++) 
 			{
 				m_points[v] = m_points[v] * diag + m_barycenter;
@@ -380,14 +380,14 @@ static void set_symmetric_difference (const HaU64Set &a,
 		m_nClusters = 0;
 		m_concavity = 0.0;
 		m_diag = 1.0;
-		m_barycenter = Vec3<hacd::HaF64>(0.0, 0.0,0.0);
-		m_alpha = 0.1;
-		m_beta = 0.1;
+		m_barycenter = Vec3<hacd::HaF32>(0.0f, 0.0f,0.0f);
+		m_alpha = 0.1f;
+		m_beta = 0.1f;
 		m_nVerticesPerCH = 30;
 		m_callBack = 0;
 		m_addExtraDistPoints = false;
 		m_addNeighboursDistPoints = false;
-		m_scale = 1000.0;
+		m_scale = 1000.0f;
 		m_partition = 0;
 		m_nMinClusters = 3;
 		m_facePoints = 0;
@@ -471,8 +471,8 @@ static void set_symmetric_difference (const HaU64Set &a,
 			delete gE.m_convexHull;
 			gE.m_convexHull = ch;
 		}
-		hacd::HaF64 volume = 0.0; 
-		hacd::HaF64 concavity = 0.0;
+		hacd::HaF32 volume = 0.0; 
+		hacd::HaF32 concavity = 0.0;
 		if (ch->IsFlat())
 		{
 			bool insideHull;
@@ -543,8 +543,8 @@ static void set_symmetric_difference (const HaU64Set &a,
 		}
   
 		// compute boudary edges
-		hacd::HaF64 perimeter = 0.0;
-		hacd::HaF64 surf    = 1.0;
+		hacd::HaF32 perimeter = 0.0;
+		hacd::HaF32 surf    = 1.0;
 		if (m_alpha > 0.0)
 		{
 			gE.m_boudaryEdges.clear();
@@ -560,8 +560,8 @@ static void set_symmetric_difference (const HaU64Set &a,
 			}
 			surf    = gV1.m_surf + gV2.m_surf;
 		}
-		hacd::HaF64 ratio   = perimeter * perimeter / (4.0 * sc_pi * surf);
-		gE.m_volume	   = (m_beta == 0.0)?0.0:ch->ComputeVolume()/pow(m_scale, 3.0);						// cluster's volume
+		hacd::HaF32 ratio   = perimeter * perimeter / (4.0f * sc_pi * surf);
+		gE.m_volume	   = (m_beta == 0.0f)?0.0f:ch->ComputeVolume()/powf(m_scale, 3.0f);						// cluster's volume
 		gE.m_surf      = surf;                          // cluster's area  
 		gE.m_perimeter = perimeter;                     // cluster's perimeter
 		gE.m_concavity = concavity;                     // cluster's concavity
@@ -581,32 +581,32 @@ static void set_symmetric_difference (const HaU64Set &a,
 	{
 		hacd::HaI32 v1 = -1;
 		hacd::HaI32 v2 = -1;        
-		hacd::HaF64 progressOld = -1.0;
-		hacd::HaF64 progress = 0.0;
-		hacd::HaF64 globalConcavity  = 0.0;     
+		hacd::HaF32 progressOld = -1.0;
+		hacd::HaF32 progress = 0.0;
+		hacd::HaF32 globalConcavity  = 0.0;     
 		char msg[1024];
-		hacd::HaF64 ptgStep = 1.0;
+		hacd::HaF32 ptgStep = 1.0;
 		while ( (globalConcavity < m_concavity) && 
 				(m_graph.GetNVertices() > m_nMinClusters) && 
 				(m_graph.GetNEdges()> 0))   // Revise #125
 		{
-			progress = 100.0-m_graph.GetNVertices() * 100.0 / m_nTriangles;
+			progress = 100.0f-m_graph.GetNVertices() * 100.0f / m_nTriangles;
 			if (fabs(progress-progressOld) > ptgStep && m_callBack)
 			{
 				sprintf_s(msg,1024, "%3.2f %% V = %lu \t C = %f \t \t \r", progress, static_cast<hacd::HaU32>(m_graph.GetNVertices()), globalConcavity);
 				m_callBack->progressUpdate(msg, progress, globalConcavity,  m_graph.GetNVertices());
 				progressOld = progress;
-				if (progress > 99.0)
+				if (progress > 99.0f)
 				{
-					ptgStep = 0.01;
+					ptgStep = 0.01f;
 				}
-				else if (progress > 90.0)
+				else if (progress > 90.0f)
 				{
-					ptgStep = 0.1;
+					ptgStep = 0.1f;
 				}
 			}
 
-			GraphEdgePQ currentEdge(0,0.0);
+			GraphEdgePQ currentEdge(0,0.0f);
 			bool done = false;
 			do
 			{
@@ -780,7 +780,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 		return m_convexHulls[numCH].GetMesh().GetNVertices();
 	}
 
-	bool HACD::GetCH(hacd::HaU32 numCH, Vec3<hacd::HaF64> * const points, Vec3<hacd::HaI32> * const triangles)
+	bool HACD::GetCH(hacd::HaU32 numCH, Vec3<hacd::HaF32> * const points, Vec3<hacd::HaI32> * const triangles)
 	{
 		if (numCH >= m_nClusters)
 		{
