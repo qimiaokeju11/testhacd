@@ -29,20 +29,20 @@ namespace hacd
 		explicit  vector(const PxEmpty& v)
 		{
 			if(mData)
-				mCapacity |= PX_SIGN_BITMASK;
+				mCapacity |= HACD_SIGN_BITMASK;
 		}
 
 		/*!
 		Default array constructor. Initialize an empty array
 		*/
-		PX_INLINE explicit vector(void)
+		HACD_INLINE explicit vector(void)
 			: mData(0), mSize(0), mCapacity(0) 
 		{}
 
 		/*!
 		Initialize array with given capacity
 		*/
-		PX_INLINE explicit vector(HaU32 size, const T& a = T())
+		HACD_INLINE explicit vector(HaU32 size, const T& a = T())
 		: mData(0), mSize(0), mCapacity(0) 
 		{
 			resize(size, a);
@@ -54,7 +54,7 @@ namespace hacd
 		// Also never make a copy constructor explicit, or copy-initialization* will no longer work. This is because
 		// 'binding an rvalue to a const reference requires an accessible copy constructor' (http://gcc.gnu.org/bugs/)
 		// *http://stackoverflow.com/questions/1051379/is-there-a-difference-in-c-between-copy-initialization-and-assignment-initializ
-		PX_INLINE vector(const vector& other)
+		HACD_INLINE vector(const vector& other)
 			{
 			copy(other);
 			}
@@ -62,7 +62,7 @@ namespace hacd
 		/*!
 		Initialize array with given length
 		*/
-		PX_INLINE explicit vector(const T* first, const T* last)
+		HACD_INLINE explicit vector(const T* first, const T* last)
 			: mSize(last<first?0:(HaU32)(last-first)), mCapacity(mSize)
 		{
 			mData = allocate(mSize);
@@ -72,7 +72,7 @@ namespace hacd
 		/*!
 		Destructor
 		*/
-		PX_INLINE ~vector()
+		HACD_INLINE ~vector()
 		{
 			destroy(mData, mData + mSize);
 
@@ -83,7 +83,7 @@ namespace hacd
 		/*!
 		Assignment operator. Copy content (deep-copy)
 		*/
-		PX_INLINE vector& operator= (const vector<T>& rhs)
+		HACD_INLINE vector& operator= (const vector<T>& rhs)
 		{
 			if(&rhs == this)
 				return *this;
@@ -103,9 +103,9 @@ namespace hacd
 		\return
 		The element i in the array.
 		*/
-		PX_FORCE_INLINE const T& operator[] (HaU32 i) const 
+		HACD_FORCE_INLINE const T& operator[] (HaU32 i) const 
 		{
-			PX_ASSERT(i < mSize);
+			HACD_ASSERT(i < mSize);
 			return mData[i];
 		}
 
@@ -116,9 +116,9 @@ namespace hacd
 		\return
 		The element i in the array.
 		*/
-		PX_FORCE_INLINE T& operator[] (HaU32 i) 
+		HACD_FORCE_INLINE T& operator[] (HaU32 i) 
 		{
-			PX_ASSERT(i < mSize);
+			HACD_ASSERT(i < mSize);
 			return mData[i];
 		}
 
@@ -127,12 +127,12 @@ namespace hacd
 		\return
 		a pointer to the initial element of the array.
 		*/
-		PX_FORCE_INLINE const_iterator begin() const 
+		HACD_FORCE_INLINE const_iterator begin() const 
 		{
 			return mData;
 		}
 
-		PX_FORCE_INLINE iterator begin()
+		HACD_FORCE_INLINE iterator begin()
 		{
 			return mData;
 		}
@@ -143,12 +143,12 @@ namespace hacd
 		a pointer to the element beyond the last element of the array.
 		*/
 
-		PX_FORCE_INLINE const_iterator end() const 
+		HACD_FORCE_INLINE const_iterator end() const 
 		{
 			return mData+mSize;
 		}
 
-		PX_FORCE_INLINE iterator end()
+		HACD_FORCE_INLINE iterator end()
 		{
 			return mData+mSize;
 		}
@@ -158,15 +158,15 @@ namespace hacd
 		\return a reference to the first element of the array
 		*/
 
-		PX_FORCE_INLINE const T& front() const 
+		HACD_FORCE_INLINE const T& front() const 
 		{
-			PX_ASSERT(mSize);
+			HACD_ASSERT(mSize);
 			return mData[0];
 		}
 
-		PX_FORCE_INLINE T& front()
+		HACD_FORCE_INLINE T& front()
 		{
-			PX_ASSERT(mSize);
+			HACD_ASSERT(mSize);
 			return mData[0];
 		}
 
@@ -175,15 +175,15 @@ namespace hacd
 		\return a reference to the last element of the array
 		*/
 
-		PX_FORCE_INLINE const T& back() const 
+		HACD_FORCE_INLINE const T& back() const 
 		{
-			PX_ASSERT(mSize);
+			HACD_ASSERT(mSize);
 			return mData[mSize-1];
 		}
 
-		PX_FORCE_INLINE T& back()
+		HACD_FORCE_INLINE T& back()
 		{
-			PX_ASSERT(mSize);
+			HACD_ASSERT(mSize);
 			return mData[mSize-1];
 		}
 
@@ -194,7 +194,7 @@ namespace hacd
 		\return
 		The number of of entries in the array.
 		*/
-		PX_FORCE_INLINE HaU32 size() const 
+		HACD_FORCE_INLINE HaU32 size() const 
 		{
 			return mSize;
 		}
@@ -202,7 +202,7 @@ namespace hacd
 		/*!
 		Clears the array.
 		*/
-		PX_INLINE void clear() 
+		HACD_INLINE void clear() 
 		{
 			destroy(mData, mData + mSize);
 			mSize = 0;
@@ -213,7 +213,7 @@ namespace hacd
 		\return
 		true if the array is empty
 		*/
-		PX_FORCE_INLINE bool empty() const
+		HACD_FORCE_INLINE bool empty() const
 		{
 			return mSize==0;
 		}
@@ -225,7 +225,7 @@ namespace hacd
 		*/
 
 
-		PX_INLINE iterator find(const T& a)
+		HACD_INLINE iterator find(const T& a)
 		{
 			HaU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
@@ -233,7 +233,7 @@ namespace hacd
 			return mData+index;
 		}
 
-		PX_INLINE const_iterator find(const T& a) const
+		HACD_INLINE const_iterator find(const T& a) const
 		{
 			HaU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
@@ -250,12 +250,12 @@ namespace hacd
 		*/
 		/////////////////////////////////////////////////////////////////////////
 
-		PX_FORCE_INLINE T& push_back(const T& a)
+		HACD_FORCE_INLINE T& push_back(const T& a)
 		{
 			if(capacity()<=mSize) 
 				grow(capacityIncrement());
 
-			PX_PLACEMENT_NEW((void*)(mData + mSize),T)(a);
+			HACD_PLACEMENT_NEW((void*)(mData + mSize),T)(a);
 
 			return mData[mSize++];
 		}
@@ -265,9 +265,9 @@ namespace hacd
 		Returns the element at the end of the array. Only legal if the array is non-empty.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE T pop_back() 
+		HACD_INLINE T pop_back() 
 		{
-			PX_ASSERT(mSize);
+			HACD_ASSERT(mSize);
 			T t = mData[mSize-1];
 			mData[--mSize].~T();
 			return t;
@@ -278,7 +278,7 @@ namespace hacd
 		Construct one element at the end of the array. Operation is O(1).
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE T& insert()
+		HACD_INLINE T& insert()
 		{
 			if(capacity()<=mSize) 
 				grow(capacityIncrement());
@@ -297,14 +297,14 @@ namespace hacd
 		The element that was removed.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE void replaceWithLast(HaU32 i)
+		HACD_INLINE void replaceWithLast(HaU32 i)
 		{
-			PX_ASSERT(i<mSize);
+			HACD_ASSERT(i<mSize);
 			mData[i] = mData[--mSize];
 			mData[mSize].~T();
 		}
 
-		PX_INLINE void replaceWithLast(iterator i) 
+		HACD_INLINE void replaceWithLast(iterator i) 
 		{
 			replaceWithLast(static_cast<HaU32>(i-mData));
 		}
@@ -319,7 +319,7 @@ namespace hacd
 		*/
 		/////////////////////////////////////////////////////////////////////////
 
-		PX_INLINE bool findAndReplaceWithLast(const T& a)
+		HACD_INLINE bool findAndReplaceWithLast(const T& a)
 		{
 			HaU32 index = 0;
 			while(index<mSize && mData[index]!=a)
@@ -339,9 +339,9 @@ namespace hacd
 		The position of the element that will be subtracted from this array.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE void remove(HaU32 i)
+		HACD_INLINE void remove(HaU32 i)
 		{
-			PX_ASSERT(i<mSize);
+			HACD_ASSERT(i<mSize);
 			for(T* it=mData+i; it->~T(), ++i<mSize; ++it)
 				new(it)T(mData[i]);
 
@@ -358,10 +358,10 @@ namespace hacd
 		The ending position of the elment that will be subtracted from this array.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		PX_INLINE void removeRange(HaU32 begin,HaU32 count)
+		HACD_INLINE void removeRange(HaU32 begin,HaU32 count)
 		{
-			PX_ASSERT(begin<mSize);
-			PX_ASSERT( (begin+count) <= mSize );
+			HACD_ASSERT(begin<mSize);
+			HACD_ASSERT( (begin+count) <= mSize );
 			for (HaU32 i=0; i<count; i++)
 			{
 				mData[begin+i].~T(); // call the destructor on the ones being removed first.
@@ -385,7 +385,7 @@ namespace hacd
 		Resize array
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		PX_NOINLINE void resize(const HaU32 size, const T& a = T());
+		HACD_NOINLINE void resize(const HaU32 size, const T& a = T());
 
 		//////////////////////////////////////////////////////////////////////////
 		/*!
@@ -393,7 +393,7 @@ namespace hacd
 		existing elements
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		PX_INLINE void shrink()
+		HACD_INLINE void shrink()
 		{
 			recreate(mSize);
 		}
@@ -404,7 +404,7 @@ namespace hacd
 		Deletes all array elements and frees memory.
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		PX_INLINE void reset()
+		HACD_INLINE void reset()
 		{
 			resize(0);
 			shrink();
@@ -416,7 +416,7 @@ namespace hacd
 		Ensure that the array has at least size capacity.
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		PX_INLINE void reserve(const HaU32 capacity)
+		HACD_INLINE void reserve(const HaU32 capacity)
 		{
 			if(capacity > this->capacity())
 				grow(capacity);
@@ -427,14 +427,14 @@ namespace hacd
 		Query the capacity(allocated mem) for the array.
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		PX_FORCE_INLINE HaU32 capacity()	const
+		HACD_FORCE_INLINE HaU32 capacity()	const
 		{
-			return mCapacity & ~PX_SIGN_BITMASK;
+			return mCapacity & ~HACD_SIGN_BITMASK;
 		}
 
 	protected:
 
-		PX_NOINLINE void copy(const vector<T>& other)
+		HACD_NOINLINE void copy(const vector<T>& other)
 		{
 			if(!other.empty())
 			{
@@ -455,29 +455,29 @@ namespace hacd
 
 		}
 
-		PX_INLINE T* allocate(HaU32 size)
+		HACD_INLINE T* allocate(HaU32 size)
 		{
-			return size ? (T*)PX_ALLOC(sizeof(T) * size) : 0;
+			return size ? (T*)HACD_ALLOC(sizeof(T) * size) : 0;
 		}
 
-		PX_INLINE void deallocate(void* mem)
+		HACD_INLINE void deallocate(void* mem)
 		{
-			PX_FREE(mem);
+			HACD_FREE(mem);
 		}
 
-		static PX_INLINE void create(T* first, T* last, const T& a)
+		static HACD_INLINE void create(T* first, T* last, const T& a)
 		{
 			for(; first<last; ++first)
 				::new(first)T(a);
 		}
 
-		static PX_INLINE void copy(T* first, T* last, const T* src)
+		static HACD_INLINE void copy(T* first, T* last, const T* src)
 		{
 			for(; first<last; ++first, ++src)
 				::new (first)T(*src);
 		}
 
-		static PX_INLINE void destroy(T* first, T* last)
+		static HACD_INLINE void destroy(T* first, T* last)
 		{
 			for(; first<last; ++first)
 				first->~T();
@@ -489,9 +489,9 @@ namespace hacd
 		\param capacity
 		The number of entries that the set should be able to hold.
 		*/	
-		PX_INLINE void grow(HaU32 capacity) 
+		HACD_INLINE void grow(HaU32 capacity) 
 		{
-			PX_ASSERT(this->capacity() < capacity);
+			HACD_ASSERT(this->capacity() < capacity);
 			recreate(capacity);
 		}
 
@@ -501,12 +501,12 @@ namespace hacd
 		\param capacity
 		The number of entries that the set should be able to hold.
 		*/
-		PX_NOINLINE void recreate(HaU32 capacity);
+		HACD_NOINLINE void recreate(HaU32 capacity);
 
 		// The idea here is to prevent accidental brain-damage with push_back or insert. Unfortunately
 		// it interacts badly with InlineArrays with smaller inline allocations.
 		// TODO(dsequeira): policy template arg, this is exactly what they're for.
-		PX_INLINE HaU32 capacityIncrement()	const
+		HACD_INLINE HaU32 capacityIncrement()	const
 		{
 			const HaU32 capacity = this->capacity();
 			return capacity == 0 ? 1 : capacity * 2;
@@ -514,9 +514,9 @@ namespace hacd
 
 		// We need one bit to mark arrays that have been deserialized from a user-provided memory block.
 		// For alignment & memory saving purpose we store that bit in the rarely used capacity member.
-		PX_FORCE_INLINE	HaU32		isInUserMemory()		const
+		HACD_FORCE_INLINE	HaU32		isInUserMemory()		const
 		{
-			return mCapacity & PX_SIGN_BITMASK;
+			return mCapacity & HACD_SIGN_BITMASK;
 		}
 
 	public: // need to be public for serialization
@@ -530,7 +530,7 @@ namespace hacd
 	};
 
 	template<class T>
-	PX_NOINLINE void vector<T>::resize(const HaU32 size, const T& a)
+	HACD_NOINLINE void vector<T>::resize(const HaU32 size, const T& a)
 	{
 		reserve(size);
 		create(mData + mSize, mData + size, a);
@@ -539,10 +539,10 @@ namespace hacd
 	}
 
 	template<class T>
-	PX_NOINLINE void vector<T>::recreate(HaU32 capacity)
+	HACD_NOINLINE void vector<T>::recreate(HaU32 capacity)
 	{
 		T* newData = allocate(capacity);
-		PX_ASSERT(!capacity || newData && newData != mData);
+		HACD_ASSERT(!capacity || newData && newData != mData);
 
 		copy(newData, newData + mSize, mData);
 		destroy(mData, mData + mSize);

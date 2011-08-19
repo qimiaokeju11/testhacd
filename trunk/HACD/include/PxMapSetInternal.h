@@ -610,7 +610,7 @@ namespace hacd
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef EASTL_FORCE_INLINE
-#define EASTL_FORCE_INLINE PX_INLINE
+#define EASTL_FORCE_INLINE HACD_INLINE
 #endif
 
 
@@ -2352,9 +2352,9 @@ namespace hacd
 	inline void* allocator::allocate(size_t n, int /*flags*/)
 	{
 #if EASTL_NAME_ENABLED
-		return PX_ALLOC(n);
+		return HACD_ALLOC(n);
 #else
-		return PX_ALLOC(n);
+		return HACD_ALLOC(n);
 #endif
 	}
 
@@ -2362,16 +2362,16 @@ namespace hacd
 	inline void* allocator::allocate(size_t n, size_t /*alignment*/, size_t /*offset*/, int /*flags*/)
 	{
 #if EASTL_NAME_ENABLED
-		return PX_ALLOC(n);
+		return HACD_ALLOC(n);
 #else
-		return PX_ALLOC(n);
+		return HACD_ALLOC(n);
 #endif
 	}
 
 
 	inline void allocator::deallocate(void* p, size_t)
 	{
-		PX_FREE(p);
+		HACD_FREE(p);
 	}
 
 
@@ -5454,13 +5454,13 @@ namespace hacd
 	public:
 		typedef Result (T::*MemberFunction)();
 
-		PX_INLINE explicit mem_fun_t(MemberFunction pMemberFunction)
+		HACD_INLINE explicit mem_fun_t(MemberFunction pMemberFunction)
 			: mpMemberFunction(pMemberFunction)
 		{
 			// Empty
 		}
 
-		PX_INLINE Result operator()(T* pT) const
+		HACD_INLINE Result operator()(T* pT) const
 		{
 			return (pT->*mpMemberFunction)();
 		}
@@ -5480,13 +5480,13 @@ namespace hacd
 	public:
 		typedef Result (T::*MemberFunction)(Argument);
 
-		PX_INLINE explicit mem_fun1_t(MemberFunction pMemberFunction)
+		HACD_INLINE explicit mem_fun1_t(MemberFunction pMemberFunction)
 			: mpMemberFunction(pMemberFunction)
 		{
 			// Empty
 		}
 
-		PX_INLINE Result operator()(T* pT, Argument arg) const
+		HACD_INLINE Result operator()(T* pT, Argument arg) const
 		{
 			return (pT->*mpMemberFunction)(arg);
 		}
@@ -5509,13 +5509,13 @@ namespace hacd
 	public:
 		typedef Result (T::*MemberFunction)() const;
 
-		PX_INLINE explicit const_mem_fun_t(MemberFunction pMemberFunction)
+		HACD_INLINE explicit const_mem_fun_t(MemberFunction pMemberFunction)
 			: mpMemberFunction(pMemberFunction)
 		{
 			// Empty
 		}
 
-		PX_INLINE Result operator()(const T* pT) const
+		HACD_INLINE Result operator()(const T* pT) const
 		{
 			return (pT->*mpMemberFunction)();
 		}
@@ -5538,13 +5538,13 @@ namespace hacd
 	public:
 		typedef Result (T::*MemberFunction)(Argument) const;
 
-		PX_INLINE explicit const_mem_fun1_t(MemberFunction pMemberFunction)
+		HACD_INLINE explicit const_mem_fun1_t(MemberFunction pMemberFunction)
 			: mpMemberFunction(pMemberFunction)
 		{
 			// Empty
 		}
 
-		PX_INLINE Result operator()(const T* pT, Argument arg) const
+		HACD_INLINE Result operator()(const T* pT, Argument arg) const
 		{
 			return (pT->*mpMemberFunction)(arg);
 		}
@@ -5564,28 +5564,28 @@ namespace hacd
 	///    for_each(pTestClassArray, pTestClassArray + 3, &TestClass::print);
 	///
 	template <typename Result, typename T>
-	PX_INLINE mem_fun_t<Result, T>
+	HACD_INLINE mem_fun_t<Result, T>
 		mem_fun(Result (T::*MemberFunction)())
 	{
 		return hacd::mem_fun_t<Result, T>(MemberFunction);
 	}
 
 	template <typename Result, typename T, typename Argument>
-	PX_INLINE mem_fun1_t<Result, T, Argument>
+	HACD_INLINE mem_fun1_t<Result, T, Argument>
 		mem_fun(Result (T::*MemberFunction)(Argument))
 	{
 		return hacd::mem_fun1_t<Result, T, Argument>(MemberFunction);
 	}
 
 	template <typename Result, typename T>
-	PX_INLINE const_mem_fun_t<Result, T>
+	HACD_INLINE const_mem_fun_t<Result, T>
 		mem_fun(Result (T::*MemberFunction)() const)
 	{
 		return hacd::const_mem_fun_t<Result, T>(MemberFunction);
 	}
 
 	template <typename Result, typename T, typename Argument>
-	PX_INLINE const_mem_fun1_t<Result, T, Argument>
+	HACD_INLINE const_mem_fun1_t<Result, T, Argument>
 		mem_fun(Result (T::*MemberFunction)(Argument) const)
 	{
 		return hacd::const_mem_fun1_t<Result, T, Argument>(MemberFunction);
@@ -5609,13 +5609,13 @@ namespace hacd
 	public:
 		typedef Result (T::*MemberFunction)();
 
-		PX_INLINE explicit mem_fun_ref_t(MemberFunction pMemberFunction)
+		HACD_INLINE explicit mem_fun_ref_t(MemberFunction pMemberFunction)
 			: mpMemberFunction(pMemberFunction)
 		{
 			// Empty
 		}
 
-		PX_INLINE Result operator()(T& t) const
+		HACD_INLINE Result operator()(T& t) const
 		{
 			return (t.*mpMemberFunction)();
 		}
@@ -5633,13 +5633,13 @@ namespace hacd
 	public:
 		typedef Result (T::*MemberFunction)(Argument);
 
-		PX_INLINE explicit mem_fun1_ref_t(MemberFunction pMemberFunction)
+		HACD_INLINE explicit mem_fun1_ref_t(MemberFunction pMemberFunction)
 			: mpMemberFunction(pMemberFunction)
 		{
 			// Empty
 		}
 
-		PX_INLINE Result operator()(T& t, Argument arg) const
+		HACD_INLINE Result operator()(T& t, Argument arg) const
 		{
 			return (t.*mpMemberFunction)(arg);
 		}
@@ -5657,13 +5657,13 @@ namespace hacd
 	public:
 		typedef Result (T::*MemberFunction)() const;
 
-		PX_INLINE explicit const_mem_fun_ref_t(MemberFunction pMemberFunction)
+		HACD_INLINE explicit const_mem_fun_ref_t(MemberFunction pMemberFunction)
 			: mpMemberFunction(pMemberFunction)
 		{
 			// Empty
 		}
 
-		PX_INLINE Result operator()(const T& t) const
+		HACD_INLINE Result operator()(const T& t) const
 		{
 			return (t.*mpMemberFunction)();
 		}
@@ -5681,13 +5681,13 @@ namespace hacd
 	public:
 		typedef Result (T::*MemberFunction)(Argument) const;
 
-		PX_INLINE explicit const_mem_fun1_ref_t(MemberFunction pMemberFunction)
+		HACD_INLINE explicit const_mem_fun1_ref_t(MemberFunction pMemberFunction)
 			: mpMemberFunction(pMemberFunction)
 		{
 			// Empty
 		}
 
-		PX_INLINE Result operator()(const T& t, Argument arg) const
+		HACD_INLINE Result operator()(const T& t, Argument arg) const
 		{
 			return (t.*mpMemberFunction)(arg);
 		}
@@ -5704,28 +5704,28 @@ namespace hacd
 	///    for_each(testClassArray, testClassArray + 3, &TestClass::print);
 	///
 	template <typename Result, typename T>
-	PX_INLINE mem_fun_ref_t<Result, T>
+	HACD_INLINE mem_fun_ref_t<Result, T>
 		mem_fun_ref(Result (T::*MemberFunction)())
 	{
 		return hacd::mem_fun_ref_t<Result, T>(MemberFunction);
 	}
 
 	template <typename Result, typename T, typename Argument>
-	PX_INLINE mem_fun1_ref_t<Result, T, Argument>
+	HACD_INLINE mem_fun1_ref_t<Result, T, Argument>
 		mem_fun_ref(Result (T::*MemberFunction)(Argument))
 	{
 		return hacd::mem_fun1_ref_t<Result, T, Argument>(MemberFunction);
 	}
 
 	template <typename Result, typename T>
-	PX_INLINE const_mem_fun_ref_t<Result, T>
+	HACD_INLINE const_mem_fun_ref_t<Result, T>
 		mem_fun_ref(Result (T::*MemberFunction)() const)
 	{
 		return hacd::const_mem_fun_ref_t<Result, T>(MemberFunction);
 	}
 
 	template <typename Result, typename T, typename Argument>
-	PX_INLINE const_mem_fun1_ref_t<Result, T, Argument>
+	HACD_INLINE const_mem_fun1_ref_t<Result, T, Argument>
 		mem_fun_ref(Result (T::*MemberFunction)(Argument) const)
 	{
 		return hacd::const_mem_fun1_ref_t<Result, T, Argument>(MemberFunction);

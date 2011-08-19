@@ -81,18 +81,18 @@ void createSkeletalMesh(hacd::MeshImport *meshImport,hacd::MeshSystemContainer *
 	if ( boneCount )
 	{
 		hacd::MeshImportInterface *import = meshImport->getMeshImportInterface(output);
-		char **boneNames = (char **)PX_ALLOC(sizeof(char *)*boneCount);
+		char **boneNames = (char **)HACD_ALLOC(sizeof(char *)*boneCount);
 		for (hacd::HaU32 i=0; i<boneCount; i++)
 		{
 			char scratch[512];
 			sprintf_s(scratch,"bone%d", i );
 			hacd::HaU32 slen = (hacd::HaU32)strlen(scratch);
-			boneNames[i] = (char *)PX_ALLOC(slen+1);
+			boneNames[i] = (char *)HACD_ALLOC(slen+1);
 			memcpy(boneNames[i],scratch,slen+1);
 		}
 		hacd::MeshSkeleton skeleton;
 		skeleton.mBoneCount = boneCount;
-		skeleton.mBones		= (hacd::MeshBone *)PX_ALLOC(sizeof(hacd::MeshBone)*boneCount);
+		skeleton.mBones		= (hacd::MeshBone *)HACD_ALLOC(sizeof(hacd::MeshBone)*boneCount);
 		for (hacd::HaU32 i=0; i<boneCount; i++)
 		{
 			const HACD::HACD_API::Constraint *c = skel->getConstraint(i);
@@ -120,8 +120,8 @@ void createSkeletalMesh(hacd::MeshImport *meshImport,hacd::MeshSystemContainer *
 
 		meshImport->releaseSerializeMemory(mserialize);
 
-		PX_FREE(skeleton.mBones);
-		PX_FREE(boneNames);
+		HACD_FREE(skeleton.mBones);
+		HACD_FREE(boneNames);
 	}
 	meshImport->releaseMeshSystemContainer(output);
 }
@@ -222,7 +222,7 @@ void main(int argc,const char ** argv)
 					fseek(fph,0L,SEEK_SET);
 					if ( len )
 					{
-						void *buffer = PX_ALLOC(len);
+						void *buffer = HACD_ALLOC(len);
 						fread(buffer,len,1,fph);
 						fclose(fph);
 						msc = meshImport->createMeshSystemContainer(wavefront,buffer,len,NULL);
