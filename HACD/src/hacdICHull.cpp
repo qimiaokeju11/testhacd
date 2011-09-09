@@ -1,23 +1,23 @@
 /* Copyright (c) 2011 Khaled Mamou (kmamou at gmail dot com)
  All rights reserved.
- 
- 
+
+
  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
- 
+
  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- 
+
  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- 
+
  3. The names of the contributors may not be used to endorse or promote products derived from this software without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <hacdICHull.h>
+#pragma warning(disable:4706 4100)
 
-#pragma warning(disable:4706)
 
 namespace HACD
-{   
+{
 
 static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
 {
@@ -32,6 +32,7 @@ static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
 		m_isFlat = false;
 		m_dummyVertex = 0;
     }
+
 	bool ICHull::AddPoints(const Vec3<hacd::HaF32> * points, hacd::HaU32 nPoints)
 	{
 		if (!points)
@@ -47,7 +48,8 @@ static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
 		}     
 		return true;
 	}
-	bool ICHull::AddPoints(Vec3Vector points)
+
+	bool ICHull::AddPoints(const Vec3Vector &points)
 	{
 		CircularListElement<TMMVertex> * vertex = NULL;
 		for (hacd::HaI32 i = 0; i < (hacd::HaI32)points.size(); i++)
@@ -801,6 +803,7 @@ static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
         }
         return totalVolume;
     }
+
     bool ICHull::IsInside(const Vec3<hacd::HaF32> pt)
     {
 		if (m_isFlat)
@@ -844,6 +847,7 @@ static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
 			return true;
 		}
     }
+
 	hacd::HaF32 ICHull::ComputeDistance(hacd::HaI32 name,
 										const Vec3<hacd::HaF32> & pt,
 										const Vec3<hacd::HaF32> & normal,
@@ -910,32 +914,21 @@ static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
 		}
 		else
 		{
+			hacd::HaU32 nT = m_mesh.GetNTriangles();
+			hacd::HaF32 distance = 0.0; 
+			insideHull = false;
+			CircularListElement<TMMTriangle> * face = 0;
 			Vec3<hacd::HaF32> impact;
 			hacd::HaI32 nhit;
 			hacd::HaF32 dist;
-			hacd::HaF32 distance = 0.0; 
-			hacd::HaU32 nT = m_mesh.GetNTriangles();
-			insideHull = false;
-			CircularListElement<TMMTriangle> * face = 0;
 			for(hacd::HaU32 f = 0; f < nT; f++)
 			{
 				TMMTriangle & currentTriangle = m_mesh.m_triangles.GetHead()->GetData();
-				if (currentTriangle.m_vertices[0]->GetData().m_name == name ||
-					currentTriangle.m_vertices[1]->GetData().m_name == name ||
-					currentTriangle.m_vertices[2]->GetData().m_name == name)
-				{
-					nhit = 1;
-					dist = 0.0;
-				}
-				else
-				{
-					nhit = IntersectRayTriangle(pt, normal, 
+				nhit = IntersectRayTriangle(pt, normal, 
 										currentTriangle.m_vertices[0]->GetData().m_pos, 
 										currentTriangle.m_vertices[1]->GetData().m_pos, 
 										currentTriangle.m_vertices[2]->GetData().m_pos, dist);
-				}
-
-				if (nhit == 1 && distance <= dist)
+				if (nhit == 1 && distance < dist)
 				{
 					distance = dist;
 					insideHull = true;
@@ -956,4 +949,3 @@ static hacd::HaF32 max(hacd::HaF32 v1,hacd::HaF32 v2)
 		}
 	}
 }
-
