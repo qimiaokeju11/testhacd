@@ -5,7 +5,6 @@
 #include "PlatformConfigHACD.h"
 #include "hacdVector.h"
 
-
 namespace HACD
 {
 	//! priority queque element
@@ -63,9 +62,9 @@ typedef STDNAME::vector<GraphEdgePQ> GraphEdgePQVector;
 
 }; // end of HACD namespace
 
-
 namespace HACD
 {
+
 	class TMMEdge;
 	//!	Vertex data structure used in a triangular manifold mesh (TMM).
 	class TMMVertex
@@ -228,7 +227,6 @@ namespace HACD
 	typedef STDNAME::map<hacd::HaI32, DPoint> DPointMap;
 	typedef STDNAME::vector<CircularListElement<TMMEdge> *> CircularListElementTMMEdgeVector;
 	typedef STDNAME::vector<CircularListElement<TMMTriangle> *> CircularListElementTMMTriangleVector;
-
 	class ICHull : public UANS::UserAllocated
 	{
 	public:
@@ -261,7 +259,7 @@ namespace HACD
 		bool                                                AddPoint(const Vec3<hacd::HaF32> & point, hacd::HaI32 id);
 		//!	Add points to the convex-hull
 		bool                                                AddPoints(const Vec3<hacd::HaF32> * points, hacd::HaU32 nPoints);	
-		bool												AddPoints(Vec3Vector points);
+		bool												AddPoints(const Vec3Vector &points);
 		//!	
 		ICHullError                                         Process();
 		//! 
@@ -281,6 +279,9 @@ namespace HACD
 		virtual                                             ~ICHull(void) {};
 
 	private:
+		bool												m_isFlat;
+		DPointMap *							m_distPoints;            
+		TMMesh                                              m_mesh;
 		//!	DoubleTriangle builds the initial hacd::HaF32 triangle.  It first finds 3 noncollinear points and makes two faces out of them, in opposite order. It then finds a fourth point that is not coplanar with that face.  The vertices are stored in the face structure in counterclockwise order so that the volume between the face and the point is negative. Lastly, the 3 newfaces to the fourth point are constructed and the data structures are cleaned up. 
 		ICHullError                                         DoubleTriangle();
 		//!	MakeFace creates a new face structure from three vertices (in ccw order).  It returns a pointer to the face.
@@ -312,18 +313,12 @@ namespace HACD
 	private:
 		static const hacd::HaI32                                   sc_dummyIndex;
 		static const hacd::HaF32                                 sc_distMin;
-		TMMesh                                              m_mesh;
 		CircularListElementTMMEdgeVector         m_edgesToDelete;
 		CircularListElementTMMEdgeVector         m_edgesToUpdate;
 		CircularListElementTMMTriangleVector     m_trianglesToDelete; 
-		DPointMap *							m_distPoints;            
 		CircularListElement<TMMVertex> *					m_dummyVertex;
 		Vec3<hacd::HaF32>										m_normal;
-		bool												m_isFlat;
-
-
 		ICHull(const ICHull & rhs);
-
 		friend class HACD;
 	};
 

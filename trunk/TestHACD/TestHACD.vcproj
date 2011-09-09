@@ -219,14 +219,6 @@
 					RelativePath="..\HACD\src\PxMapSet.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\HACD\src\RaycastMesh.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\HACD\src\StanHull.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="include"
@@ -273,14 +265,6 @@
 				</File>
 				<File
 					RelativePath="..\HACD\include\PxVector.h"
-					>
-				</File>
-				<File
-					RelativePath="..\HACD\include\RaycastMesh.h"
-					>
-				</File>
-				<File
-					RelativePath="..\HACD\include\StanHull.h"
 					>
 				</File>
 			</Filter>

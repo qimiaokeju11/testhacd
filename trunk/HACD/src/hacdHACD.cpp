@@ -230,6 +230,7 @@ static void set_symmetric_difference (const HaU64Set &a,
 			m_faceNormals = (Vec3<hacd::HaF32> *)HACD_ALLOC(sizeof(Vec3<hacd::HaF32>)*m_nTriangles);
 		}
 		memset(m_normals, 0, sizeof(Vec3<hacd::HaF32>) * m_nPoints);
+
 		for(hacd::HaU32 f = 0; f < m_nTriangles; f++)
 		{
 			i = m_triangles[f].X();
@@ -242,9 +243,11 @@ static void set_symmetric_difference (const HaU64Set &a,
 			
 			ICHull  * ch = HACD_NEW(ICHull);
 			m_graph.m_vertices[f].m_convexHull = ch;
+
 			ch->AddPoint(m_points[i], i);
 			ch->AddPoint(m_points[j], j);
 			ch->AddPoint(m_points[k], k);
+
 			ch->SetDistPoints(&m_graph.m_vertices[f].m_distPoints);
 
 			u = m_points[j] - m_points[i];
@@ -264,12 +267,14 @@ static void set_symmetric_difference (const HaU64Set &a,
 			m_graph.m_vertices[f].m_boudaryEdges.insert(GetEdgeIndex(i,j));
 			m_graph.m_vertices[f].m_boudaryEdges.insert(GetEdgeIndex(j,k));
 			m_graph.m_vertices[f].m_boudaryEdges.insert(GetEdgeIndex(k,i));
+
 			if(m_addFacesPoints)
 			{
 				m_faceNormals[f] = normal;
 				m_facePoints[f] = (m_points[i] + m_points[j] + m_points[k]) / 3.0;
 				m_graph.m_vertices[f].m_distPoints[-static_cast<hacd::HaI32>(f)-1].m_distOnly = true;
 			}
+
 			if (m_addExtraDistPoints)	
 			{// we need a kd-tree structure to accelerate this part!
 				hacd::HaI32 i1, j1, k1;
