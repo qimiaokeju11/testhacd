@@ -27,7 +27,6 @@
 #include "dgDebug.h"
 #include "dgVector.h"
 #include "dgPlane.h"
-#include "dgSimd_Instrutions.h"
 #include <math.h>
 
 class dgMatrix;
@@ -87,15 +86,6 @@ class dgMatrix
 	void EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess = dgGetIdentityMatrix());
 	void EigenVectors (const dgMatrix& initialGuess = dgGetIdentityMatrix());
 
-
-	// simd operations
-	dgMatrix InverseSimd () const;
-	dgMatrix MultiplySimd (const dgMatrix& B) const;
-	simd_128 RotateVectorSimd (const dgVector &v) const;
-	simd_128 UnrotateVectorSimd (const dgVector &v) const;
-	simd_128 TransformVectorSimd (const dgVector &v) const;
-	simd_128 UntransformVectorSimd (const dgVector &v) const;
-	void TransformVectorsSimd (dgVector* const dst, const dgVector* const src, dgInt32 count) const;
 
 	dgVector m_front;
 	dgVector m_up;
@@ -261,79 +251,6 @@ DG_INLINE dgMatrix dgMatrix::Inverse () const
 					 dgVector (m_front.m_z, m_up.m_z, m_right.m_z, dgFloat32(0.0f)),
 					 dgVector (- (m_posit % m_front), - (m_posit % m_up), - (m_posit % m_right), dgFloat32(1.0f)));
 }
-
-DG_INLINE simd_128 dgMatrix::TransformVectorSimd (const dgVector &v) const
-{
-	const dgMatrix& source = *this;
-	return (simd_128&)source[0] * simd_128(v[0]) + (simd_128&)source[1] * simd_128(v[1]) + (simd_128&)source[2] * simd_128(v[2]) + (simd_128&)source[3];
-}
-
-DG_INLINE simd_128 dgMatrix::UntransformVectorSimd (const dgVector &v) const
-{
-	return UnrotateVectorSimd((simd_128&)v - (simd_128&)m_posit);
-}
-
-DG_INLINE void dgMatrix::TransformVectorsSimd (dgVector* const dst, const dgVector* const src, dgInt32 count) const
-{
-	for (dgInt32 i = 0; i < count; i ++) {
-		dst[i] = TransformVectorSimd (src[i]);
-	}
-}
-
-
-DG_INLINE simd_128 dgMatrix::RotateVectorSimd (const dgVector &v) const
-{
-	const dgMatrix& source = *this;
-	return (simd_128&)source[0] * simd_128(v[0])  + (simd_128&)source[1] * simd_128(v[1]) + (simd_128&)source[2] * simd_128(v[2]);
-}
-
-DG_INLINE simd_128 dgMatrix::UnrotateVectorSimd (const dgVector &v) const
-{
-	simd_128 x ((simd_128&)v * (simd_128&)m_front);
-	simd_128 y ((simd_128&)v * (simd_128&)m_up);
-	simd_128 z ((simd_128&)v * (simd_128&)m_right);
-
-	simd_128 tmp2 (dgFloat32 (0.0f));
-	simd_128 tmp0 (x.PackLow(y));
-	simd_128 tmp1 (z.PackLow(tmp2));
-	simd_128 r0 (tmp0.MoveLowToHigh (tmp1) + tmp1.MoveHighToLow (tmp0));
-
-	tmp0 = x.PackHigh(y);
-	tmp1 = z.PackHigh(tmp2);
-	return tmp0.MoveLowToHigh (tmp1) + r0;
-}
-
-DG_INLINE dgMatrix dgMatrix::InverseSimd () const
-{
-	dgMatrix matrix;
-	const dgMatrix& source = *this;
-
-	simd_128 tmp2 (dgFloat32 (0.0f));
-	simd_128 tmp0 (((simd_128&)source[0]).PackLow((simd_128&)source[1]));
-	simd_128 tmp1 (((simd_128&)source[2]).PackLow(tmp2));
-	matrix[0] = tmp0.MoveLowToHigh (tmp1);
-	matrix[1] = tmp1.MoveHighToLow (tmp0);
-
-	tmp0 = ((simd_128&)source[0]).PackHigh((simd_128&)source[1]);
-	tmp1 = ((simd_128&)source[2]).PackHigh(tmp2);
-	matrix[2] = tmp0.MoveLowToHigh (tmp1);
-
-	matrix[3] = tmp2 - simd_128 (source.m_posit.m_x) * (simd_128&)matrix[0] - simd_128 (source.m_posit.m_y) * (simd_128&)matrix[1] - simd_128 (source.m_posit.m_z) * (simd_128&)matrix[2];
-	matrix[3][3] = dgFloat32 (1.0f);
-	return matrix;
-}
-
-DG_INLINE dgMatrix dgMatrix::MultiplySimd (const dgMatrix& B) const
-{
-	dgMatrix matrix;
-	const dgMatrix& A = *this;
-	matrix[0] = ((simd_128&)B[0]) * simd_128 (A[0][0]) + ((simd_128&)B[1]) * simd_128 (A[0][1]) + ((simd_128&)B[2]) * simd_128 (A[0][2]) + ((simd_128&)B[3]) * simd_128 (A[0][3]);
-	matrix[1] = ((simd_128&)B[0]) * simd_128 (A[1][0]) + ((simd_128&)B[1]) * simd_128 (A[1][1]) + ((simd_128&)B[2]) * simd_128 (A[1][2]) + ((simd_128&)B[3]) * simd_128 (A[1][3]);
-	matrix[2] = ((simd_128&)B[0]) * simd_128 (A[2][0]) + ((simd_128&)B[1]) * simd_128 (A[2][1]) + ((simd_128&)B[2]) * simd_128 (A[2][2]) + ((simd_128&)B[3]) * simd_128 (A[2][3]);
-	matrix[3] = ((simd_128&)B[0]) * simd_128 (A[3][0]) + ((simd_128&)B[1]) * simd_128 (A[3][1]) + ((simd_128&)B[2]) * simd_128 (A[3][2]) + ((simd_128&)B[3]) * simd_128 (A[3][3]);
-	return matrix;
-}
-
 
 #endif
 
