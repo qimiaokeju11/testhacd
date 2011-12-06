@@ -38,9 +38,9 @@ namespace hacd
 #define HACD_FORCE_PARAMETER_REFERENCE(_P) (void)(_P);
 #define HACD_UNUSED(_P) HACD_FORCE_PARAMETER_REFERENCE(_P)
 
-
-#define HACD_ALLOC(x) ::malloc(x)
-#define HACD_FREE(x) ::free(x)
+#define HACD_ALLOC_ALIGNED(x,y) ::_aligned_malloc(x,y)
+#define HACD_ALLOC(x) ::_aligned_malloc(x,16)
+#define HACD_FREE(x) ::_aligned_free(x)
 
 #define HACD_ASSERT(x) assert(x)
 #define HACD_ALWAYS_ASSERT() assert(0)

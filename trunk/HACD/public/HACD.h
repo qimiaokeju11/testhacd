@@ -36,14 +36,15 @@ public:
 		}
 
 		UserCallback		*mCallback;
-		hacd::HaU32		mTriangleCount;
-		hacd::HaU32		mVertexCount;
+		hacd::HaU32			mTriangleCount;
+		hacd::HaU32			mVertexCount;
 		const hacd::HaF32	*mVertices;
 		const hacd::HaU32	*mIndices;
-		hacd::HaU32		mMinHullCount;
-		hacd::HaF32		mConcavity;
-		hacd::HaU32		mMaxHullVertices;
-		hacd::HaF32		mConnectDistance;
+		hacd::HaU32			mMinHullCount;
+		hacd::HaF32			mConcavity;
+		hacd::HaU32			mMaxHullVertices;
+		hacd::HaF32			mConnectDistance;
+		bool				mUseNewtonHACD;
 		void init(void)
 		{
 			mCallback = NULL;
@@ -55,6 +56,7 @@ public:
 			mConcavity = 100;
 			mMaxHullVertices = 64;
 			mConnectDistance = 0;
+			mUseNewtonHACD = false;
 		}
 	};
 
@@ -67,17 +69,17 @@ public:
 		const hacd::HaU32		*mIndices;
 	};
 
-	virtual hacd::HaU32	performHACD(const Desc &desc) = 0;
-	virtual hacd::HaU32	getHullCount(void) = 0;
+	virtual hacd::HaU32		performHACD(const Desc &desc) = 0;
+	virtual hacd::HaU32		getHullCount(void) = 0;
 	virtual const Hull		*getHull(hacd::HaU32 index) const = 0;
 	virtual void			releaseHACD(void) = 0; // release memory associated with the last HACD request
-	virtual hacd::HaU32	generateConstraints(void) = 0;
-	virtual hacd::HaU32	getConstraintCount(void) = 0;
+	virtual hacd::HaU32		generateConstraints(void) = 0;
+	virtual hacd::HaU32		getConstraintCount(void) = 0;
 
-	virtual const Constraint		*getConstraint(hacd::HaU32 index)const  = 0;
+	virtual const Constraint	*getConstraint(hacd::HaU32 index)const  = 0;
 
 
-	virtual void release(void) = 0; // release the HACD_API interface
+	virtual void			release(void) = 0; // release the HACD_API interface
 protected:
 	virtual ~HACD_API(void)
 	{
