@@ -138,6 +138,7 @@ void main(int argc,const char ** argv)
 		printf("-v		: Max Hull Vertices (default 64)\r\n");
 		printf("-c		: Concavity (default 100)\r\n");
 		printf("-m		: Mimimum number of hulls (default 2)\r\n");
+		printf("-j		: Use Julio Jerez's fast implementation of HACD\r\n");
 		printf("-connect : The connection distance to use (merges discrete sub-meshes).  Default is zero.\r\n");
 		printf("-constraint : Auto-generates constraints for the output convex hulls.\r\n");
 		printf("-mesh	: Generates an output skeletal mesh with the mesh deformation distance passed. (Not yet implemented)\r\n");
@@ -179,6 +180,11 @@ void main(int argc,const char ** argv)
 			else if ( strcmp(option,"-constraint") == 0 )
 			{
 				generateConstraints = true;
+				scan++;
+			}
+			else if ( strcmp(option,"-j") == 0 )
+			{
+				desc.mUseNewtonHACD = true;
 				scan++;
 			}
 			else if ( strcmp(option,"-mesh") == 0 )

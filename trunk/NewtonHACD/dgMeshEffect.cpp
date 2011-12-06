@@ -20,6 +20,7 @@
 */
 
 #include "dgMeshEffect.h"
+#include "dgConvexHull3d.h"
 #include "dgStack.h"
 
 class dgFlatClipEdgeAttr
@@ -1199,16 +1200,20 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList,
 	_ASSERTE (count < dgInt32 (sizeof (points)/sizeof (points[0])));
 
 	dgInt32 stride = strideIndBytes / sizeof (dgFloat32);
-	for (dgInt32 i = 0; i < count; i ++) {
+	for (dgInt32 i = 0; i < count; i ++) 
+	{
 		points[i].m_vertex.m_x = vertexList[i * stride + 0];
 		points[i].m_vertex.m_y = vertexList[i * stride + 1];
 		points[i].m_vertex.m_z = vertexList[i * stride + 2];
 		points[i].m_vertex.m_w = vertexList[i * stride + 3];
+
 		points[i].m_normal_x = vertexList[i * stride + 4];
 		points[i].m_normal_y = vertexList[i * stride + 5];
 		points[i].m_normal_z = vertexList[i * stride + 6];
+
 		points[i].m_u0 = vertexList[i * stride + 7];
 		points[i].m_v0 = vertexList[i * stride + 8];
+
 		points[i].m_u1 = vertexList[i * stride + 9];
 		points[i].m_u1 = vertexList[i * stride + 10];
 	}
@@ -2053,10 +2058,45 @@ dgInt32 dgMeshEffect::GetEffectiveVertexCount() const
 }
 */
 
+dgConvexHull3d * dgMeshEffect::CreateConvexHull(dgFloat64 tolerance,dgInt32 maxVertexCount) const
+{
+	dgConvexHull3d *ret = NULL;
+
+	dgStack<dgBigVector> poolPtr(m_pointCount * 2); 
+	dgBigVector* const pool = &poolPtr[0];
+
+	dgInt32 count = 0;
+	dgInt32 mark = IncLRU();
+	dgPolyhedra::Iterator iter (*this);
+	for (iter.Begin(); iter; iter ++)
+	{
+		dgEdge* const vertex = &(*iter);
+		if (vertex->m_mark != mark) 
+		{
+			dgEdge* ptr = vertex;
+			do {
+				ptr->m_mark = mark;
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != vertex);
+
+			if (count < dgInt32 (poolPtr.GetElementsCount())) 
+			{
+				const dgBigVector p = m_points[vertex->m_incidentVertex];
+				pool[count] = p;
+				count++;
+			}
+		}
+	}
+
+	ret = HACD_NEW(dgConvexHull3d)((const dgFloat64 *)pool,sizeof(dgBigVector),count,tolerance,maxVertexCount);
+
+	return ret;
+}
+
 
 dgCollision* dgMeshEffect::CreateConvexCollision(dgFloat64 tolerance, dgInt32 shapeID, const dgMatrix& srcMatrix) const
 {
-	HACD_ALWAYS_ASSERT(); // not implemented in the reduced source version
+//	HACD_ALWAYS_ASSERT(); // not implemented in the reduced source version
 #if 0  // UNUSED
 	dgStack<dgVector> poolPtr (m_pointCount * 2); 
 	dgVector* const pool = &poolPtr[0];

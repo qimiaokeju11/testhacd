@@ -49,7 +49,7 @@ class dgConvexHull3DFace
 
 class dgHullVertex;
 
-class dgConvexHull3d: public dgList<dgConvexHull3DFace>
+class dgConvexHull3d: public dgList<dgConvexHull3DFace>, public hacd::UserAllocated
 {
 	public:
 	dgConvexHull3d(const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount = 0x7fffffff);
