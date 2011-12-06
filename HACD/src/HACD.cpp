@@ -5,10 +5,11 @@
 #include "PlatformConfigHACD.h"
 
 #include "dgMeshEffect.h"
+#include "dgConvexHull3d.h"
+#include "FloatMath.h"
 
 #if USE_CONSTRAINT_BUILDER
 #include "ConstraintBuilder.h"
-#include "FloatMath.h"
 #endif
 
 #pragma warning(disable:4100 4996)
@@ -39,33 +40,157 @@ public:
 		{
 			if ( desc.mUseNewtonHACD )
 			{
-				dgMeshEffect mesh(false);
+				dgMeshEffect mesh(true);
+
+#if 1
+				float normal[3] = { 0,1,0 };
+				float uv[2] = { 0,0 };
+
+				dgInt32 *faceIndexCount = (dgInt32 *)HACD_ALLOC(sizeof(dgInt32)*desc.mTriangleCount);
+				dgInt32 *dummyIndex = (dgInt32 *)HACD_ALLOC(sizeof(dgInt32)*desc.mTriangleCount*3);
+
 				for (hacd::HaU32 i=0; i<desc.mTriangleCount; i++)
 				{
+					faceIndexCount[i] = 3;
+					dummyIndex[i*3+0] = 0;
+					dummyIndex[i*3+1] = 0;
+					dummyIndex[i*3+2] = 0;
+				}
+
+				mesh.BuildFromVertexListIndexList(desc.mTriangleCount,faceIndexCount,dummyIndex,
+					desc.mVertices,sizeof(dgFloat32)*3,(const dgInt32 *const)desc.mIndices,
+					normal,sizeof(dgFloat32)*3,dummyIndex,
+					uv,sizeof(dgFloat32)*2,dummyIndex,
+					uv,sizeof(dgFloat32)*2,dummyIndex);
+
+#else
+
+				for (hacd::HaU32 i=0; i<desc.mTriangleCount; i++)
+				{
+
 					hacd::HaU32 i1 = desc.mIndices[i*3+0];
 					hacd::HaU32 i2 = desc.mIndices[i*3+1];
 					hacd::HaU32 i3 = desc.mIndices[i*3+2];
+
 					const hacd::HaF32 *p1 = &desc.mVertices[i1*3];
 					const hacd::HaF32 *p2 = &desc.mVertices[i2*3];
 					const hacd::HaF32 *p3 = &desc.mVertices[i3*3];
 
-					dgFloat32 polygon[3*3];
+					hacd::HaF32 normal[3];
+					hacd::fm_computePlane(p1,p2,p3,normal);
 
-					polygon[0] = p1[0];
-					polygon[1] = p1[1];
-					polygon[2] = p1[2];
+					dgMeshEffect::dgVertexAtribute polygon[3];
 
-					polygon[3] = p2[0];
-					polygon[4] = p2[1];
-					polygon[5] = p2[2];
+					polygon[0].m_vertex.m_x = p1[0];
+					polygon[0].m_vertex.m_y = p1[1];
+					polygon[0].m_vertex.m_z = p1[2];
+					polygon[0].m_vertex.m_w = 0;
+					polygon[0].m_normal_x = normal[0];
+					polygon[0].m_normal_y = normal[1];
+					polygon[0].m_normal_z = normal[2];
+					polygon[0].m_u0 = 0;
+					polygon[0].m_v0 = 0;
+					polygon[0].m_u1 = 0;
+					polygon[0].m_v1 = 0;
+					polygon[0].m_material = 0;
 
-					polygon[6] = p3[0];
-					polygon[7] = p3[1];
-					polygon[8] = p3[2];
+					polygon[1].m_vertex.m_x = p2[0];
+					polygon[1].m_vertex.m_y = p2[1];
+					polygon[1].m_vertex.m_z = p2[2];
+					polygon[1].m_vertex.m_w = 0;
+					polygon[1].m_normal_x = normal[0];
+					polygon[1].m_normal_y = normal[1];
+					polygon[1].m_normal_z = normal[2];
+					polygon[1].m_u0 = 0;
+					polygon[1].m_v0 = 0;
+					polygon[1].m_u1 = 0;
+					polygon[1].m_v1 = 0;
+					polygon[1].m_material = 0;
 
-					mesh.AddPolygon(3,polygon,sizeof(dgFloat32)*3,0);
+					polygon[2].m_vertex.m_x = p3[0];
+					polygon[2].m_vertex.m_y = p3[1];
+					polygon[2].m_vertex.m_z = p3[2];
+					polygon[2].m_vertex.m_w = 0;
+					polygon[2].m_normal_x = normal[0];
+					polygon[2].m_normal_y = normal[1];
+					polygon[2].m_normal_z = normal[2];
+					polygon[2].m_u0 = 0;
+					polygon[2].m_v0 = 0;
+					polygon[2].m_u1 = 0;
+					polygon[2].m_v1 = 0;
+					polygon[2].m_material = 0;
+	
+					mesh.AddPolygon(3,(const dgFloat64 *)polygon,sizeof(polygon[0]),0);
+
 				}
+				mesh.PackVertexArrays();
 
+#endif
+
+				dgMeshEffect *result = mesh.CreateConvexApproximation(0.2f,32);
+				if ( result )
+				{
+					// now we build hulls for each connected surface...
+					dgPolyhedra segment;
+					result->BeginConectedSurface();
+					if ( result->GetConectedSurface(segment))
+					{
+						dgMeshEffect *solid = HACD_NEW(dgMeshEffect)(segment,*result);
+						while ( solid )
+						{
+							dgConvexHull3d *hull = solid->CreateConvexHull(0.00001,desc.mMaxHullVertices);
+							if ( hull )
+							{
+								Hull h;
+								h.mVertexCount = hull->GetVertexCount();
+								h.mVertices = (hacd::HaF32 *)HACD_ALLOC( sizeof(hacd::HaF32)*3*h.mVertexCount);
+								for (hacd::HaU32 i=0; i<h.mVertexCount; i++)
+								{
+									hacd::HaF32 *dest = (hacd::HaF32 *)&h.mVertices[i*3];
+									const dgBigVector &source = hull->GetVertex(i);
+									dest[0] = (hacd::HaF32)source.m_x;
+									dest[1] = (hacd::HaF32)source.m_y;
+									dest[2] = (hacd::HaF32)source.m_z;
+								}
+
+								h.mTriangleCount = hull->GetCount();
+								hacd::HaU32 *destIndices = (hacd::HaU32 *)HACD_ALLOC(sizeof(hacd::HaU32)*3*h.mTriangleCount);
+								h.mIndices = destIndices;
+			
+								dgList<dgConvexHull3DFace>::Iterator iter(*hull);
+								for (iter.Begin(); iter; iter++)
+								{
+									dgConvexHull3DFace &face = (*iter);
+									destIndices[0] = face.m_index[0];
+									destIndices[1] = face.m_index[1];
+									destIndices[2] = face.m_index[2];
+									destIndices+=3;
+								}
+
+								mHulls.push_back(h);
+
+								// save it!
+								delete hull;
+							}
+
+							delete solid;
+							solid = NULL;
+							dgPolyhedra nextSegment;
+							dgInt32 moreSegments = result->GetConectedSurface(nextSegment);
+							if ( moreSegments )
+							{
+								solid = HACD_NEW(dgMeshEffect)(nextSegment,*result);
+							}
+							else
+							{
+								result->EndConectedSurface();
+							}
+						}
+					}
+
+					delete result;
+				}
+				ret= mHulls.size();
 			}
 			else
 			{

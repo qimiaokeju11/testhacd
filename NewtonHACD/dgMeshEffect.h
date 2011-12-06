@@ -34,6 +34,7 @@ class dgCollision;
 class dgMeshEffect;
 class dgMeshEffectSolidTree;
 class dgMeshTreeCSGEdgePool;
+class dgConvexHull3d;
 
 
 #define DG_MESH_EFFECT_INITIAL_VERTEX_SIZE	8
@@ -216,6 +217,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void GetMaterialGetIndexStream (dgIndexArray* const handle, dgInt32 materialHandle, dgInt32* const index);
 	void GetMaterialGetIndexStreamShort (dgIndexArray* const handle, dgInt32 materialHandle, dgInt16* const index);
 	
+	dgConvexHull3d * dgMeshEffect::CreateConvexHull(dgFloat64 tolerance,dgInt32 maxVertexCount) const;
+
 	dgCollision* CreateConvexCollision(dgFloat64 tolerance, dgInt32 shapeID, const dgMatrix& matrix = dgGetIdentityMatrix()) const;
 
 	dgMeshEffect* CreateConvexApproximation (dgFloat32 maxConcavity, dgInt32 maxCount = 32) const;
