@@ -43,14 +43,6 @@
 
 #endif
 
-//#if !(defined (__ppc__) || defined (__USE_DOUBLE_PRECISION__) || defined (_SCALAR_ARITHMETIC_ONLY))
-//	#define DG_BUILD_SIMD_CODE
-//#endif
-
-#ifndef __USE_DOUBLE_PRECISION__
-	#define DG_BUILD_SIMD_CODE
-#endif
-
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 
 	#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
@@ -746,49 +738,6 @@ DG_INLINE dgFloat32 dgCeil(dgFloat32 x)
 
 typedef dgUnsigned32 (dgApi *OnGetPerformanceCountCallback) ();
 
-dgCpuClass dgApi dgGetCpuType ();
 
-
-inline dgInt32 dgAtomicAdd (dgInt32* const addend, dgInt32 amount)
-{
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-		return InterlockedExchangeAdd((long*) addend, long (amount));
-	#endif
-
-	#if (defined (_LINUX_VER))
-		return __sync_fetch_and_add ((int32_t*)addend, amount );
-	#endif
-
-	#if (defined (_MAC_VER))
-		dgInt32 count = OSAtomicAdd32 (amount, (int32_t*)addend);
-		return count - *addend;
-	#endif
-}
-
-inline dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
-{
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-		return InterlockedExchange((long*) ptr, value);
-	#endif
-
-	#if (defined (_LINUX_VER))
-		return __sync_fetch_and_add ((int32_t*)ptr, value );
-	#endif
-
-	#if (defined (_MAC_VER))
-		return OSAtomicAdd32 (value, (int32_t*)ptr);
-	#endif
-}
-
-inline void dgThreadYield()
-{
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-		Sleep(0);
-	#endif
-
-	#if (defined (_LINUX_VER) || defined (_MAC_VER))
-		sched_yield();
-	#endif
-}
 #endif
 

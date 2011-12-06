@@ -485,10 +485,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\NewtonHACD\dgSimD_Instrutions.h"
-				>
-			</File>
-			<File
 				RelativePath="..\NewtonHACD\dgSmallDeterminant.cpp"
 				>
 			</File>

@@ -25,7 +25,6 @@
 //#include "dgStdafx.h"
 #include "dgDebug.h"
 #include "dgMemory.h"
-#include "dgSimd_Instrutions.h"
 
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
 //#define dgCheckVector(x) true
@@ -87,20 +86,12 @@ class dgVector: public dgTemplateVector<dgFloat32>
 {
 	public:
 	dgVector();
-//	dgVector(const simd_type& val);
-	dgVector(const simd_128& val);
 
 	dgVector (const dgTemplateVector<dgFloat32>& v);
 	dgVector (const dgFloat32 *ptr);
 	dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w); 
          dgVector (const dgBigVector& copy); 
 
-//	dgVector operator= (const simd_type& val);
-	dgVector operator= (const simd_128& val);
-
-	dgFloat32 DotProductSimd (const dgVector& A) const;
-	dgVector CrossProductSimd (const dgVector &A) const;
-	dgVector CompProductSimd (const dgVector &A) const;
 
 }DG_GCC_VECTOR_ALIGMENT;
 
@@ -314,44 +305,11 @@ DG_INLINE dgVector::dgVector (const dgBigVector& copy)
 	_ASSERTE (dgCheckVector ((*this)));
 }
 
-DG_INLINE dgVector::dgVector(const simd_128& val)
-{
-	_ASSERTE ((dgUnsigned64(this) & 0x0f) == 0);
-	(simd_128&) *this = val;
-	_ASSERTE (dgCheckVector ((*this)));
-}
-
-
-DG_INLINE dgVector dgVector::operator= (const simd_128& val)
-{
-	(simd_128&)*this = val;
-	return *this;
-}
-
 
 DG_INLINE dgVector::dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w) 
 	:dgTemplateVector<dgFloat32>(x, y, z, w)
 {
 	_ASSERTE (dgCheckVector ((*this)));
-}
-
-DG_INLINE dgFloat32 dgVector::DotProductSimd (const dgVector& A) const
-{
-	dgFloat32 dot;
-	simd_128 temp (((simd_128&)*this).DotProduct((simd_128&)A));
-	temp.StoreScalar (&dot);
-	return dot;
-}
-
-DG_INLINE dgVector dgVector::CrossProductSimd (const dgVector &e10) const
-{
-	return ((simd_128&)*this).CrossProduct((simd_128&)e10);
-}
-
-
-DG_INLINE dgVector dgVector::CompProductSimd (const dgVector &A) const
-{
-	return ((simd_128&)*this) * (simd_128&)A;
 }
 
 DG_INLINE dgBigVector::dgBigVector()
