@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include;../MergeHulls/public"
+				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include;../MergeHulls/public;../NewtonHACD"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include;../MergeHulls/public"
+				AdditionalIncludeDirectories="../HACD/include;../HACD/public;../ConstraintBuilder/public;../ConstraintBuilder/include;../MeshImport/include;../FloatMath/include;../MergeHulls/include;../MergeHulls/public;../NewtonHACD"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -356,6 +356,178 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="NewtonHACD"
+			>
+			<File
+				RelativePath="..\NewtonHACD\dgArray.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgCollision.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgConvexHull3d.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgConvexHull3d.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgCRC.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgCRC.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgDebug.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgDebug.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgFunctions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgGoogol.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgGoogol.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgHeap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgMatrix.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgMatrix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgMemory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgMeshEffect.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgMeshEffect.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgMeshEffect2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgMeshEffect3.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgPlane.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgPolyhedra.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgPolyhedra.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgQuaternion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgQuaternion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgRandom.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgRandom.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgRef.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgRef.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgRefCounter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgRtti.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgSimD_Instrutions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgSmallDeterminant.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgSmallDeterminant.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgSphere.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgSphere.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgStack.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgTree.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgTree.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgTypes.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgTypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\NewtonHACD\dgVector.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

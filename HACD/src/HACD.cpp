@@ -4,6 +4,8 @@
 #include <string.h>
 #include "PlatformConfigHACD.h"
 
+#include "dgMeshEffect.h"
+
 #if USE_CONSTRAINT_BUILDER
 #include "ConstraintBuilder.h"
 #include "FloatMath.h"
@@ -35,47 +37,80 @@ public:
 		mUserCallback = desc.mCallback;
 		if ( desc.mVertexCount )
 		{
-			mHACD = HACD_NEW(HACD);
-			// convert the input data points into doubles
-			for (hacd::HaU32 i=0; i<desc.mVertexCount; i++)
+			if ( desc.mUseNewtonHACD )
 			{
-				Vec3<hacd::HaF32> p;
-				p.X() = desc.mVertices[i*3+0];
-				p.Y() = desc.mVertices[i*3+1];
-				p.Z() = desc.mVertices[i*3+2];
-				mPoints.push_back(p);
-			}
-			for (hacd::HaU32 i=0; i<desc.mTriangleCount; i++)
-			{
-				Vec3<hacd::HaI32> t;
-				t.X() = desc.mIndices[i*3+0];
-				t.Y() = desc.mIndices[i*3+1];
-				t.Z() = desc.mIndices[i*3+2];
-				mTriangles.push_back(t);
-			}
+				dgMeshEffect mesh(false);
+				for (hacd::HaU32 i=0; i<desc.mTriangleCount; i++)
+				{
+					hacd::HaU32 i1 = desc.mIndices[i*3+0];
+					hacd::HaU32 i2 = desc.mIndices[i*3+1];
+					hacd::HaU32 i3 = desc.mIndices[i*3+2];
+					const hacd::HaF32 *p1 = &desc.mVertices[i1*3];
+					const hacd::HaF32 *p2 = &desc.mVertices[i2*3];
+					const hacd::HaF32 *p3 = &desc.mVertices[i3*3];
 
-			mHACD->SetPoints(&mPoints[0]);
-			mHACD->SetNPoints(desc.mVertexCount);
-			mHACD->SetTriangles(&mTriangles[0]);
-			mHACD->SetNTriangles(desc.mTriangleCount);
-			mHACD->SetCompacityWeight(0.1f);
-			mHACD->SetVolumeWeight(0);
-			mHACD->SetNClusters(desc.mMinHullCount);
-			mHACD->SetCallBack(this);
-			mHACD->SetAddExtraDistPoints(false);
-			mHACD->SetAddNeighboursDistPoints(false);
-			mHACD->SetAddFacesPoints(true);
-			mHACD->SetNVerticesPerCH(desc.mMaxHullVertices);		// max of 64 vertices per convex-hull
-			mHACD->SetConcavity(desc.mConcavity);
-			mHACD->SetConnectDist(desc.mConnectDistance);
-			mHACD->Compute();
+					dgFloat32 polygon[3*3];
 
-			ret = (hacd::HaU32)mHACD->GetNClusters();
-			for (hacd::HaU32 i=0; i<ret; i++)
+					polygon[0] = p1[0];
+					polygon[1] = p1[1];
+					polygon[2] = p1[2];
+
+					polygon[3] = p2[0];
+					polygon[4] = p2[1];
+					polygon[5] = p2[2];
+
+					polygon[6] = p3[0];
+					polygon[7] = p3[1];
+					polygon[8] = p3[2];
+
+					mesh.AddPolygon(3,polygon,sizeof(dgFloat32)*3,0);
+				}
+
+			}
+			else
 			{
-				Hull h;
-				getHull(i,h);
-				mHulls.push_back(h);
+				mHACD = HACD_NEW(HACD);
+				// convert the input data points into doubles
+				for (hacd::HaU32 i=0; i<desc.mVertexCount; i++)
+				{
+					Vec3<hacd::HaF32> p;
+					p.X() = desc.mVertices[i*3+0];
+					p.Y() = desc.mVertices[i*3+1];
+					p.Z() = desc.mVertices[i*3+2];
+					mPoints.push_back(p);
+				}
+				for (hacd::HaU32 i=0; i<desc.mTriangleCount; i++)
+				{
+					Vec3<hacd::HaI32> t;
+					t.X() = desc.mIndices[i*3+0];
+					t.Y() = desc.mIndices[i*3+1];
+					t.Z() = desc.mIndices[i*3+2];
+					mTriangles.push_back(t);
+				}
+
+				mHACD->SetPoints(&mPoints[0]);
+				mHACD->SetNPoints(desc.mVertexCount);
+				mHACD->SetTriangles(&mTriangles[0]);
+				mHACD->SetNTriangles(desc.mTriangleCount);
+				mHACD->SetCompacityWeight(0.1f);
+				mHACD->SetVolumeWeight(0);
+				mHACD->SetNClusters(desc.mMinHullCount);
+				mHACD->SetCallBack(this);
+				mHACD->SetAddExtraDistPoints(false);
+				mHACD->SetAddNeighboursDistPoints(false);
+				mHACD->SetAddFacesPoints(true);
+				mHACD->SetNVerticesPerCH(desc.mMaxHullVertices);		// max of 64 vertices per convex-hull
+				mHACD->SetConcavity(desc.mConcavity);
+				mHACD->SetConnectDist(desc.mConnectDistance);
+				mHACD->Compute();
+
+				ret = (hacd::HaU32)mHACD->GetNClusters();
+				for (hacd::HaU32 i=0; i<ret; i++)
+				{
+					Hull h;
+					getHull(i,h);
+					mHulls.push_back(h);
+				}
 			}
 		}
 		return ret;
