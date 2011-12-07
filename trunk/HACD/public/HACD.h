@@ -45,6 +45,9 @@ public:
 		hacd::HaU32			mMaxHullVertices;
 		hacd::HaF32			mConnectDistance;
 		bool				mUseNewtonHACD;
+		bool				mMergeHulls;
+		hacd::HaF32			mMergePercentage;
+		hacd::HaF32			mMergeTotalPercentage;
 		void init(void)
 		{
 			mCallback = NULL;
@@ -57,6 +60,9 @@ public:
 			mMaxHullVertices = 64;
 			mConnectDistance = 0;
 			mUseNewtonHACD = false;
+			mMergeHulls = false;
+			mMergePercentage = 5;
+			mMergeTotalPercentage = 0.01f;
 		}
 	};
 

@@ -517,6 +517,30 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="MergeHulls"
+			>
+			<Filter
+				Name="include"
+				>
+			</Filter>
+			<Filter
+				Name="public"
+				>
+				<File
+					RelativePath="..\MergeHulls\public\MergeHulls.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="src"
+				>
+				<File
+					RelativePath="..\MergeHulls\src\MergeHulls.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

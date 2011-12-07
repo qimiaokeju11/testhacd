@@ -7,6 +7,7 @@
 #include "dgMeshEffect.h"
 #include "dgConvexHull3d.h"
 #include "FloatMath.h"
+#include "MergeHulls.h"
 
 #if USE_CONSTRAINT_BUILDER
 #include "ConstraintBuilder.h"
@@ -238,6 +239,29 @@ public:
 				}
 			}
 		}
+
+		if ( ret && desc.mMergeHulls )
+		{
+			MergeHullsInterface *mhi = createMergeHullsInterface();
+			if ( mhi )
+			{
+				MergeHullVector inputHulls;
+				MergeHullVector outputHulls;
+				for (hacd::HaU32 i=0; i<ret; i++)
+				{
+					Hull &h = mHulls[i];
+					MergeHull mh;
+					mh.mTriangleCount = h.mTriangleCount;
+					mh.mVertexCount = h.mVertexCount;
+					mh.mVertices = h.mVertices;
+					mh.mIndices = h.mIndices;
+					inputHulls.push_back(mh);
+				}
+				mhi->mergeHulls(inputHulls,outputHulls,desc.mMergePercentage,desc.mMergeTotalPercentage);
+				mhi->release();
+			}
+		}
+
 		return ret;
 	}
 
@@ -351,6 +375,7 @@ public:
 			hacd::releaseConstraintBuilder(cb);
 		}
 #endif
+
 		return ret;
 	}
 
