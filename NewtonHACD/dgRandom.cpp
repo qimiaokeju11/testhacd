@@ -23,14 +23,14 @@
 #include "dgRandom.h"
 
 #define RAND_MUL 31415821u
-static dgUnsigned32 randSeed = RAND_MUL;
+static hacd::HaU32 randSeed = RAND_MUL;
 
-void dgApi dgRandomize (dgUnsigned32 Seed)
+void dgApi dgRandomize (hacd::HaU32 Seed)
 {
 	randSeed = Seed;
 }
 
-dgUnsigned32 dgApi dgRandom()
+hacd::HaU32 dgApi dgRandom()
 {
 	randSeed = RAND_MUL * randSeed + 1; 
 	return randSeed;

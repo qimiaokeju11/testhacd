@@ -36,13 +36,13 @@ class dgConvexHull3DFace
 {
 	public:
 	dgConvexHull3DFace();
-	dgInt32 m_index[3]; 
+	hacd::HaI32 m_index[3]; 
 	
 	private:
-	dgFloat64 Evalue (const dgBigVector* const pointArray, const dgBigVector& point) const;
+	hacd::HaF64 Evalue (const dgBigVector* const pointArray, const dgBigVector& point) const;
 	dgBigPlane GetPlaneEquation (const dgBigVector* const pointArray) const;
 
-	dgInt32 m_mark;
+	hacd::HaI32 m_mark;
 	dgList<dgConvexHull3DFace>::dgListNode* m_twin[3];
 	friend class dgConvexHull3d;
 };
@@ -52,43 +52,43 @@ class dgHullVertex;
 class dgConvexHull3d: public dgList<dgConvexHull3DFace>, public hacd::UserAllocated
 {
 	public:
-	dgConvexHull3d(const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount = 0x7fffffff);
+	dgConvexHull3d(const hacd::HaF64* const vertexCloud, hacd::HaI32 strideInBytes, hacd::HaI32 count, hacd::HaF64 distTol, hacd::HaI32 maxVertexCount = 0x7fffffff);
 	virtual ~dgConvexHull3d();
 
-	dgInt32 GetVertexCount() const;
+	hacd::HaI32 GetVertexCount() const;
 	const dgBigVector* GetVertexPool() const;
-	const dgBigVector& GetVertex(dgInt32 i) const;
+	const dgBigVector& GetVertex(hacd::HaI32 i) const;
 
-	dgFloat64 GetDiagonal() const;
-	dgFloat64 RayCast (const dgBigVector& localP0, const dgBigVector& localP1) const;
+	hacd::HaF64 GetDiagonal() const;
+	hacd::HaF64 RayCast (const dgBigVector& localP0, const dgBigVector& localP1) const;
 
 	protected:
 	
 	dgConvexHull3d(void);
-	void BuildHull (const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
+	void BuildHull (const hacd::HaF64* const vertexCloud, hacd::HaI32 strideInBytes, hacd::HaI32 count, hacd::HaF64 distTol, hacd::HaI32 maxVertexCount);
 
-	virtual dgListNode* AddFace (dgInt32 i0, dgInt32 i1, dgInt32 i2);
+	virtual dgListNode* AddFace (hacd::HaI32 i0, hacd::HaI32 i1, hacd::HaI32 i2);
 	virtual void DeleteFace (dgListNode* const node) ;
-//	virtual dgInt32 InitVertexArray(dgBigVector* const convexPoints, dgBigVector* const points, const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, void* const memoryPool, dgInt32 maxMemSize);
-	virtual dgInt32 InitVertexArray(dgHullVertex* const points, const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, void* const memoryPool, dgInt32 maxMemSize);
+//	virtual hacd::HaI32 InitVertexArray(dgBigVector* const convexPoints, dgBigVector* const points, const hacd::HaF64* const vertexCloud, hacd::HaI32 strideInBytes, hacd::HaI32 count, void* const memoryPool, hacd::HaI32 maxMemSize);
+	virtual hacd::HaI32 InitVertexArray(dgHullVertex* const points, const hacd::HaF64* const vertexCloud, hacd::HaI32 strideInBytes, hacd::HaI32 count, void* const memoryPool, hacd::HaI32 maxMemSize);
 
-	void CalculateConvexHull (dgAABBPointTree3d* vertexTree, dgHullVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
-	dgInt32 BuildNormalList (dgBigVector* const normalArray) const;
-	dgInt32 SupportVertex (dgAABBPointTree3d** const tree, const dgHullVertex* const points, const dgBigVector& dir) const;
-	dgFloat64 TetrahedrumVolume (const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3) const;
-	void TessellateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgBigVector* const ouput, dgInt32& start) const;
+	void CalculateConvexHull (dgAABBPointTree3d* vertexTree, dgHullVertex* const points, hacd::HaI32 count, hacd::HaF64 distTol, hacd::HaI32 maxVertexCount);
+	hacd::HaI32 BuildNormalList (dgBigVector* const normalArray) const;
+	hacd::HaI32 SupportVertex (dgAABBPointTree3d** const tree, const dgHullVertex* const points, const dgBigVector& dir) const;
+	hacd::HaF64 TetrahedrumVolume (const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3) const;
+	void TessellateTriangle (hacd::HaI32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, hacd::HaI32& count, dgBigVector* const ouput, hacd::HaI32& start) const;
 
-	dgAABBPointTree3d* BuildTree (dgAABBPointTree3d* const parent, dgHullVertex* const points, dgInt32 count, dgInt32 baseIndex, dgInt8** const memoryPool, dgInt32& maxMemSize) const;
-	static dgInt32 ConvexCompareVertex(const dgHullVertex* const  A, const dgHullVertex* const B, void* const context);
+	dgAABBPointTree3d* BuildTree (dgAABBPointTree3d* const parent, dgHullVertex* const points, hacd::HaI32 count, hacd::HaI32 baseIndex, hacd::HaI8** const memoryPool, hacd::HaI32& maxMemSize) const;
+	static hacd::HaI32 ConvexCompareVertex(const dgHullVertex* const  A, const dgHullVertex* const B, void* const context);
 	bool Sanity() const;
 
-	dgInt32 m_count;
-	dgFloat64 m_diag;
+	hacd::HaI32 m_count;
+	hacd::HaF64 m_diag;
 	dgArray<dgBigVector> m_points;
 };
 
 
-inline dgInt32 dgConvexHull3d::GetVertexCount() const
+inline hacd::HaI32 dgConvexHull3d::GetVertexCount() const
 {
 	return m_count;
 }
@@ -98,12 +98,12 @@ inline const dgBigVector* dgConvexHull3d::GetVertexPool() const
 	return &m_points[0];
 }
 
-inline const dgBigVector& dgConvexHull3d::GetVertex(dgInt32 index) const
+inline const dgBigVector& dgConvexHull3d::GetVertex(hacd::HaI32 index) const
 {
 	return m_points[index];
 }
 
-inline dgFloat64 dgConvexHull3d::GetDiagonal() const
+inline hacd::HaF64 dgConvexHull3d::GetDiagonal() const
 {
 	return m_diag;
 }

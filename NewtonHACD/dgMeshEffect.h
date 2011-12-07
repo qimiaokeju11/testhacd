@@ -42,12 +42,12 @@ class dgConvexHull3d;
 #define DG_MESH_EFFECT_POINT_SPLITED		512
 #define DG_MESH_EFFECT_POLYGON_SPLITED		256
 #define DG_MESH_EFFECT_FLAT_CUT_BORDER_EDGE	0x01
-#define DG_VERTEXLIST_INDEXLIST_TOL			(dgFloat64 (0.0f))
+#define DG_VERTEXLIST_INDEXLIST_TOL			(hacd::HaF64 (0.0f))
 
 
 #define DG_MESH_EFFECT_PRECISION_BITS		30
-#define DG_MESH_EFFECT_PRECISION_SCALE		dgFloat64(1<<DG_MESH_EFFECT_PRECISION_BITS)
-#define DG_MESH_EFFECT_PRECISION_SCALE_INV	(dgFloat64 (1.0f) / DG_MESH_EFFECT_PRECISION_SCALE)
+#define DG_MESH_EFFECT_PRECISION_SCALE		hacd::HaF64(1<<DG_MESH_EFFECT_PRECISION_BITS)
+#define DG_MESH_EFFECT_PRECISION_SCALE_INV	(hacd::HaF64 (1.0f) / DG_MESH_EFFECT_PRECISION_SCALE)
 
 
 #define DG_MESG_EFFECT_BOOLEAN_INIT()					\
@@ -80,7 +80,7 @@ class dgConvexHull3d;
 	}													\
 	if (result) {										\
 		result->ConvertToPolygons();					\
-		dgStack<dgInt32> map(result->m_pointCount + 1);	\
+		dgStack<hacd::HaI32> map(result->m_pointCount + 1);	\
 		result->RemoveUnusedVertices(&map[0]);			\
 	}													
 
@@ -94,24 +94,24 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	{
 		public:
 		dgBigVector m_vertex;
-		dgFloat64 m_normal_x;
-		dgFloat64 m_normal_y;
-		dgFloat64 m_normal_z;
-		dgFloat64 m_u0;
-		dgFloat64 m_v0;
-		dgFloat64 m_u1;
-		dgFloat64 m_v1;
-		dgFloat64 m_material;
+		hacd::HaF64 m_normal_x;
+		hacd::HaF64 m_normal_y;
+		hacd::HaF64 m_normal_z;
+		hacd::HaF64 m_u0;
+		hacd::HaF64 m_v0;
+		hacd::HaF64 m_u1;
+		hacd::HaF64 m_v1;
+		hacd::HaF64 m_material;
 	};
 
 	class dgIndexArray 
 	{
 		public:
-		dgInt32 m_materialCount;
-		dgInt32 m_indexCount;
-		dgInt32 m_materials[256];
-		dgInt32 m_materialsIndexCount[256];
-		dgInt32* m_indexList;
+		hacd::HaI32 m_materialCount;
+		hacd::HaI32 m_indexCount;
+		hacd::HaI32 m_materials[256];
+		hacd::HaI32 m_materialsIndexCount[256];
+		hacd::HaI32* m_indexList;
 	};
 
 
@@ -121,36 +121,36 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect(dgPolyhedra& mesh, const dgMeshEffect& source);
 
 	// Create a convex hull Mesh form point cloud
-	dgMeshEffect (const dgFloat64* const vertexCloud, dgInt32 count, dgInt32 strideInByte, dgFloat64 distTol);
+	dgMeshEffect (const hacd::HaF64* const vertexCloud, hacd::HaI32 count, hacd::HaI32 strideInByte, hacd::HaF64 distTol);
 
 	// create a convex approximation
-	dgMeshEffect (const dgMeshEffect& source, dgFloat32 maxConcavity, dgInt32 maxCount = 32);
+	dgMeshEffect (const dgMeshEffect& source, hacd::HaF32 maxConcavity, hacd::HaI32 maxCount = 32);
 
 	// create a planar Mesh
-	dgMeshEffect(const dgMatrix& planeMatrix, dgFloat32 witdth, dgFloat32 breadth, dgInt32 material, const dgMatrix& textureMatrix0, const dgMatrix& textureMatrix1);
+	dgMeshEffect(const dgMatrix& planeMatrix, hacd::HaF32 witdth, hacd::HaF32 breadth, hacd::HaI32 material, const dgMatrix& textureMatrix0, const dgMatrix& textureMatrix1);
 	virtual ~dgMeshEffect(void);
 
 	dgMatrix CalculateOOBB (dgBigVector& size) const;
 	void CalculateAABB (dgBigVector& min, dgBigVector& max) const;
 
-	void CalculateNormals (dgFloat64 angleInRadians);
-	void SphericalMapping (dgInt32 material);
-	void BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top);
-	void UniformBoxMapping (dgInt32 material, const dgMatrix& textruMatrix);
-	void CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMaterial);
+	void CalculateNormals (hacd::HaF64 angleInRadians);
+	void SphericalMapping (hacd::HaI32 material);
+	void BoxMapping (hacd::HaI32 front, hacd::HaI32 side, hacd::HaI32 top);
+	void UniformBoxMapping (hacd::HaI32 material, const dgMatrix& textruMatrix);
+	void CylindricalMapping (hacd::HaI32 cylinderMaterial, hacd::HaI32 capMaterial);
 
-	dgEdge* InsertEdgeVertex (dgEdge* const edge, dgFloat64 param);
+	dgEdge* InsertEdgeVertex (dgEdge* const edge, hacd::HaF64 param);
 
 	dgMeshEffect* Union (const dgMatrix& matrix, const dgMeshEffect* const clip) const;
 	dgMeshEffect* Difference (const dgMatrix& matrix, const dgMeshEffect* const clip) const;
 	dgMeshEffect* Intersection (const dgMatrix& matrix, const dgMeshEffect* const clip) const;
 	void ClipMesh (const dgMatrix& matrix, const dgMeshEffect* const clip, dgMeshEffect** const top, dgMeshEffect** const bottom) const;
 
-	bool CheckIntersection (const dgMeshEffectSolidTree* const solidTree, dgFloat64 scale) const;
+	bool CheckIntersection (const dgMeshEffectSolidTree* const solidTree, hacd::HaF64 scale) const;
 	dgMeshEffectSolidTree* CreateSolidTree() const;
 	static void DestroySolidTree (dgMeshEffectSolidTree* const tree);
 	static bool CheckIntersection (const dgMeshEffect* const meshA, const dgMeshEffectSolidTree* const solidTreeA,
-								   const dgMeshEffect* const meshB, const dgMeshEffectSolidTree* const solidTreeB, dgFloat64 scale);
+								   const dgMeshEffect* const meshB, const dgMeshEffectSolidTree* const solidTreeB, hacd::HaF64 scale);
 
 	dgMeshEffect* GetFirstLayer ();
 	dgMeshEffect* GetNextLayer (dgMeshEffect* const layer);
@@ -158,76 +158,76 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void Triangulate ();
 	void ConvertToPolygons ();
 
-	void RemoveUnusedVertices(dgInt32* const vertexRemapTable);
+	void RemoveUnusedVertices(hacd::HaI32* const vertexRemapTable);
 	
 	void BeginPolygon ();
-	void AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 stride, dgInt32 material);
-	void AddPolygon (dgInt32 count, const dgFloat64* const vertexList, dgInt32 stride, dgInt32 material);
-	void EndPolygon (dgFloat64 tol);
+	void AddPolygon (hacd::HaI32 count, const hacd::HaF32* const vertexList, hacd::HaI32 stride, hacd::HaI32 material);
+	void AddPolygon (hacd::HaI32 count, const hacd::HaF64* const vertexList, hacd::HaI32 stride, hacd::HaI32 material);
+	void EndPolygon (hacd::HaF64 tol);
 
 	void PackVertexArrays ();
 
-	void BuildFromVertexListIndexList(dgInt32 faceCount, const dgInt32 * const faceIndexCount, const dgInt32 * const faceMaterialIndex, 
-		const dgFloat32* const vertex, dgInt32  vertexStrideInBytes, const dgInt32 * const vertexIndex,
-		const dgFloat32* const normal, dgInt32  normalStrideInBytes, const dgInt32 * const normalIndex,
-		const dgFloat32* const uv0, dgInt32  uv0StrideInBytes, const dgInt32 * const uv0Index,
-		const dgFloat32* const uv1, dgInt32  uv1StrideInBytes, const dgInt32 * const uv1Index);
+	void BuildFromVertexListIndexList(hacd::HaI32 faceCount, const hacd::HaI32 * const faceIndexCount, const hacd::HaI32 * const faceMaterialIndex, 
+		const hacd::HaF32* const vertex, hacd::HaI32  vertexStrideInBytes, const hacd::HaI32 * const vertexIndex,
+		const hacd::HaF32* const normal, hacd::HaI32  normalStrideInBytes, const hacd::HaI32 * const normalIndex,
+		const hacd::HaF32* const uv0, hacd::HaI32  uv0StrideInBytes, const hacd::HaI32 * const uv0Index,
+		const hacd::HaF32* const uv1, hacd::HaI32  uv1StrideInBytes, const hacd::HaI32 * const uv1Index);
 
 
-	dgInt32 GetVertexCount() const;
-	dgInt32 GetVertexStrideInByte() const;
-	dgFloat64* GetVertexPool () const;
+	hacd::HaI32 GetVertexCount() const;
+	hacd::HaI32 GetVertexStrideInByte() const;
+	hacd::HaF64* GetVertexPool () const;
 
-	dgInt32 GetPropertiesCount() const;
-	dgInt32 GetPropertiesStrideInByte() const;
-	dgFloat64* GetAttributePool() const;
-	dgFloat64* GetNormalPool() const;
-	dgFloat64* GetUV0Pool() const;
-	dgFloat64* GetUV1Pool() const;
+	hacd::HaI32 GetPropertiesCount() const;
+	hacd::HaI32 GetPropertiesStrideInByte() const;
+	hacd::HaF64* GetAttributePool() const;
+	hacd::HaF64* GetNormalPool() const;
+	hacd::HaF64* GetUV0Pool() const;
+	hacd::HaF64* GetUV1Pool() const;
 
 	dgEdge* ConectVertex (dgEdge* const e0, dgEdge* const e1);
 
-	dgInt32 GetTotalFaceCount() const;
-	dgInt32 GetTotalIndexCount() const;
-	void GetFaces (dgInt32* const faceCount, dgInt32* const materials, void** const faceNodeList) const;
+	hacd::HaI32 GetTotalFaceCount() const;
+	hacd::HaI32 GetTotalIndexCount() const;
+	void GetFaces (hacd::HaI32* const faceCount, hacd::HaI32* const materials, void** const faceNodeList) const;
 
 	void RepairTJoints (bool triangulate);
 	bool SeparateDuplicateLoops (dgEdge* const edge);
 	bool HasOpenEdges () const;
-	dgFloat64 CalculateVolume () const;
+	hacd::HaF64 CalculateVolume () const;
 
-	void GetVertexStreams (dgInt32 vetexStrideInByte, dgFloat32* const vertex, 
-						   dgInt32 normalStrideInByte, dgFloat32* const normal, 
-						   dgInt32 uvStrideInByte0, dgFloat32* const uv0, 
-						   dgInt32 uvStrideInByte1, dgFloat32* const uv1);
+	void GetVertexStreams (hacd::HaI32 vetexStrideInByte, hacd::HaF32* const vertex, 
+						   hacd::HaI32 normalStrideInByte, hacd::HaF32* const normal, 
+						   hacd::HaI32 uvStrideInByte0, hacd::HaF32* const uv0, 
+						   hacd::HaI32 uvStrideInByte1, hacd::HaF32* const uv1);
 
-	void GetIndirectVertexStreams(dgInt32 vetexStrideInByte, dgFloat64* const vertex, dgInt32* const vertexIndices, dgInt32* const vertexCount,
-								  dgInt32 normalStrideInByte, dgFloat64* const normal, dgInt32* const normalIndices, dgInt32* const normalCount,
-								  dgInt32 uvStrideInByte0, dgFloat64* const uv0, dgInt32* const uvIndices0, dgInt32* const uvCount0,
-								  dgInt32 uvStrideInByte1, dgFloat64* const uv1, dgInt32* const uvIndices1, dgInt32* const uvCount1);
+	void GetIndirectVertexStreams(hacd::HaI32 vetexStrideInByte, hacd::HaF64* const vertex, hacd::HaI32* const vertexIndices, hacd::HaI32* const vertexCount,
+								  hacd::HaI32 normalStrideInByte, hacd::HaF64* const normal, hacd::HaI32* const normalIndices, hacd::HaI32* const normalCount,
+								  hacd::HaI32 uvStrideInByte0, hacd::HaF64* const uv0, hacd::HaI32* const uvIndices0, hacd::HaI32* const uvCount0,
+								  hacd::HaI32 uvStrideInByte1, hacd::HaF64* const uv1, hacd::HaI32* const uvIndices1, hacd::HaI32* const uvCount1);
 
 	
 
 	dgIndexArray* MaterialGeometryBegin();
 	void MaterialGeomteryEnd(dgIndexArray* const handle);
-	dgInt32 GetFirstMaterial (dgIndexArray* const handle);
-	dgInt32 GetNextMaterial (dgIndexArray* const handle, dgInt32 materialHandle);
-	dgInt32 GetMaterialID (dgIndexArray* const handle, dgInt32 materialHandle);
-	dgInt32 GetMaterialIndexCount (dgIndexArray* const handle, dgInt32 materialHandle);
-	void GetMaterialGetIndexStream (dgIndexArray* const handle, dgInt32 materialHandle, dgInt32* const index);
-	void GetMaterialGetIndexStreamShort (dgIndexArray* const handle, dgInt32 materialHandle, dgInt16* const index);
+	hacd::HaI32 GetFirstMaterial (dgIndexArray* const handle);
+	hacd::HaI32 GetNextMaterial (dgIndexArray* const handle, hacd::HaI32 materialHandle);
+	hacd::HaI32 GetMaterialID (dgIndexArray* const handle, hacd::HaI32 materialHandle);
+	hacd::HaI32 GetMaterialIndexCount (dgIndexArray* const handle, hacd::HaI32 materialHandle);
+	void GetMaterialGetIndexStream (dgIndexArray* const handle, hacd::HaI32 materialHandle, hacd::HaI32* const index);
+	void GetMaterialGetIndexStreamShort (dgIndexArray* const handle, hacd::HaI32 materialHandle, hacd::HaI16* const index);
 	
-	dgConvexHull3d * dgMeshEffect::CreateConvexHull(dgFloat64 tolerance,dgInt32 maxVertexCount) const;
+	dgConvexHull3d * dgMeshEffect::CreateConvexHull(hacd::HaF64 tolerance,hacd::HaI32 maxVertexCount) const;
 
-	dgCollision* CreateConvexCollision(dgFloat64 tolerance, dgInt32 shapeID, const dgMatrix& matrix = dgGetIdentityMatrix()) const;
+	dgCollision* CreateConvexCollision(hacd::HaF64 tolerance, hacd::HaI32 shapeID, const dgMatrix& matrix = dgGetIdentityMatrix()) const;
 
-	dgMeshEffect* CreateConvexApproximation (dgFloat32 maxConcavity, dgInt32 maxCount = 32) const;
-	dgMeshEffect* CreateDelanayTretrahedralization (dgInt32 interionMaterial, dgMatrix& matrix) const;
-	dgMeshEffect* CreateVoronoiPartition (dgInt32 pointsCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 interionMaterial, dgMatrix& matrix) const;
+	dgMeshEffect* CreateConvexApproximation (hacd::HaF32 maxConcavity, hacd::HaI32 maxCount = 32) const;
+	dgMeshEffect* CreateDelanayTretrahedralization (hacd::HaI32 interionMaterial, dgMatrix& matrix) const;
+	dgMeshEffect* CreateVoronoiPartition (hacd::HaI32 pointsCount, hacd::HaI32 pointStrideInBytes, const hacd::HaF32* const pointCloud, hacd::HaI32 interionMaterial, dgMatrix& matrix) const;
 
-	void PlaneClipMesh (const dgMatrix& planeMatrix, const dgMatrix& planeTextMatrix, dgInt32 planeMaterial, dgMeshEffect** const leftMeshSource, dgMeshEffect** const rightMeshSource) const;
+	void PlaneClipMesh (const dgMatrix& planeMatrix, const dgMatrix& planeTextMatrix, hacd::HaI32 planeMaterial, dgMeshEffect** const leftMeshSource, dgMeshEffect** const rightMeshSource) const;
 
-	dgVertexAtribute& GetAttribute (dgInt32 index) const;
+	dgVertexAtribute& GetAttribute (hacd::HaI32 index) const;
 	void TransformMesh (const dgMatrix& matrix);
 
 
@@ -243,8 +243,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void* GetFirstEdge ();
 	void* GetNextEdge (const void* const edge);
-	void GetEdgeIndex (const void* const edge, dgInt32& v0, dgInt32& v1) const;
-//	void GetEdgeAttributeIndex (const void* edge, dgInt32& v0, dgInt32& v1) const;
+	void GetEdgeIndex (const void* const edge, hacd::HaI32& v0, hacd::HaI32& v1) const;
+//	void GetEdgeAttributeIndex (const void* edge, hacd::HaI32& v0, hacd::HaI32& v1) const;
 
 	void* GetFirstFace ();
 	void* GetNextFace (const void* const face);
@@ -260,41 +260,41 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void Init (bool preAllocaBuffers);
 	dgBigVector GetOrigin ()const;
-	dgInt32 CalculateMaxAttributes () const;
-	dgFloat64 QuantizeCordinade(dgFloat64 val) const;
+	hacd::HaI32 CalculateMaxAttributes () const;
+	hacd::HaF64 QuantizeCordinade(hacd::HaF64 val) const;
 	void EnumerateAttributeArray (dgVertexAtribute* const attib);
 	void ApplyAttributeArray (dgVertexAtribute* const attib);
 	void AddVertex(const dgBigVector& vertex);
 	void AddAtribute (const dgVertexAtribute& attib);
-	void AddPoint(const dgFloat64* vertexList, dgInt32 material);
+	void AddPoint(const hacd::HaF64* vertexList, hacd::HaI32 material);
 	void FixCylindricalMapping (dgVertexAtribute* const attib) const;
 
 	void MergeFaces (const dgMeshEffect* const source);
 	void ReverseMergeFaces (dgMeshEffect* const source);
-	dgVertexAtribute InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
+	dgVertexAtribute InterpolateEdge (dgEdge* const edge, hacd::HaF64 param) const;
 	dgVertexAtribute InterpolateVertex (const dgBigVector& point, dgEdge* const face) const;
 
-	dgMeshEffect* GetNextLayer (dgInt32 mark);
+	dgMeshEffect* GetNextLayer (hacd::HaI32 mark);
 
-	void FilterCoplanarFaces (const dgMeshEffect* const otherCap, dgFloat32 sign);
+	void FilterCoplanarFaces (const dgMeshEffect* const otherCap, hacd::HaF32 sign);
 	void ClipMesh (const dgMeshEffect* const clipMesh, dgMeshEffect** const back, dgMeshEffect** const front, dgMeshEffect** const coplanar) const;
 	void ClipMesh (const dgMeshEffectSolidTree* const clipper, dgMeshEffect** const back, dgMeshEffect** const front, dgMeshEffect** const coplanar) const;
 
-	dgInt32 PlaneApplyCap (const dgMeshEffect* planeMesh, const dgBigPlane& normal);
+	hacd::HaI32 PlaneApplyCap (const dgMeshEffect* planeMesh, const dgBigPlane& normal);
 	void PlaneClipMesh (const dgMeshEffect* planeMesh, dgMeshEffect** leftMeshSource, dgMeshEffect** rightMeshSource) const;
 
-	dgMeshEffect* MakeDelanayIntersection (dgMeshEffectSolidTree* const tree, dgBigVector* const points, dgInt32 count, dgInt32 materialId, const dgMatrix& textureProjectionMatrix, dgFloat32 normalAngleInRadians) const;
+	dgMeshEffect* MakeDelanayIntersection (dgMeshEffectSolidTree* const tree, dgBigVector* const points, hacd::HaI32 count, hacd::HaI32 materialId, const dgMatrix& textureProjectionMatrix, hacd::HaF32 normalAngleInRadians) const;
 
 	
 
 	bool CheckSingleMesh() const;
 
 
-	dgInt32 m_pointCount;
-	dgInt32 m_maxPointCount;
+	hacd::HaI32 m_pointCount;
+	hacd::HaI32 m_maxPointCount;
 
-	dgInt32 m_atribCount;
-	dgInt32 m_maxAtribCount;
+	hacd::HaI32 m_atribCount;
+	hacd::HaI32 m_maxAtribCount;
 
 	dgBigVector* m_points;
 	dgVertexAtribute* m_attib;
@@ -308,67 +308,67 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 
 
-inline dgInt32 dgMeshEffect::GetVertexCount() const
+inline hacd::HaI32 dgMeshEffect::GetVertexCount() const
 {
 	return m_pointCount;
 }
 
-inline dgInt32 dgMeshEffect::GetPropertiesCount() const
+inline hacd::HaI32 dgMeshEffect::GetPropertiesCount() const
 {
 	return m_atribCount;
 }
 
-inline dgInt32 dgMeshEffect::GetMaterialID (dgIndexArray* const handle, dgInt32 materialHandle)
+inline hacd::HaI32 dgMeshEffect::GetMaterialID (dgIndexArray* const handle, hacd::HaI32 materialHandle)
 {
 	return handle->m_materials[materialHandle];
 }
 
-inline dgInt32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handle, dgInt32 materialHandle)
+inline hacd::HaI32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handle, hacd::HaI32 materialHandle)
 {
 	return handle->m_materialsIndexCount[materialHandle];
 }
 
-inline dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (dgInt32 index) const 
+inline dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (hacd::HaI32 index) const 
 {
 	return m_attib[index];
 }
 
-inline dgInt32 dgMeshEffect::GetPropertiesStrideInByte() const 
+inline hacd::HaI32 dgMeshEffect::GetPropertiesStrideInByte() const 
 {
 	return sizeof (dgVertexAtribute);
 }
 
-inline dgFloat64* dgMeshEffect::GetAttributePool() const 
+inline hacd::HaF64* dgMeshEffect::GetAttributePool() const 
 {
 	return &m_attib->m_vertex.m_x;
 }
 
-inline dgFloat64* dgMeshEffect::GetNormalPool() const 
+inline hacd::HaF64* dgMeshEffect::GetNormalPool() const 
 {
 	return &m_attib->m_normal_x;
 }
 
-inline dgFloat64* dgMeshEffect::GetUV0Pool() const 
+inline hacd::HaF64* dgMeshEffect::GetUV0Pool() const 
 {
 	return &m_attib->m_u0;
 }
 
-inline dgFloat64* dgMeshEffect::GetUV1Pool() const 
+inline hacd::HaF64* dgMeshEffect::GetUV1Pool() const 
 {
 	return &m_attib->m_u1;
 }
 
-inline bool dgMeshEffect::CheckIntersection (const dgMeshEffect* const meshA, const dgMeshEffectSolidTree* const solidTreeA, const dgMeshEffect* const meshB, const dgMeshEffectSolidTree* const solidTreeB, dgFloat64 scale)
+inline bool dgMeshEffect::CheckIntersection (const dgMeshEffect* const meshA, const dgMeshEffectSolidTree* const solidTreeA, const dgMeshEffect* const meshB, const dgMeshEffectSolidTree* const solidTreeB, hacd::HaF64 scale)
 {
 	return (meshA->CheckIntersection (solidTreeB, scale) || meshB->CheckIntersection (solidTreeA, scale));
 }
 
-inline dgInt32 dgMeshEffect::GetVertexStrideInByte() const 
+inline hacd::HaI32 dgMeshEffect::GetVertexStrideInByte() const 
 {
 	return sizeof (dgBigVector);
 }
 
-inline dgFloat64* dgMeshEffect::GetVertexPool () const 
+inline hacd::HaF64* dgMeshEffect::GetVertexPool () const 
 {
 	return &m_points[0].m_x;
 }
@@ -388,13 +388,13 @@ inline dgMeshEffect* dgMeshEffect::GetNextLayer (dgMeshEffect* const layerSegmen
 }
 
 
-inline dgFloat64 dgMeshEffect::QuantizeCordinade(dgFloat64 x) const
+inline hacd::HaF64 dgMeshEffect::QuantizeCordinade(hacd::HaF64 x) const
 {
-	dgInt32 exp;
-	dgFloat64 mantissa = frexp(x, &exp);
+	hacd::HaI32 exp;
+	hacd::HaF64 mantissa = frexp(x, &exp);
 	mantissa = DG_MESH_EFFECT_PRECISION_SCALE_INV * floor (mantissa * DG_MESH_EFFECT_PRECISION_SCALE);
 
-	dgFloat64 x1 = ldexp(mantissa, exp);
+	hacd::HaF64 x1 = ldexp(mantissa, exp);
 	return x1;
 }
 

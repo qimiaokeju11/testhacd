@@ -24,7 +24,6 @@
 
 //#include "dgStdafx.h"
 #include "dgRef.h"
-#include "dgDebug.h"
 #include "dgMemory.h"
 
 
@@ -38,7 +37,7 @@ class dgList
 		dgListNode (dgListNode* const prev, dgListNode* const next) 
 			:m_info () 
 		{
-//			_ASSERTE ((dgUnsigned64 (&m_info) & 0x0f) == 0);
+//			HACD_ASSERT ((hacd::HaU64 (&m_info) & 0x0f) == 0);
 			m_prev = prev;
 			m_next = next;
 			if (m_prev) {
@@ -52,7 +51,7 @@ class dgList
 		dgListNode (const T &info, dgListNode* const prev, dgListNode* const next) 
 			:m_info (info) 
 		{
-//			_ASSERTE ((dgUnsigned64 (&m_info) & 0x0f) == 0);
+//			HACD_ASSERT ((hacd::HaU64 (&m_info) & 0x0f) == 0);
 			m_prev = prev;
 			m_next = next;
 			if (m_prev) {
@@ -83,7 +82,7 @@ class dgList
 
 //		void Remove()
 //		{
-//			_ASSERTE (0);
+//			HACD_ASSERT (0);
 //			Kill();
 //			Unlink();
 //			Release();
@@ -140,7 +139,7 @@ class dgList
 		{
 		}
 
-		operator dgInt32() const
+		operator hacd::HaI32() const
 		{
 			return m_ptr != NULL;
 		}
@@ -167,25 +166,25 @@ class dgList
 
 		void operator++ ()
 		{
-			_ASSERTE (m_ptr);
+			HACD_ASSERT (m_ptr);
 			m_ptr = m_ptr->m_next();
 		}
 
-		void operator++ (dgInt32)
+		void operator++ (hacd::HaI32)
 		{
-			_ASSERTE (m_ptr);
+			HACD_ASSERT (m_ptr);
 			m_ptr = m_ptr->GetNext();
 		}
 
 		void operator-- () 
 		{
-			_ASSERTE (m_ptr);
+			HACD_ASSERT (m_ptr);
 			m_ptr = m_ptr->GetPrev();
 		}
 
-		void operator-- (dgInt32) 
+		void operator-- (hacd::HaI32) 
 		{
-			_ASSERTE (m_ptr);
+			HACD_ASSERT (m_ptr);
 			m_ptr = m_ptr->GetPrev();
 		}
 
@@ -213,8 +212,8 @@ class dgList
 	dgList ();
 	virtual ~dgList ();
 
-	operator dgInt32() const;
-	dgInt32 GetCount() const;
+	operator hacd::HaI32() const;
+	hacd::HaI32 GetCount() const;
 	dgListNode *GetLast() const;
 	dgListNode *GetFirst() const;
 	dgListNode *Append ();
@@ -244,7 +243,7 @@ class dgList
 	// member variables
 	// ***********************************************************
 	private:
-	dgInt32 m_count;
+	hacd::HaI32 m_count;
 	dgListNode *m_last;
 	dgListNode *m_first;
 
@@ -277,13 +276,13 @@ dgList<T>::~dgList ()
 }
 
 template<class T>
-dgInt32 dgList<T>::GetCount() const
+hacd::HaI32 dgList<T>::GetCount() const
 {
 	return m_count;
 }
 
 template<class T>
-dgList<T>::operator dgInt32() const
+dgList<T>::operator hacd::HaI32() const
 {
 	return m_first != NULL;
 }
@@ -303,8 +302,8 @@ typename dgList<T>::dgListNode *dgList<T>::GetLast() const
 template<class T>
 typename dgList<T>::dgListNode *dgList<T>::Append (dgListNode* const node)
 {
-	_ASSERTE (node->m_next == NULL);
-	_ASSERTE (node->m_prev == NULL);
+	HACD_ASSERT (node->m_next == NULL);
+	HACD_ASSERT (node->m_prev == NULL);
 	m_count	++;
 	if (m_first == NULL) {
 		m_last = node;
@@ -314,7 +313,7 @@ typename dgList<T>::dgListNode *dgList<T>::Append (dgListNode* const node)
 		m_last = node;
 	}
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 	return m_last;
 }
@@ -330,7 +329,7 @@ typename dgList<T>::dgListNode *dgList<T>::Append ()
 		m_last = HACD_NEW(dgListNode)(m_last, NULL);
 	}
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 	return m_last;
 }
@@ -346,7 +345,7 @@ typename dgList<T>::dgListNode *dgList<T>::Append (const T &element)
 		m_last = HACD_NEW(dgListNode)(element, m_last, NULL);
 	}
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 
 	return m_last;
@@ -355,8 +354,8 @@ typename dgList<T>::dgListNode *dgList<T>::Append (const T &element)
 template<class T>
 typename dgList<T>::dgListNode *dgList<T>::Addtop (dgListNode* const node)
 {
-	_ASSERTE (node->m_next == NULL);
-	_ASSERTE (node->m_prev == NULL);
+	HACD_ASSERT (node->m_next == NULL);
+	HACD_ASSERT (node->m_prev == NULL);
 	m_count	++;
 	if (m_last == NULL) {
 		m_last = node;
@@ -366,7 +365,7 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop (dgListNode* const node)
 		m_first = node;
 	}
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 	return m_first;
 }
@@ -383,7 +382,7 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop ()
 		m_first = HACD_NEW(dgListNode)(NULL, m_first);
 	}
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 	return m_first;
 }
@@ -400,7 +399,7 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop (const T &element)
 		m_first = HACD_NEW(dgListNode)(element, NULL, m_first);
 	}
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 	return m_first;
 }
@@ -408,8 +407,8 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop (const T &element)
 template<class T>
 void dgList<T>::InsertAfter (dgListNode* const root, dgListNode* const node)
 {
-	_ASSERTE (root);
-	_ASSERTE (node != root);
+	HACD_ASSERT (root);
+	HACD_ASSERT (node != root);
 	
 	if (root->m_next != node) {
 		if (node == m_first) {
@@ -431,11 +430,11 @@ void dgList<T>::InsertAfter (dgListNode* const root, dgListNode* const node)
 			m_last = node;
 		}
 
-		_ASSERTE (m_last);
-		_ASSERTE (!m_last->m_next);
-		_ASSERTE (m_first);
-		_ASSERTE (!m_first->m_prev);
-		_ASSERTE (SanityCheck ());
+		HACD_ASSERT (m_last);
+		HACD_ASSERT (!m_last->m_next);
+		HACD_ASSERT (m_first);
+		HACD_ASSERT (!m_first->m_prev);
+		HACD_ASSERT (SanityCheck ());
 	}
 }
 
@@ -443,8 +442,8 @@ void dgList<T>::InsertAfter (dgListNode* const root, dgListNode* const node)
 template<class T>
 void dgList<T>::InsertBefore (dgListNode* const root, dgListNode* const node)
 {
-	_ASSERTE (root);
-	_ASSERTE (node != root);
+	HACD_ASSERT (root);
+	HACD_ASSERT (node != root);
 	
 	if (root->m_prev != node) {
 		if (node == m_last) {
@@ -466,11 +465,11 @@ void dgList<T>::InsertBefore (dgListNode* const root, dgListNode* const node)
 			m_first = node;
 		}
 
-		_ASSERTE (m_first);
-		_ASSERTE (!m_first->m_prev);
-		_ASSERTE (m_last);
-		_ASSERTE (!m_last->m_next);
-		_ASSERTE (SanityCheck ());
+		HACD_ASSERT (m_first);
+		HACD_ASSERT (!m_first->m_prev);
+		HACD_ASSERT (m_last);
+		HACD_ASSERT (!m_last->m_next);
+		HACD_ASSERT (SanityCheck ());
 	}
 }
 
@@ -490,7 +489,7 @@ void dgList<T>::RotateToEnd (dgListNode* const node)
 	}
 
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 }
 
@@ -509,7 +508,7 @@ void dgList<T>::RotateToBegin (dgListNode* const node)
 	}
 
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 }
 
@@ -529,14 +528,14 @@ typename dgList<T>::dgListNode *dgList<T>::Find (const T &element) const
 template<class T>
 typename dgList<T>::dgListNode *dgList<T>::GetNodeFromInfo (T &info) const
 {
-//	dgInt64 offset;
+//	hacd::HaI64 offset;
 //	dgListNode *node;
 
 	dgListNode* const node = (dgListNode *) &info;
-	dgInt64 offset = ((char*) &node->m_info) - ((char *) node);
+	hacd::HaI64 offset = ((char*) &node->m_info) - ((char *) node);
 	dgListNode* const retnode = (dgListNode *) (((char *) node) - offset);
 
-	_ASSERTE (&retnode->GetInfo () == &info);
+	HACD_ASSERT (&retnode->GetInfo () == &info);
 	return retnode;
 }
 
@@ -553,10 +552,10 @@ void dgList<T>::Remove (const T &element)
 template<class T> 
 void dgList<T>::Unlink (dgListNode* const node)
 {
-	_ASSERTE (node);
+	HACD_ASSERT (node);
 
 	m_count --;
-	_ASSERTE (m_count >= 0);
+	HACD_ASSERT (m_count >= 0);
 
 	if (node == m_first) {
 		m_first = m_first->GetNext();
@@ -568,7 +567,7 @@ void dgList<T>::Unlink (dgListNode* const node)
 	node->Unlink();
 
 #ifdef __ENABLE_SANITY_CHECK 
-	_ASSERTE (SanityCheck ());
+	HACD_ASSERT (SanityCheck ());
 #endif
 }
 
@@ -591,7 +590,7 @@ void dgList<T>::RemoveAll ()
 		node->Unlink();
 		delete node;
 	}
-	_ASSERTE (m_count == 0);
+	HACD_ASSERT (m_count == 0);
 	m_last = NULL;
 	m_first = NULL;
 }
@@ -600,26 +599,26 @@ template<class T>
 bool dgList<T>::SanityCheck () const
 {
 	#ifdef _DEBUG
-	dgInt32 tCount = 0;
+	hacd::HaI32 tCount = 0;
 	for (dgListNode * node = m_first; node; node = node->GetNext()) {
 		tCount ++;
 		if (node->GetPrev()) {
-			_ASSERTE (node->GetPrev() != node->GetNext());
+			HACD_ASSERT (node->GetPrev() != node->GetNext());
 			if (node->GetPrev()->GetNext() != node) {
-				_ASSERTE (0);
+				HACD_ASSERT (0);
 				return false; 
 			}
 		}
 		if (node->GetNext()) {
-			_ASSERTE (node->GetPrev() != node->GetNext());
+			HACD_ASSERT (node->GetPrev() != node->GetNext());
 			if (node->GetNext()->GetPrev() != node)	{
-				_ASSERTE (0);
+				HACD_ASSERT (0);
 				return false;
 			}
 		}
 	}
 	if (tCount != m_count) {
-		_ASSERTE (0);
+		HACD_ASSERT (0);
 		return false;
 	}
 	#endif

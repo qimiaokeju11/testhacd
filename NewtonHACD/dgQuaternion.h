@@ -27,56 +27,55 @@
 class dgVector;
 class dgMatrix;
 
-DG_MSC_VECTOR_ALIGMENT
 class dgQuaternion
 {
 	public:
 	dgQuaternion (); 
 	dgQuaternion (const dgMatrix &matrix);
-	dgQuaternion (dgFloat32 q0, dgFloat32 q1, dgFloat32 q2, dgFloat32 q3); 
-	dgQuaternion (const dgVector &unit_Axis, dgFloat32 angle = dgFloat32 (0.0f));
+	dgQuaternion (hacd::HaF32 q0, hacd::HaF32 q1, hacd::HaF32 q2, hacd::HaF32 q3); 
+	dgQuaternion (const dgVector &unit_Axis, hacd::HaF32 angle = hacd::HaF32 (0.0f));
 	
-	void Scale (dgFloat32 scale); 
+	void Scale (hacd::HaF32 scale); 
 	void Normalize (); 
-	inline dgFloat32 DotProduct (const dgQuaternion &QB) const;
+	inline hacd::HaF32 DotProduct (const dgQuaternion &QB) const;
 	dgQuaternion Inverse () const; 
 
-	dgQuaternion Slerp (const dgQuaternion &q1, dgFloat32 t) const;
-	dgVector CalcAverageOmega (const dgQuaternion &q1, dgFloat32 dt) const;
+	dgQuaternion Slerp (const dgQuaternion &q1, hacd::HaF32 t) const;
+	dgVector CalcAverageOmega (const dgQuaternion &q1, hacd::HaF32 dt) const;
 
 	dgQuaternion operator* (const dgQuaternion &B) const;
 	dgQuaternion operator+ (const dgQuaternion &B) const; 
 	dgQuaternion operator- (const dgQuaternion &B) const; 
 
-	dgFloat32 m_q0;
-	dgFloat32 m_q1;
-	dgFloat32 m_q2;
-	dgFloat32 m_q3;
-}DG_GCC_VECTOR_ALIGMENT;
+	hacd::HaF32 m_q0;
+	hacd::HaF32 m_q1;
+	hacd::HaF32 m_q2;
+	hacd::HaF32 m_q3;
+};
 
 
 
 
 inline dgQuaternion::dgQuaternion () 
 {
-	m_q0 = dgFloat32 (1.0f);
-	m_q1 = dgFloat32 (0.0f);
-	m_q2 = dgFloat32 (0.0f);
-	m_q3 = dgFloat32 (0.0f);
+	m_q0 = hacd::HaF32 (1.0f);
+	m_q1 = hacd::HaF32 (0.0f);
+	m_q2 = hacd::HaF32 (0.0f);
+	m_q3 = hacd::HaF32 (0.0f);
 }
 
-inline dgQuaternion::dgQuaternion (dgFloat32 Q0, dgFloat32 Q1, dgFloat32 Q2, dgFloat32 Q3) 
+inline dgQuaternion::dgQuaternion (hacd::HaF32 Q0, hacd::HaF32 Q1, hacd::HaF32 Q2, hacd::HaF32 Q3) 
 {
 	m_q0 = Q0;
 	m_q1 = Q1;
 	m_q2 = Q2;
 	m_q3 = Q3;
-//	_ASSERTE (dgAbsf (DotProduct (*this) -dgFloat32 (1.0f)) < dgFloat32(1.0e-4f));
+//	HACD_ASSERT (dgAbsf (DotProduct (*this) -hacd::HaF32 (1.0f)) < hacd::HaF32(1.0e-4f));
 }
 
 
 
-inline void dgQuaternion::Scale (dgFloat32 scale) 
+inline void dgQuaternion::Scale (hacd::HaF32 scale) 
 {
 	m_q0 *= scale;
 	m_q1 *= scale;
@@ -89,7 +88,7 @@ inline void dgQuaternion::Normalize ()
 	Scale (dgRsqrt (DotProduct (*this)));
 }
 
-inline dgFloat32 dgQuaternion::DotProduct (const dgQuaternion &QB) const
+inline hacd::HaF32 dgQuaternion::DotProduct (const dgQuaternion &QB) const
 {
 	return m_q0 * QB.m_q0 + m_q1 * QB.m_q1 + m_q2 * QB.m_q2 + m_q3 * QB.m_q3;
 }

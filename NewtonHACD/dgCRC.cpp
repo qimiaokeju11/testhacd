@@ -23,14 +23,13 @@
 #include "dgCRC.h"
 #include "dgList.h"
 #include "dgTree.h"
-#include "dgDebug.h"
 #include "dgRandom.h"
 
 namespace InternalCRC
 {
-	const dgInt32 STRING_POOL_SIZE =	1024 * 8 - 256;
+	const hacd::HaI32 STRING_POOL_SIZE =	1024 * 8 - 256;
 
-	static dgUnsigned32 randBits[] = {
+	static hacd::HaU32 randBits[] = {
 		0x00000001, 0x2C11F801, 0xDFD8F60E, 0x6C8FA2B7, 
 		0xB573754C, 0x1522DCDD, 0x21615D3A, 0xE1B307F3, 
 		0x12AFA158, 0x53D18179, 0x70950126, 0x941702EF, 
@@ -108,14 +107,15 @@ namespace InternalCRC
 
 		StringPool (const StringPool &arg)
 		{
+			HACD_FORCE_PARAMETER_REFERENCE(arg);
 		}
 	};
 	
 /*	
-	class CRCStringLookup: public dgTree<char *, dgUnsigned32>, public dgList<StringPool>
+	class CRCStringLookup: public dgTree<char *, hacd::HaU32>, public dgList<StringPool>
 	{
 	
-		dgInt32 size;
+		hacd::HaI32 size;
 		char *ptr;
 	
 		void AddContainer ()
@@ -134,7 +134,7 @@ namespace InternalCRC
 		public:
 
 		CRCStringLookup () 
-			:dgTree<char *, dgUnsigned32>(NULL), dgList<StringPool>()
+			:dgTree<char *, hacd::HaU32>(NULL), dgList<StringPool>()
 		{
 			AddContainer();
 		}
@@ -144,15 +144,15 @@ namespace InternalCRC
 		}
 
 
-		void AddString (dgUnsigned32 crc, const char *string)
+		void AddString (hacd::HaU32 crc, const char *string)
 		{
-			dgInt32 length;
+			hacd::HaI32 length;
 	
-			if (dgTree<char *, dgUnsigned32>::Find(crc)) {
+			if (dgTree<char *, hacd::HaU32>::Find(crc)) {
 				return;
 			}
 	
-			length = dgInt32 (strlen (string)) + 1;
+			length = hacd::HaI32 (strlen (string)) + 1;
 			if (size < length) {
 				AddContainer();
 			}
@@ -164,11 +164,11 @@ namespace InternalCRC
 			size -= length;
 		}
 
-		const char* FindString (dgUnsigned32 crc) const
+		const char* FindString (hacd::HaU32 crc) const
 		{
 			dgTreeNode *node;
 
-			node = dgTree<char *, dgUnsigned32>::Find(crc);
+			node = dgTree<char *, hacd::HaU32>::Find(crc);
 //			return node ? node->GetInfo() : NULL;
 			return node ? node->GetInfo() : NULL;
 		}
@@ -184,12 +184,12 @@ namespace InternalCRC
 
 
 	/*
-	dgUnsigned32 RSHash(char* str, dgUnsigned32 len)
+	hacd::HaU32 RSHash(char* str, hacd::HaU32 len)
 	{
-	dgUnsigned32 b    = 378551;
-	dgUnsigned32 a    = 63689;
-	dgUnsigned32 hash = 0;
-	dgUnsigned32 i    = 0;
+	hacd::HaU32 b    = 378551;
+	hacd::HaU32 a    = 63689;
+	hacd::HaU32 hash = 0;
+	hacd::HaU32 i    = 0;
 
 	for(i = 0; i < len; str++, i++)	{
 	hash = hash * a + (*str);
@@ -201,10 +201,10 @@ namespace InternalCRC
 	// End Of RS Hash Function 
 
 
-	dgUnsigned32 JSHash(char* str, dgUnsigned32 len)
+	hacd::HaU32 JSHash(char* str, hacd::HaU32 len)
 	{
-	dgUnsigned32 hash = 1315423911;
-	dgUnsigned32 i    = 0;
+	hacd::HaU32 hash = 1315423911;
+	hacd::HaU32 i    = 0;
 
 	for(i = 0; i < len; str++, i++)
 	{
@@ -216,15 +216,15 @@ namespace InternalCRC
 	// End Of JS Hash Function 
 
 
-	dgUnsigned32 PJWHash(char* str, dgUnsigned32 len)
+	hacd::HaU32 PJWHash(char* str, hacd::HaU32 len)
 	{
-	dgUnsigned32 BitsInUnsignedInt = (dgUnsigned32)(sizeof(dgUnsigned32) * 8);
-	dgUnsigned32 ThreeQuarters     = (dgUnsigned32)((BitsInUnsignedInt  * 3) / 4);
-	dgUnsigned32 OneEighth         = (dgUnsigned32)(BitsInUnsignedInt / 8);
-	dgUnsigned32 HighBits          = (dgUnsigned32)(0xFFFFFFFF) << (BitsInUnsignedInt - OneEighth);
-	dgUnsigned32 hash              = 0;
-	dgUnsigned32 test              = 0;
-	dgUnsigned32 i                 = 0;
+	hacd::HaU32 BitsInUnsignedInt = (hacd::HaU32)(sizeof(hacd::HaU32) * 8);
+	hacd::HaU32 ThreeQuarters     = (hacd::HaU32)((BitsInUnsignedInt  * 3) / 4);
+	hacd::HaU32 OneEighth         = (hacd::HaU32)(BitsInUnsignedInt / 8);
+	hacd::HaU32 HighBits          = (hacd::HaU32)(0xFFFFFFFF) << (BitsInUnsignedInt - OneEighth);
+	hacd::HaU32 hash              = 0;
+	hacd::HaU32 test              = 0;
+	hacd::HaU32 i                 = 0;
 
 	for(i = 0; i < len; str++, i++)
 	{
@@ -241,11 +241,11 @@ namespace InternalCRC
 	// End Of  P. J. Weinberger Hash Function 
 
 
-	dgUnsigned32 ELFHash(char* str, dgUnsigned32 len)
+	hacd::HaU32 ELFHash(char* str, hacd::HaU32 len)
 	{
-	dgUnsigned32 hash = 0;
-	dgUnsigned32 x    = 0;
-	dgUnsigned32 i    = 0;
+	hacd::HaU32 hash = 0;
+	hacd::HaU32 x    = 0;
+	hacd::HaU32 i    = 0;
 
 	for(i = 0; i < len; str++, i++)
 	{
@@ -262,11 +262,11 @@ namespace InternalCRC
 	// End Of ELF Hash Function 
 
 
-	dgUnsigned32 BKDRHash(char* str, dgUnsigned32 len)
+	hacd::HaU32 BKDRHash(char* str, hacd::HaU32 len)
 	{
-	dgUnsigned32 seed = 131; // 31 131 1313 13131 131313 etc.. 
-	dgUnsigned32 hash = 0;
-	dgUnsigned32 i    = 0;
+	hacd::HaU32 seed = 131; // 31 131 1313 13131 131313 etc.. 
+	hacd::HaU32 hash = 0;
+	hacd::HaU32 i    = 0;
 
 	for(i = 0; i < len; str++, i++)
 	{
@@ -278,10 +278,10 @@ namespace InternalCRC
 	// End Of BKDR Hash Function 
 
 
-	dgUnsigned32 SDBMHash(char* str, dgUnsigned32 len)
+	hacd::HaU32 SDBMHash(char* str, hacd::HaU32 len)
 	{
-	dgUnsigned32 hash = 0;
-	dgUnsigned32 i    = 0;
+	hacd::HaU32 hash = 0;
+	hacd::HaU32 i    = 0;
 
 	for(i = 0; i < len; str++, i++)
 	{
@@ -293,10 +293,10 @@ namespace InternalCRC
 	// End Of SDBM Hash Function 
 
 
-	dgUnsigned32 DEKHash(char* str, dgUnsigned32 len)
+	hacd::HaU32 DEKHash(char* str, hacd::HaU32 len)
 	{
-	dgUnsigned32 hash = len;
-	dgUnsigned32 i    = 0;
+	hacd::HaU32 hash = len;
+	hacd::HaU32 i    = 0;
 
 	for(i = 0; i < len; str++, i++)
 	{
@@ -307,10 +307,10 @@ namespace InternalCRC
 	// End Of DEK Hash Function 
 
 
-	dgUnsigned32 APHash(char* str, dgUnsigned32 len)
+	hacd::HaU32 APHash(char* str, hacd::HaU32 len)
 	{
-	dgUnsigned32 hash = 0;
-	dgUnsigned32 i    = 0;
+	hacd::HaU32 hash = 0;
+	hacd::HaU32 i    = 0;
 
 	for(i = 0; i < len; str++, i++)
 	{
@@ -323,10 +323,10 @@ namespace InternalCRC
 	*/
 
 	// End Of DJB Hash Function 
-	dgUnsigned32 DJBHash(const char* const str, dgInt32 len)
+	hacd::HaU32 DJBHash(const char* const str, hacd::HaI32 len)
 	{
-		dgUnsigned32 hash = 5381;
-		for(dgInt32 i = 0; i < len; i++)
+		hacd::HaU32 hash = 5381;
+		for(hacd::HaI32 i = 0; i < len; i++)
 		{
 			//hash = ((hash << 5) + hash) + (*str);
 			hash = ((hash << 5) + hash) + str[i];
@@ -337,54 +337,54 @@ namespace InternalCRC
 }	
 
 
-dgUnsigned32 dgApi dgCRC (const char* const name)
+hacd::HaU32 dgApi dgCRC (const char* const name)
 {
-//	dgUnsigned32 c;
-//	dgUnsigned32 crc;
+//	hacd::HaU32 c;
+//	hacd::HaU32 crc;
 //	unsigned char *ptr;
-//	dgUnsigned32 val;
+//	hacd::HaU32 val;
 	if (!name) {
 		return 0;
 	}
 
-	dgUnsigned32 crc = 0;
+	hacd::HaU32 crc = 0;
 	//for (ptr = (unsigned char*)name; *ptr; ptr ++) {
-	for (dgInt32 i = 0; name[i]; i ++) {
+	for (hacd::HaI32 i = 0; name[i]; i ++) {
 		char c = name[i];
-		dgUnsigned32 val = InternalCRC::randBits[((crc >> 24) ^ c) & 0xff];
+		hacd::HaU32 val = InternalCRC::randBits[((crc >> 24) ^ c) & 0xff];
 		crc = (crc << 8) ^ val;
 	}
 
-	_ASSERTE (0);
+	HACD_ASSERT (0);
 //	InternalCRC::GetDatabase().AddString (crc, name);
 	return crc;
 }
 
 
 
-dgUnsigned32 dgApi dgCRC (const void* const buffer, dgInt32 size, dgUnsigned32 crcAcc)
+hacd::HaU32 dgApi dgCRC (const void* const buffer, hacd::HaI32 size, hacd::HaU32 crcAcc)
 {
-	_ASSERTE (buffer);
+	HACD_ASSERT (buffer);
 	unsigned char* const ptr = (unsigned char*)buffer;
-	for (dgInt32 i = 0; i < size; i ++) {
-		dgUnsigned32 c = ptr[i];
-		dgUnsigned32 val = InternalCRC::randBits[((crcAcc >> 24) ^ c) & 0xff];
+	for (hacd::HaI32 i = 0; i < size; i ++) {
+		hacd::HaU32 c = ptr[i];
+		hacd::HaU32 val = InternalCRC::randBits[((crcAcc >> 24) ^ c) & 0xff];
 		crcAcc = (crcAcc << 8) ^ val;
 	}
 	return crcAcc;
 }
 
 
-const char* dgApi dgInverseCRC (dgUnsigned32 crc)
+const char* dgApi dgInverseCRC (hacd::HaU32 crc)
 {	
-	_ASSERTE (0);
+	HACD_ASSERT (0);
+	HACD_FORCE_PARAMETER_REFERENCE(crc);
 	return NULL;
-//	return InternalCRC::GetDatabase().FindString (crc);
 }
 	
 
 
-dgUnsigned32 dgApi dgHash (const void* const string, int size)
+hacd::HaU32 dgApi dgHash (const void* const string, int size)
 {
 	return InternalCRC::DJBHash ((char*)string, size);
 }

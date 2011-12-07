@@ -25,25 +25,23 @@
 //#include "dgStdafx.h"
 #include "dgCRC.h"
 #include "dgRtti.h"
-#include "dgDebug.h"
 #include "dgMemory.h"
-
 
 struct dgRefFlags
 {
 	dgRefFlags ();
-	inline dgInt32 operator = (dgInt32 val);
+	inline hacd::HaI32 operator = (hacd::HaI32 val);
 
-	dgUnsigned8 m_alive; 
-	dgUnsigned8 m_userFlag0;
-	dgUnsigned8 m_userFlag1;
-	dgUnsigned8 m_userFlag2;
-//	dgUnsigned32 m_userFlag3	: 1;
-//	dgUnsigned32 m_userFlag4	: 1;
-//	dgUnsigned32 m_userFlag5	: 1;
-//	dgUnsigned32 m_userFlag6	: 1;
+	hacd::HaU8 m_alive; 
+	hacd::HaU8 m_userFlag0;
+	hacd::HaU8 m_userFlag1;
+	hacd::HaU8 m_userFlag2;
+//	hacd::HaU32 m_userFlag3	: 1;
+//	hacd::HaU32 m_userFlag4	: 1;
+//	hacd::HaU32 m_userFlag5	: 1;
+//	hacd::HaU32 m_userFlag6	: 1;
 
-	dgUnsigned32 m_ref;
+	hacd::HaU32 m_ref;
 };
 
 
@@ -52,16 +50,16 @@ class dgRef: public dgRefFlags
    public:
 	dgRef ();
 	dgRef (const char *name);
-	dgRef (dgUnsigned32 idArg);
+	dgRef (hacd::HaU32 idArg);
 	dgRef(const dgRef &Clone);
 	dgRef *AddRef () ;
-	dgInt32 Release ();
-	dgInt32 GetRefCount() const;
+	hacd::HaI32 Release ();
+	hacd::HaI32 GetRefCount() const;
 
 
 	virtual dgRef *CreateClone ()	const;
-	virtual dgUnsigned32 GetTypeId () const;
-	virtual bool IsType (dgUnsigned32 typeId) const;
+	virtual hacd::HaU32 GetTypeId () const;
+	virtual bool IsType (hacd::HaU32 typeId) const;
 
 	bool GetUserFlag0 () const;
 	bool GetUserFlag1 () const;
@@ -73,21 +71,21 @@ class dgRef: public dgRefFlags
 	virtual void Unkill();
 
 	const char* GetName () const;
-	dgUnsigned32 GetNameID () const;
-	inline void SetNameID (dgUnsigned32 newID);
+	hacd::HaU32 GetNameID () const;
+	inline void SetNameID (hacd::HaU32 newID);
 	virtual inline void SetName (const char *name);
 
 	void AttachRef (dgRef **oldRef, dgRef *newRef);
 
 	
 	bool IsTypeByName (const char *typeName) const;
-	static dgUnsigned32 GetRttiType();
+	static hacd::HaU32 GetRttiType();
 
 	protected:
 	virtual ~dgRef (); 
 
 	private:
-	dgUnsigned32 m_id;
+	hacd::HaU32 m_id;
 	static dgRtti m_rtti;
 };
 
@@ -100,10 +98,10 @@ inline dgRefFlags::dgRefFlags ()
 	m_ref = 1;
 }
 
-inline dgInt32 dgRefFlags::operator = (dgInt32 val)
+inline hacd::HaI32 dgRefFlags::operator = (hacd::HaI32 val)
 {
-	dgInt32* ptr;
-	ptr = &(*(dgInt32*)this);
+	hacd::HaI32* ptr;
+	ptr = &(*(hacd::HaI32*)this);
 	*ptr = val;
 	return val;
 }
@@ -120,7 +118,7 @@ inline dgRef::dgRef (const char *name)
 	SetName (name);
 }
 
-inline dgRef::dgRef (dgUnsigned32 idArg)
+inline dgRef::dgRef (hacd::HaU32 idArg)
 {
 	SetNameID (idArg);
 }
@@ -137,15 +135,15 @@ inline dgRef::~dgRef ()
 inline dgRef *dgRef::AddRef () 
 {
 	m_ref ++;
-	_ASSERTE (m_ref < ((1<<24) - 1));
+	HACD_ASSERT (m_ref < ((1<<24) - 1));
 	return this;
 }
 
-inline dgInt32 dgRef::Release ()
+inline hacd::HaI32 dgRef::Release ()
 {
 	m_ref --;
 	if (m_ref) {
-		return dgInt32 (m_ref);
+		return hacd::HaI32 (m_ref);
 	}
 	delete this;
 	return 0;
@@ -153,29 +151,29 @@ inline dgInt32 dgRef::Release ()
 
 inline dgRef *dgRef::CreateClone () const
 {
-	_ASSERTE (0);
+	HACD_ASSERT (0);
 	return NULL;
 }
 
 
-inline dgUnsigned32 dgRef::GetTypeId () const
+inline hacd::HaU32 dgRef::GetTypeId () const
 {
 	return m_rtti.GetTypeId ();
 }
 
-inline bool dgRef::IsType (dgUnsigned32 typeId) const
+inline bool dgRef::IsType (hacd::HaU32 typeId) const
 {
 	return m_rtti.IsTypeID (typeId);
 }
 
-inline dgUnsigned32 dgRef::GetRttiType()
+inline hacd::HaU32 dgRef::GetRttiType()
 {
 	return m_rtti.GetTypeId();
 }
 
 inline bool dgRef::IsTypeByName (const char *typeName) const
 {
-	return IsType (dgCRC (typeName,  (dgInt32) strlen (typeName)));
+	return IsType (dgCRC (typeName,  (hacd::HaI32) strlen (typeName)));
 }
 
 
@@ -192,12 +190,12 @@ inline bool dgRef::GetUserFlag1 () const
 
 inline void dgRef::SetUserFlag0 (bool flags)
 {
-	m_userFlag0 = dgUnsigned8 (flags);
+	m_userFlag0 = hacd::HaU8 (flags);
 }
 
 inline void dgRef::SetUserFlag1 (bool flags)
 {
-	m_userFlag1 = dgUnsigned8 (flags);
+	m_userFlag1 = hacd::HaU8 (flags);
 }
 
 
@@ -216,12 +214,12 @@ inline void dgRef::Unkill()
 	m_alive = true;
 }
 
-inline void dgRef::SetNameID (dgUnsigned32 newID)
+inline void dgRef::SetNameID (hacd::HaU32 newID)
 {
 	m_id = newID;
 }
 
-inline dgUnsigned32 dgRef::GetNameID () const
+inline hacd::HaU32 dgRef::GetNameID () const
 {
 	return m_id;
 }
@@ -239,9 +237,9 @@ inline const char* dgRef::GetName () const
 	return dgInverseCRC (GetNameID ());
 }
 
-inline dgInt32 dgRef::GetRefCount() const
+inline hacd::HaI32 dgRef::GetRefCount() const
 {
-	return dgInt32 (m_ref);
+	return hacd::HaI32 (m_ref);
 }
 
 #endif

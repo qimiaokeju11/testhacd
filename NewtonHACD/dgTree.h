@@ -22,9 +22,7 @@
 #ifndef __dgTree__
 #define __dgTree__
 
-//#include "dgStdafx.h"
 #include "dgRef.h"
-#include "dgDebug.h"
 #include "dgMemory.h"
 
 
@@ -62,8 +60,8 @@ class dgRedBackNode : public hacd::UserAllocated
 	inline void Initdata (dgRedBackNode* const parent);
 	inline void SetColor (REDBLACK_COLOR color);
 	REDBLACK_COLOR GetColor () const;
-	dgUnsigned32 IsInTree () const;
-	inline void SetInTreeFlag (dgUnsigned32 flag);
+	hacd::HaU32 IsInTree () const;
+	inline void SetInTreeFlag (hacd::HaU32 flag);
 
 	void RemoveAll ();
 	dgRedBackNode* Prev() const;
@@ -77,9 +75,9 @@ class dgRedBackNode : public hacd::UserAllocated
 	dgRedBackNode* m_left;
 	dgRedBackNode* m_right;
 	dgRedBackNode* m_parent;
-	dgUnsigned32  m_color	: 1;
-	dgUnsigned32  m_inTree	: 1;
-//	dgUnsigned32  m_pad[2];
+	hacd::HaU32  m_color	: 1;
+	hacd::HaU32  m_inTree	: 1;
+//	hacd::HaU32  m_pad[2];
 };
 
 template<class OBJECT, class KEY>
@@ -94,7 +92,7 @@ class dgTree
 			dgTreeNode* parentNode)
 			:dgRedBackNode(parentNode), m_info (info), m_key (key)
 		{
-//			_ASSERTE ((dgUnsigned64 (&m_info) & 0x0f) == 0);
+//			HACD_ASSERT ((hacd::HaU64 (&m_info) & 0x0f) == 0);
 		}
 
 		~dgTreeNode () 
@@ -178,32 +176,32 @@ class dgTree
 			m_ptr = node;
 		}
 
-		operator dgInt32() const 
+		operator hacd::HaI32() const 
 		{
 			return m_ptr != NULL;
 		}
 
 		void operator++ ()
 		{
-			_ASSERTE (m_ptr);
+			HACD_ASSERT (m_ptr);
 			m_ptr = m_ptr->Next();
 		}
 
-		void operator++ (dgInt32)
+		void operator++ (hacd::HaI32)
 		{
-			_ASSERTE (m_ptr);
+			HACD_ASSERT (m_ptr);
 			m_ptr = m_ptr->Next();
 		}
 
 		void operator-- () 
 		{
-			_ASSERTE (m_ptr);
+			HACD_ASSERT (m_ptr);
 			m_ptr = m_ptr->Prev();
 		}
 
-		void operator-- (dgInt32) 
+		void operator-- (hacd::HaI32) 
 		{
-			_ASSERTE (m_ptr);
+			HACD_ASSERT (m_ptr);
 			m_ptr = m_ptr->Prev();
 		}
 
@@ -240,8 +238,8 @@ class dgTree
 	virtual ~dgTree (); 
 
 
-	operator dgInt32() const;
-	dgInt32 GetCount() const;
+	operator hacd::HaI32() const;
+	hacd::HaI32 GetCount() const;
 
 	dgTreeNode* GetRoot () const;
 	dgTreeNode* Minimum () const;
@@ -275,11 +273,11 @@ class dgTree
 	// member variables
 	// ***********************************************************
 	private:
-	dgInt32 m_count;
+	hacd::HaI32 m_count;
 	dgTreeNode* m_head;
 
-	dgInt32 CompareKeys (const KEY &key0, const KEY &key1) const;
-	bool SanityCheck (dgTreeNode* const ptr, dgInt32 height) const;
+	hacd::HaI32 CompareKeys (const KEY &key0, const KEY &key1) const;
+	bool SanityCheck (dgTreeNode* const ptr, hacd::HaI32 height) const;
 
 	friend class dgTreeNode;
 };
@@ -312,12 +310,12 @@ inline dgRedBackNode::REDBLACK_COLOR  dgRedBackNode::GetColor () const
 }
 
 
-inline void dgRedBackNode::SetInTreeFlag (dgUnsigned32 flag)
+inline void dgRedBackNode::SetInTreeFlag (hacd::HaU32 flag)
 {
 	m_inTree = flag;
 }
 
-inline dgUnsigned32 dgRedBackNode::IsInTree () const
+inline hacd::HaU32 dgRedBackNode::IsInTree () const
 {
 	return m_inTree;
 }
@@ -346,13 +344,13 @@ dgTree<OBJECT, KEY>::~dgTree ()
 }
 
 template<class OBJECT, class KEY>
-dgTree<OBJECT, KEY>::operator dgInt32() const
+dgTree<OBJECT, KEY>::operator hacd::HaI32() const
 {
 	return m_head != NULL;
 }
 
 template<class OBJECT, class KEY>
-dgInt32 dgTree<OBJECT, KEY>::GetCount() const
+hacd::HaI32 dgTree<OBJECT, KEY>::GetCount() const
 {
 	return m_count;
 }
@@ -385,13 +383,13 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::Find (KEY key) co
 	dgTreeNode* ptr = m_head;
 	while (ptr != NULL) {
 		if (key < ptr->m_key) {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == -1) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == -1) ;
 			ptr = ptr->GetLeft();
 		} else if (key > ptr->m_key) {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == 1) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == 1) ;
 			ptr = ptr->GetRight();
 		} else {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == 0) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == 0) ;
 			break;
 		}
 	}
@@ -402,11 +400,11 @@ template<class OBJECT, class KEY>
 typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::GetNodeFromInfo (OBJECT &info) const
 {
 	dgTreeNode* const node = (dgTreeNode* ) &info;
-	dgInt64 offset = ((char*) &node->m_info) - ((char *) node);
+	hacd::HaI64 offset = ((char*) &node->m_info) - ((char *) node);
 	dgTreeNode* const retnode = (dgTreeNode* ) (((char *) node) - offset);
 
-	_ASSERTE (retnode->IsInTree ());
-	_ASSERTE (&retnode->GetInfo () == &info);
+	HACD_ASSERT (retnode->IsInTree ());
+	HACD_ASSERT (&retnode->GetInfo () == &info);
 	return (retnode->IsInTree ()) ? retnode : NULL;
 
 }
@@ -435,11 +433,11 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::FindGreater (KEY 
 		Iterator iter (*this);
 		for (iter.Begin(); iter.GetNode() != prev; iter ++) {
 			KEY key1 = iter.GetKey(); 
-			_ASSERTE (key1 <= key);
+			HACD_ASSERT (key1 <= key);
 		}
 		for (; iter.GetNode(); iter ++) {
 			KEY key1 = iter.GetKey(); 
-			_ASSERTE (key1 > key);
+			HACD_ASSERT (key1 > key);
 		}
 	}
 #endif
@@ -474,11 +472,11 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::FindGreaterEqual 
 		Iterator iter (*this);
 		for (iter.Begin(); iter.GetNode() != prev; iter ++) {
 			KEY key1 = iter.GetKey(); 
-			_ASSERTE (key1 <= key);
+			HACD_ASSERT (key1 <= key);
 		}
 		for (; iter.GetNode(); iter ++) {
 			KEY key1 = iter.GetKey(); 
-			_ASSERTE (key1 >= key);
+			HACD_ASSERT (key1 >= key);
 		}
 	}
 #endif
@@ -515,11 +513,11 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::FindLessEqual (KE
 		Iterator iter (*this);
 		for (iter.End(); iter.GetNode() != prev; iter --) {
 			KEY key1 = iter.GetKey(); 
-			_ASSERTE (key1 >= key);
+			HACD_ASSERT (key1 >= key);
 		}
 		for (; iter.GetNode(); iter --) {
 			KEY key1 = iter.GetKey(); 
-			_ASSERTE (key1 < key);
+			HACD_ASSERT (key1 < key);
 		}
 	}
 #endif
@@ -532,21 +530,21 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::Insert (const OBJ
 {
 	dgTreeNode* parent = NULL;
 	dgTreeNode* ptr = m_head;
-	dgInt32 val = 0;
+	hacd::HaI32 val = 0;
 	elementWasInTree = false;
 	while (ptr != NULL) {
 		parent = ptr;
 
 		if (key < ptr->m_key) {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == -1) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == -1) ;
 			val = -1;
 			ptr = ptr->GetLeft();
 		} else if (key > ptr->m_key) {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == 1) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == 1) ;
 			val = 1;
 			ptr = ptr->GetRight();
 		} else {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == 0) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == 0) ;
 			elementWasInTree = true;
 			return ptr;
 		}
@@ -585,7 +583,7 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::Insert (const OBJ
 template<class OBJECT, class KEY>
 typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::Insert (typename dgTree<OBJECT, KEY>::dgTreeNode* const node, KEY key)
 {
-	dgInt32 val = 0;
+	hacd::HaI32 val = 0;
 	dgTreeNode* ptr = m_head;
 	dgTreeNode* parent = NULL;
 	while (ptr != NULL) {
@@ -600,15 +598,15 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::Insert (typename 
 //		}
 
 		if (key < ptr->m_key) {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == -1) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == -1) ;
 			val = -1;
 			ptr = ptr->GetLeft();
 		} else if (key > ptr->m_key) {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == 1) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == 1) ;
 			val = 1;
 			ptr = ptr->GetRight();
 		} else {
-			_ASSERTE (CompareKeys (ptr->m_key, key) == 0) ;
+			HACD_ASSERT (CompareKeys (ptr->m_key, key) == 0) ;
 			return NULL;
 		}
 	}
@@ -641,11 +639,11 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::Replace (OBJECT &
 {
 	dgTreeNode* parent = NULL;
 	dgTreeNode* ptr = m_head;
-	dgInt32 val = 0;
+	hacd::HaI32 val = 0;
 	while (ptr != NULL) {
 		parent = ptr;
 
-		_ASSERTE (0);
+		HACD_ASSERT (0);
 		val = CompareKeys (ptr->m_key, key);
 		if (val == 0) {
 			ptr->m_info = element;
@@ -681,7 +679,7 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::ReplaceKey (typen
 {
 	Unlink (node);
 	dgTreeNode* const ptr = Insert (node, key);
-	_ASSERTE (ptr);
+	HACD_ASSERT (ptr);
 	return ptr;
 }
 
@@ -699,7 +697,7 @@ void dgTree<OBJECT, KEY>::Unlink (typename dgTree<OBJECT, KEY>::dgTreeNode* cons
 
 	dgTreeNode** const headPtr = (dgTreeNode**) &m_head;
 	node->Unlink ((dgRedBackNode**)headPtr);
-	_ASSERTE (!Find (node->GetKey()));
+	HACD_ASSERT (!Find (node->GetKey()));
 }
 
 
@@ -742,7 +740,7 @@ bool dgTree<OBJECT, KEY>::SanityCheck () const
 
 
 template<class OBJECT, class KEY>
-bool dgTree<OBJECT, KEY>::SanityCheck (typename dgTree<OBJECT, KEY>::dgTreeNode* const ptr, dgInt32 height) const
+bool dgTree<OBJECT, KEY>::SanityCheck (typename dgTree<OBJECT, KEY>::dgTreeNode* const ptr, hacd::HaI32 height) const
 {
 	if (!ptr) {
 		return true;
@@ -772,7 +770,7 @@ bool dgTree<OBJECT, KEY>::SanityCheck (typename dgTree<OBJECT, KEY>::dgTreeNode*
 	}
 
 	if (!ptr->m_left && !ptr->m_right) {
-		dgInt32 bh = 0;
+		hacd::HaI32 bh = 0;
 		for (dgTreeNode* x = ptr; x; x = x->GetParent()) {
 	 		if (x->GetColor() == dgTreeNode::BLACK) {
 				bh ++;
@@ -795,7 +793,7 @@ bool dgTree<OBJECT, KEY>::SanityCheck (typename dgTree<OBJECT, KEY>::dgTreeNode*
 
 
 template<class OBJECT, class KEY>
-dgInt32 dgTree<OBJECT, KEY>::CompareKeys (const KEY &key0, const KEY &key1) const
+hacd::HaI32 dgTree<OBJECT, KEY>::CompareKeys (const KEY &key0, const KEY &key1) const
 {
 	if (key1 < key0) {
 		return - 1;

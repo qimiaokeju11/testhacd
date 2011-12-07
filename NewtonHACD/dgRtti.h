@@ -29,24 +29,24 @@ class dgRtti
 {
 	public:
 	dgRtti(const char* typeName);
-	dgUnsigned32 GetTypeId() const;
-	bool IsTypeID(dgUnsigned32 id) const;
+	hacd::HaU32 GetTypeId() const;
+	bool IsTypeID(hacd::HaU32 id) const;
 
 	private:
-	dgUnsigned32 m_TypeId;
+	hacd::HaU32 m_TypeId;
 };
 
 inline dgRtti::dgRtti(const char* typeName)
 {
-	m_TypeId = dgCRC (typeName,  (dgInt32) strlen (typeName));
+	m_TypeId = dgCRC (typeName,  (hacd::HaI32) strlen (typeName));
 }
 
-inline dgUnsigned32 dgRtti::GetTypeId() const
+inline hacd::HaU32 dgRtti::GetTypeId() const
 {
 	return m_TypeId;
 }
 
-inline bool dgRtti::IsTypeID (dgUnsigned32 id) const
+inline bool dgRtti::IsTypeID (hacd::HaU32 id) const
 {
 	return m_TypeId == id;
 }
@@ -57,18 +57,18 @@ inline bool dgRtti::IsTypeID (dgUnsigned32 id) const
 	private:												\
 	static dgRtti rtti; 									\
 	public:													\
-	virtual bool IsType (dgUnsigned32 typeId) const			\
+	virtual bool IsType (hacd::HaU32 typeId) const			\
 	{														\
 		if (rtti.IsTypeID (typeId)) {						\
 			return true;									\
 		}													\
 		return baseClass::IsType (typeId);					\
 	}														\
-	virtual dgUnsigned32 GetTypeId () const					\
+	virtual hacd::HaU32 GetTypeId () const					\
 	{														\
 		return rtti.GetTypeId ();							\
 	}														\
-	static dgUnsigned32 GetRttiType()						\
+	static hacd::HaU32 GetRttiType()						\
 	{														\
 		return rtti.GetTypeId();							\
 	}

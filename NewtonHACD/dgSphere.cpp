@@ -20,7 +20,6 @@
 */
 
 //#include "dgStdafx.h"
-#include "dgDebug.h"
 #include "dgPlane.h"
 #include "dgSphere.h"
 #include "dgMatrix.h"
@@ -35,11 +34,11 @@ const dgSphere& GetIdentitySphere()
 
 namespace InternalSphere
 {
-	const dgFloat32 SPHERE_TOL = 0.002f;	
+	const hacd::HaF32 SPHERE_TOL = 0.002f;	
 
-	static dgFloat32 AspectRatio (dgFloat32 x, dgFloat32 y)
+	static hacd::HaF32 AspectRatio (hacd::HaF32 x, hacd::HaF32 y)
 	{
-		dgFloat32 tmp;
+		hacd::HaF32 tmp;
 		x = dgAbsf (x);
 		y = dgAbsf (y);
 
@@ -55,20 +54,20 @@ namespace InternalSphere
 	}
 	
 
-	static void BoundingBox (const dgMatrix &matrix, const dgFloat32 vertex[], dgInt32 stride, const dgInt32 index[], dgInt32 indexCount, dgVector &min, dgVector &max)
+	static void BoundingBox (const dgMatrix &matrix, const hacd::HaF32 vertex[], hacd::HaI32 stride, const hacd::HaI32 index[], hacd::HaI32 indexCount, dgVector &min, dgVector &max)
 	{
-	   dgFloat32 xmin = dgFloat32 (1.0e10f);
-	   dgFloat32 ymin = dgFloat32 (1.0e10f);
-	   dgFloat32 zmin = dgFloat32 (1.0e10f);
+	   hacd::HaF32 xmin = hacd::HaF32 (1.0e10f);
+	   hacd::HaF32 ymin = hacd::HaF32 (1.0e10f);
+	   hacd::HaF32 zmin = hacd::HaF32 (1.0e10f);
 
-	   dgFloat32 xmax = dgFloat32 (-1.0e10f);
-	   dgFloat32 ymax = dgFloat32 (-1.0e10f);
-	   dgFloat32 zmax = dgFloat32 (-1.0e10f);
+	   hacd::HaF32 xmax = hacd::HaF32 (-1.0e10f);
+	   hacd::HaF32 ymax = hacd::HaF32 (-1.0e10f);
+	   hacd::HaF32 zmax = hacd::HaF32 (-1.0e10f);
 
-	   const dgFloat32*	const ptr = vertex;
-	   for (dgInt32 j = 0 ; j < indexCount; j ++ ) {
-			dgInt32 i = index[j] * stride;
-			dgVector tmp (ptr[i + 0], ptr[i + 1], ptr[i + 2], dgFloat32 (0.0f));
+	   const hacd::HaF32*	const ptr = vertex;
+	   for (hacd::HaI32 j = 0 ; j < indexCount; j ++ ) {
+			hacd::HaI32 i = index[j] * stride;
+			dgVector tmp (ptr[i + 0], ptr[i + 1], ptr[i + 2], hacd::HaF32 (0.0f));
 			tmp = matrix.UnrotateVector (tmp);
 			if (tmp.m_x < xmin) xmin = tmp.m_x;
 			if (tmp.m_y < ymin) ymin = tmp.m_y;
@@ -78,24 +77,24 @@ namespace InternalSphere
 			if (tmp.m_z > zmax) zmax = tmp.m_z;
 	   }
 		
-	   min = dgVector (xmin, ymin, zmin, dgFloat32 (0.0f));
-	   max = dgVector (xmax, ymax, zmax, dgFloat32 (0.0f));
+	   min = dgVector (xmin, ymin, zmin, hacd::HaF32 (0.0f));
+	   max = dgVector (xmax, ymax, zmax, hacd::HaF32 (0.0f));
 	}
 
 	// Compute axis aligned box
-	static void BoundingBox (const dgMatrix &Mat, const dgFloat32 vertex[], dgInt32 vertexCount, dgInt32 stride, dgVector &min, dgVector &max)
+	static void BoundingBox (const dgMatrix &Mat, const hacd::HaF32 vertex[], hacd::HaI32 vertexCount, hacd::HaI32 stride, dgVector &min, dgVector &max)
 	{
-		dgFloat32 xmin = dgFloat32 (1.0e10f);
-		dgFloat32 ymin = dgFloat32 (1.0e10f);
-		dgFloat32 zmin = dgFloat32 (1.0e10f);
+		hacd::HaF32 xmin = hacd::HaF32 (1.0e10f);
+		hacd::HaF32 ymin = hacd::HaF32 (1.0e10f);
+		hacd::HaF32 zmin = hacd::HaF32 (1.0e10f);
 
-		dgFloat32 xmax = dgFloat32 (-1.0e10f);
-		dgFloat32 ymax = dgFloat32 (-1.0e10f);
-		dgFloat32 zmax = dgFloat32 (-1.0e10f);
+		hacd::HaF32 xmax = hacd::HaF32 (-1.0e10f);
+		hacd::HaF32 ymax = hacd::HaF32 (-1.0e10f);
+		hacd::HaF32 zmax = hacd::HaF32 (-1.0e10f);
 
-		const dgFloat32* ptr = vertex;
-		for (dgInt32 i = 0 ; i < vertexCount; i ++ ) {
-			dgVector tmp (ptr[0], ptr[1], ptr[2], dgFloat32 (0.0f));
+		const hacd::HaF32* ptr = vertex;
+		for (hacd::HaI32 i = 0 ; i < vertexCount; i ++ ) {
+			dgVector tmp (ptr[0], ptr[1], ptr[2], hacd::HaF32 (0.0f));
 			ptr += stride;
 			tmp = Mat.UnrotateVector (tmp);
 			if (tmp.m_x < xmin) xmin = tmp.m_x;
@@ -106,22 +105,22 @@ namespace InternalSphere
 			if (tmp.m_z > zmax) zmax = tmp.m_z;
 		}
 
-		min = dgVector (xmin, ymin, zmin, dgFloat32 (0.0f));
-		max = dgVector (xmax, ymax, zmax, dgFloat32 (0.0f));
+		min = dgVector (xmin, ymin, zmin, hacd::HaF32 (0.0f));
+		max = dgVector (xmax, ymax, zmax, hacd::HaF32 (0.0f));
 	}
 
 
-	static void Statistics (dgSphere &sphere, dgVector &eigenValues, dgVector &scaleVector, const dgFloat32 vertex[], const dgInt32 faceIndex[], dgInt32 indexCount, dgInt32 stride)
+	static void Statistics (dgSphere &sphere, dgVector &eigenValues, dgVector &scaleVector, const hacd::HaF32 vertex[], const hacd::HaI32 faceIndex[], hacd::HaI32 indexCount, hacd::HaI32 stride)
 	{
-		dgVector var (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector cov (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector centre (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector massCenter (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector var (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+		dgVector cov (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+		dgVector centre (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+		dgVector massCenter (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
 
-		dgFloat64 totalArea = dgFloat32 (0.0f);
-		const dgFloat32* const ptr = vertex;
-		for (dgInt32 i = 0; i < indexCount; i += 3) {
-			dgInt32 index = faceIndex[i] * stride;
+		hacd::HaF64 totalArea = hacd::HaF32 (0.0f);
+		const hacd::HaF32* const ptr = vertex;
+		for (hacd::HaI32 i = 0; i < indexCount; i += 3) {
+			hacd::HaI32 index = faceIndex[i] * stride;
 			dgVector p0 (&ptr[index]);
 			p0 = p0.CompProduct (scaleVector);
 
@@ -135,22 +134,22 @@ namespace InternalSphere
 
 			dgVector normal ((p1 - p0) * (p2 - p0));
 
-			dgFloat64 area = dgFloat32 (0.5f) * sqrt (normal % normal);
+			hacd::HaF64 area = hacd::HaF32 (0.5f) * sqrt (normal % normal);
 
 			centre = p0 + p1 + p2;
-			centre = centre.Scale (dgFloat32  (1.0f / 3.0f));
+			centre = centre.Scale (hacd::HaF32  (1.0f / 3.0f));
 
 			// Inertia of each point in the triangle
-			dgFloat64 Ixx = p0.m_x * p0.m_x + p1.m_x * p1.m_x + p2.m_x * p2.m_x;	
-			dgFloat64 Iyy = p0.m_y * p0.m_y + p1.m_y * p1.m_y + p2.m_y * p2.m_y;	
-			dgFloat64 Izz = p0.m_z * p0.m_z + p1.m_z * p1.m_z + p2.m_z * p2.m_z;	
+			hacd::HaF64 Ixx = p0.m_x * p0.m_x + p1.m_x * p1.m_x + p2.m_x * p2.m_x;	
+			hacd::HaF64 Iyy = p0.m_y * p0.m_y + p1.m_y * p1.m_y + p2.m_y * p2.m_y;	
+			hacd::HaF64 Izz = p0.m_z * p0.m_z + p1.m_z * p1.m_z + p2.m_z * p2.m_z;	
 
-			dgFloat64 Ixy = p0.m_x * p0.m_y + p1.m_x * p1.m_y + p2.m_x * p2.m_y;	
-			dgFloat64 Iyz = p0.m_y * p0.m_z + p1.m_y * p1.m_z + p2.m_y * p2.m_z;	
-			dgFloat64 Ixz = p0.m_x * p0.m_z + p1.m_x * p1.m_z + p2.m_x * p2.m_z;	
+			hacd::HaF64 Ixy = p0.m_x * p0.m_y + p1.m_x * p1.m_y + p2.m_x * p2.m_y;	
+			hacd::HaF64 Iyz = p0.m_y * p0.m_z + p1.m_y * p1.m_z + p2.m_y * p2.m_z;	
+			hacd::HaF64 Ixz = p0.m_x * p0.m_z + p1.m_x * p1.m_z + p2.m_x * p2.m_z;	
 
 			if (area > dgEPSILON * 10.0) {
-				dgFloat64 K = area / dgFloat64 (12.0);
+				hacd::HaF64 K = area / hacd::HaF64 (12.0);
 				//Coriolis theorem for Inertia of a triangle in an arbitrary orientation
 				Ixx = K * (Ixx + 9.0 * centre.m_x * centre.m_x);
 				Iyy = K * (Iyy + 9.0 * centre.m_y * centre.m_y);
@@ -159,70 +158,70 @@ namespace InternalSphere
 				Ixy = K * (Ixy + 9.0 * centre.m_x * centre.m_y);
 				Ixz = K * (Ixz + 9.0 * centre.m_x * centre.m_z);
 				Iyz = K * (Iyz + 9.0 * centre.m_y * centre.m_z);
-				centre = centre.Scale ((dgFloat32)area);
+				centre = centre.Scale ((hacd::HaF32)area);
 			} 
 
 			totalArea += area;
 			massCenter += centre;
-			var += dgVector ((dgFloat32)Ixx, (dgFloat32)Iyy, (dgFloat32)Izz, dgFloat32 (0.0f));
-			cov += dgVector ((dgFloat32)Ixy, (dgFloat32)Ixz, (dgFloat32)Iyz, dgFloat32 (0.0f));
+			var += dgVector ((hacd::HaF32)Ixx, (hacd::HaF32)Iyy, (hacd::HaF32)Izz, hacd::HaF32 (0.0f));
+			cov += dgVector ((hacd::HaF32)Ixy, (hacd::HaF32)Ixz, (hacd::HaF32)Iyz, hacd::HaF32 (0.0f));
 		}
 
 		if (totalArea > dgEPSILON * 10.0) {
-			dgFloat64 K = dgFloat64 (1.0) / totalArea; 
-			var = var.Scale ((dgFloat32)K);
-			cov = cov.Scale ((dgFloat32)K);
-			massCenter = massCenter.Scale ((dgFloat32)K);
+			hacd::HaF64 K = hacd::HaF64 (1.0) / totalArea; 
+			var = var.Scale ((hacd::HaF32)K);
+			cov = cov.Scale ((hacd::HaF32)K);
+			massCenter = massCenter.Scale ((hacd::HaF32)K);
 		}
 
-		dgFloat64 Ixx = var.m_x - massCenter.m_x * massCenter.m_x;
-		dgFloat64 Iyy = var.m_y - massCenter.m_y * massCenter.m_y;
-		dgFloat64 Izz = var.m_z - massCenter.m_z * massCenter.m_z;
+		hacd::HaF64 Ixx = var.m_x - massCenter.m_x * massCenter.m_x;
+		hacd::HaF64 Iyy = var.m_y - massCenter.m_y * massCenter.m_y;
+		hacd::HaF64 Izz = var.m_z - massCenter.m_z * massCenter.m_z;
 
-		dgFloat64 Ixy = cov.m_x - massCenter.m_x * massCenter.m_y;
-		dgFloat64 Ixz = cov.m_y - massCenter.m_x * massCenter.m_z;
-		dgFloat64 Iyz = cov.m_z - massCenter.m_y * massCenter.m_z;
+		hacd::HaF64 Ixy = cov.m_x - massCenter.m_x * massCenter.m_y;
+		hacd::HaF64 Ixz = cov.m_y - massCenter.m_x * massCenter.m_z;
+		hacd::HaF64 Iyz = cov.m_z - massCenter.m_y * massCenter.m_z;
 
-		sphere.m_front = dgVector ((dgFloat32)Ixx, (dgFloat32)Ixy, (dgFloat32)Ixz, dgFloat32 (0.0f));
-		sphere.m_up    = dgVector ((dgFloat32)Ixy, (dgFloat32)Iyy, (dgFloat32)Iyz, dgFloat32 (0.0f));
-		sphere.m_right = dgVector ((dgFloat32)Ixz, (dgFloat32)Iyz, (dgFloat32)Izz, dgFloat32 (0.0f));
+		sphere.m_front = dgVector ((hacd::HaF32)Ixx, (hacd::HaF32)Ixy, (hacd::HaF32)Ixz, hacd::HaF32 (0.0f));
+		sphere.m_up    = dgVector ((hacd::HaF32)Ixy, (hacd::HaF32)Iyy, (hacd::HaF32)Iyz, hacd::HaF32 (0.0f));
+		sphere.m_right = dgVector ((hacd::HaF32)Ixz, (hacd::HaF32)Iyz, (hacd::HaF32)Izz, hacd::HaF32 (0.0f));
 		sphere.EigenVectors(eigenValues);
 	}
 
 	
-	static void Statistics (dgSphere &sphere, dgVector &eigenValues, dgVector &scaleVector, const dgFloat32 vertex[], dgInt32 vertexCount, dgInt32 stride)
+	static void Statistics (dgSphere &sphere, dgVector &eigenValues, dgVector &scaleVector, const hacd::HaF32 vertex[], hacd::HaI32 vertexCount, hacd::HaI32 stride)
 	{
-		dgBigVector var (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgBigVector cov (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgBigVector massCenter (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgBigVector var (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+		dgBigVector cov (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+		dgBigVector massCenter (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
 	
-		const dgFloat32* ptr = vertex;
-		for (dgInt32 i = 0; i < vertexCount; i ++) {
-			dgFloat32 x = ptr[0] * scaleVector.m_x;
-			dgFloat32 y = ptr[1] * scaleVector.m_y;
-			dgFloat32 z = ptr[2] * scaleVector.m_z;
+		const hacd::HaF32* ptr = vertex;
+		for (hacd::HaI32 i = 0; i < vertexCount; i ++) {
+			hacd::HaF32 x = ptr[0] * scaleVector.m_x;
+			hacd::HaF32 y = ptr[1] * scaleVector.m_y;
+			hacd::HaF32 z = ptr[2] * scaleVector.m_z;
 			ptr += stride;
-			massCenter += dgBigVector (x, y, z, dgFloat32 (0.0f));
-			var += dgBigVector (x * x, y * y, z * z, dgFloat32 (0.0f));
-			cov += dgBigVector (x * y, x * z, y * z, dgFloat32 (0.0f));
+			massCenter += dgBigVector (x, y, z, hacd::HaF32 (0.0f));
+			var += dgBigVector (x * x, y * y, z * z, hacd::HaF32 (0.0f));
+			cov += dgBigVector (x * y, x * z, y * z, hacd::HaF32 (0.0f));
 		}
 	
-		dgFloat64 k = dgFloat64 (1.0) / vertexCount;
+		hacd::HaF64 k = hacd::HaF64 (1.0) / vertexCount;
 		var = var.Scale (k);
 		cov = cov.Scale (k);
 		massCenter = massCenter.Scale (k);
 	
-		dgFloat64 Ixx = var.m_x - massCenter.m_x * massCenter.m_x;
-		dgFloat64 Iyy = var.m_y - massCenter.m_y * massCenter.m_y;
-		dgFloat64 Izz = var.m_z - massCenter.m_z * massCenter.m_z;
+		hacd::HaF64 Ixx = var.m_x - massCenter.m_x * massCenter.m_x;
+		hacd::HaF64 Iyy = var.m_y - massCenter.m_y * massCenter.m_y;
+		hacd::HaF64 Izz = var.m_z - massCenter.m_z * massCenter.m_z;
 	
-		dgFloat64 Ixy = cov.m_x - massCenter.m_x * massCenter.m_y;
-		dgFloat64 Ixz = cov.m_y - massCenter.m_x * massCenter.m_z;
-		dgFloat64 Iyz = cov.m_z - massCenter.m_y * massCenter.m_z;
+		hacd::HaF64 Ixy = cov.m_x - massCenter.m_x * massCenter.m_y;
+		hacd::HaF64 Ixz = cov.m_y - massCenter.m_x * massCenter.m_z;
+		hacd::HaF64 Iyz = cov.m_z - massCenter.m_y * massCenter.m_z;
 	
-		sphere.m_front = dgVector (dgFloat32(Ixx), dgFloat32(Ixy), dgFloat32(Ixz), dgFloat32 (0.0f));
-		sphere.m_up    = dgVector (dgFloat32(Ixy), dgFloat32(Iyy), dgFloat32(Iyz), dgFloat32 (0.0f));
-		sphere.m_right = dgVector (dgFloat32(Ixz), dgFloat32(Iyz), dgFloat32(Izz), dgFloat32 (0.0f));
+		sphere.m_front = dgVector (hacd::HaF32(Ixx), hacd::HaF32(Ixy), hacd::HaF32(Ixz), hacd::HaF32 (0.0f));
+		sphere.m_up    = dgVector (hacd::HaF32(Ixy), hacd::HaF32(Iyy), hacd::HaF32(Iyz), hacd::HaF32 (0.0f));
+		sphere.m_right = dgVector (hacd::HaF32(Ixz), hacd::HaF32(Iyz), hacd::HaF32(Izz), hacd::HaF32 (0.0f));
  		sphere.EigenVectors (eigenValues);
 	}
 
@@ -231,31 +230,31 @@ namespace InternalSphere
 		dgSphere &sphere,
 		dgVector &eigenValues,
 		const dgVector &scaleVector,
-		const dgFloat32 vertex[],
-		dgInt32 stride,
+		const hacd::HaF32 vertex[],
+		hacd::HaI32 stride,
 		const dgFace face[],
-		dgInt32 faceCount)
+		hacd::HaI32 faceCount)
 	{
-		_ASSERTE (0);
+		HACD_ASSERT (0);
 
-		dgInt32 i;
-		dgInt32 index;
-		const dgFloat32 *ptr;
-		dgFloat64 K;
-		dgFloat64 Ixx;
-		dgFloat64 Iyy;
-		dgFloat64 Izz;
-		dgFloat64 Ixy;
-		dgFloat64 Ixz;
-		dgFloat64 Iyz;
-		dgFloat64 area;
-		dgFloat64 totalArea;
+		hacd::HaI32 i;
+		hacd::HaI32 index;
+		const hacd::HaF32 *ptr;
+		hacd::HaF64 K;
+		hacd::HaF64 Ixx;
+		hacd::HaF64 Iyy;
+		hacd::HaF64 Izz;
+		hacd::HaF64 Ixy;
+		hacd::HaF64 Ixz;
+		hacd::HaF64 Iyz;
+		hacd::HaF64 area;
+		hacd::HaF64 totalArea;
 		const dgFace *Face;
 	
-		dgVector var (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector cov (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector centre (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector massCenter (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector var (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+		dgVector cov (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+		dgVector centre (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+		dgVector massCenter (hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
 		
 		totalArea = 0.0;
 		ptr = vertex;
@@ -300,20 +299,20 @@ namespace InternalSphere
 			     Ixy = K * (Ixy + 9.0 * centre.m_x * centre.m_y);
 			     Ixz = K * (Ixz + 9.0 * centre.m_x * centre.m_z);
 			     Iyz = K * (Iyz + 9.0 * centre.m_y * centre.m_z);
-			     centre = centre.Scale ((dgFloat32)area);
+			     centre = centre.Scale ((hacd::HaF32)area);
 			 } 
 		
 			 totalArea += area;
 			 massCenter += centre;
-			 var += dgVector ((dgFloat32)Ixx, (dgFloat32)Iyy, (dgFloat32)Izz);
-			 cov += dgVector ((dgFloat32)Ixy, (dgFloat32)Ixz, (dgFloat32)Iyz);
+			 var += dgVector ((hacd::HaF32)Ixx, (hacd::HaF32)Iyy, (hacd::HaF32)Izz);
+			 cov += dgVector ((hacd::HaF32)Ixy, (hacd::HaF32)Ixz, (hacd::HaF32)Iyz);
 		}
 		
 		if (totalArea > dgEPSILON * 10.0) {
 			K = 1.0 / totalArea; 
-			var = var.Scale ((dgFloat32)K);
-			cov = cov.Scale ((dgFloat32)K);
-			massCenter = massCenter.Scale ((dgFloat32)K);
+			var = var.Scale ((hacd::HaF32)K);
+			cov = cov.Scale ((hacd::HaF32)K);
+			massCenter = massCenter.Scale ((hacd::HaF32)K);
 		}
 	
 		Ixx = var.m_x - massCenter.m_x * massCenter.m_x;
@@ -324,9 +323,9 @@ namespace InternalSphere
 		Ixz = cov.m_y - massCenter.m_x * massCenter.m_z;
 		Iyz = cov.m_z - massCenter.m_y * massCenter.m_z;
 	
-		sphere.m_front = dgVector ((dgFloat32)Ixx, (dgFloat32)Ixy, (dgFloat32)Ixz);
-		sphere.m_up    = dgVector ((dgFloat32)Ixy, (dgFloat32)Iyy, (dgFloat32)Iyz);
-		sphere.m_right = dgVector ((dgFloat32)Ixz, (dgFloat32)Iyz, (dgFloat32)Izz);
+		sphere.m_front = dgVector ((hacd::HaF32)Ixx, (hacd::HaF32)Ixy, (hacd::HaF32)Ixz);
+		sphere.m_up    = dgVector ((hacd::HaF32)Ixy, (hacd::HaF32)Iyy, (hacd::HaF32)Iyz);
+		sphere.m_right = dgVector ((hacd::HaF32)Ixz, (hacd::HaF32)Iyz, (hacd::HaF32)Izz);
 		sphere.EigenVectors(eigenValues);
 	}
 */
@@ -336,7 +335,7 @@ namespace InternalSphere
 dgSphere::dgSphere ()
 	:dgMatrix(dgGetIdentityMatrix()), m_size (0, 0, 0, 0)
 {
-//	_ASSERTE (0);
+//	HACD_ASSERT (0);
 //	planeTest = FrontTest;
 }
 
@@ -344,7 +343,7 @@ dgSphere::dgSphere (const dgQuaternion &quat, const dgVector &position, const dg
 	:dgMatrix(quat, position)
 {
    SetDimensions (dim.m_x, dim.m_y, dim.m_z);
-   _ASSERTE (0);
+   HACD_ASSERT (0);
 //	planeTest = FrontTest;
 }
 
@@ -352,35 +351,35 @@ dgSphere::dgSphere(const dgMatrix &matrix, const dgVector& dim)
 	:dgMatrix(matrix)
 {
    SetDimensions (dim.m_x, dim.m_y, dim.m_z);
-//   _ASSERTE (0);
+//   HACD_ASSERT (0);
 //	planeTest = FrontTest;
 }
 
 
 
-void dgSphere::SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, const dgInt32 triangles[], dgInt32 indexCount, const dgMatrix *basis)
+void dgSphere::SetDimensions (const hacd::HaF32 vertex[], hacd::HaI32 strideInBytes, const hacd::HaI32 triangles[], hacd::HaI32 indexCount, const dgMatrix *basis)
 {
 	dgVector eigen;
-	dgVector scaleVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
+	dgVector scaleVector (hacd::HaF32 (1.0f), hacd::HaF32 (1.0f), hacd::HaF32 (1.0f), hacd::HaF32 (0.0f));
 
 	if (indexCount < 3) {
 		return;
 	}
 
-	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
+	hacd::HaI32 stride = hacd::HaI32 (strideInBytes / sizeof (hacd::HaF32));
 	if (!basis)	{
 
 		InternalSphere::Statistics (*this, eigen, scaleVector, vertex, triangles, indexCount, stride);
 
-		dgInt32 k = 0;
-		for (dgInt32 i = 0; i < 3; i ++) {
+		hacd::HaI32 k = 0;
+		for (hacd::HaI32 i = 0; i < 3; i ++) {
 			if (k >= 6) {
 				 break;
 			}
-			for (dgInt32 j = i + 1; j < 3; j ++) {
-				dgFloat32 aspect = InternalSphere::AspectRatio (eigen[i], eigen[j]);
-				if (aspect > dgFloat32 (0.9f)) {
-					scaleVector[i] *= dgFloat32 (2.0f); 
+			for (hacd::HaI32 j = i + 1; j < 3; j ++) {
+				hacd::HaF32 aspect = InternalSphere::AspectRatio (eigen[i], eigen[j]);
+				if (aspect > hacd::HaF32 (0.9f)) {
+					scaleVector[i] *= hacd::HaF32 (2.0f); 
 					InternalSphere::Statistics (*this, eigen, scaleVector, vertex, triangles, indexCount, stride);
 					k ++;
 					i = -1;
@@ -397,33 +396,33 @@ void dgSphere::SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, c
 	InternalSphere::BoundingBox (*this, vertex, stride, triangles, indexCount, min, max);
 
 	dgVector massCenter	(max + min);
-	massCenter = massCenter.Scale (dgFloat32 (0.5f));
+	massCenter = massCenter.Scale (hacd::HaF32 (0.5f));
 	m_posit = TransformVector (massCenter);
 
 	dgVector dim (max - min);
-	dim = dim.Scale (dgFloat32(0.5f));
+	dim = dim.Scale (hacd::HaF32(0.5f));
 	SetDimensions (dim.m_x, dim.m_y, dim.m_z);
 }
 
 
-void dgSphere::SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, dgInt32 count, const dgMatrix *basis) 
+void dgSphere::SetDimensions (const hacd::HaF32 vertex[], hacd::HaI32 strideInBytes, hacd::HaI32 count, const dgMatrix *basis) 
 {
 	dgVector eigen;
-	dgVector scaleVector (dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32 (0.0f));
+	dgVector scaleVector (hacd::HaF32(1.0f), hacd::HaF32(1.0f), hacd::HaF32(1.0f), hacd::HaF32 (0.0f));
 
-	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
+	hacd::HaI32 stride = hacd::HaI32 (strideInBytes / sizeof (hacd::HaF32));
 	if (!basis)	{
 		InternalSphere::Statistics (*this, eigen, scaleVector, vertex, count, stride);
 
-		dgInt32 k = 0;
-		for (dgInt32 i = 0; i < 3; i ++) {
+		hacd::HaI32 k = 0;
+		for (hacd::HaI32 i = 0; i < 3; i ++) {
 			if (k >= 6) {
 				 break;
 			}
-			for (dgInt32 j = i + 1; j < 3; j ++) {
-				dgFloat32 aspect = InternalSphere::AspectRatio (eigen[i], eigen[j]);
-				if (aspect > dgFloat32 (0.9f)) {
-					scaleVector[i] *= dgFloat32 (2.0f); 
+			for (hacd::HaI32 j = i + 1; j < 3; j ++) {
+				hacd::HaF32 aspect = InternalSphere::AspectRatio (eigen[i], eigen[j]);
+				if (aspect > hacd::HaF32 (0.9f)) {
+					scaleVector[i] *= hacd::HaF32 (2.0f); 
 					InternalSphere::Statistics (*this, eigen, scaleVector, vertex, count, stride);
 					k ++;
 					i = -1;
@@ -444,7 +443,7 @@ void dgSphere::SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, d
 	m_posit = TransformVector (massCenter);
 
 	dgVector dim (max - min);
-	dim = dim.Scale (dgFloat32(0.5f));
+	dim = dim.Scale (hacd::HaF32(0.5f));
 	SetDimensions (dim.m_x + InternalSphere::SPHERE_TOL, 
 				   dim.m_y + InternalSphere::SPHERE_TOL, 
 				   dim.m_z + InternalSphere::SPHERE_TOL);
@@ -453,21 +452,21 @@ void dgSphere::SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, d
 
 /*
 void dgSphere::SetDimensions (
-	const dgFloat32 vertex[],  
-	dgInt32 strideInBytes,
-	const dgInt32 index[],
-	dgInt32 indexCount,
+	const hacd::HaF32 vertex[],  
+	hacd::HaI32 strideInBytes,
+	const hacd::HaI32 index[],
+	hacd::HaI32 indexCount,
 	const dgMatrix *basis)
 {
-	dgInt32 i;
-	dgInt32 j;
-	dgInt32 k;
-	dgInt32 stride;
-	dgFloat32 aspect;
+	hacd::HaI32 i;
+	hacd::HaI32 j;
+	hacd::HaI32 k;
+	hacd::HaI32 stride;
+	hacd::HaF32 aspect;
 	dgVector eigen;
-	dgVector scaleVector (dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32 (0.0f));
+	dgVector scaleVector (hacd::HaF32(1.0f), hacd::HaF32(1.0f), hacd::HaF32(1.0f), hacd::HaF32 (0.0f));
 
-	stride = strideInBytes / sizeof (dgFloat32);
+	stride = strideInBytes / sizeof (hacd::HaF32);
 	if (!basis)	{
 		InternalSphere::Statistics (*this, eigen, scaleVector, vertex, index, indexCount, stride);
 
@@ -478,8 +477,8 @@ void dgSphere::SetDimensions (
 			}
 			for (j = i + 1; j < 3; j ++) {
 				aspect = InternalSphere::AspectRatio (eigen[i], eigen[j]);
-				if (aspect > dgFloat32 (0.9f)) {
-					scaleVector[i] *= dgFloat32 (2.0f); 
+				if (aspect > hacd::HaF32 (0.9f)) {
+					scaleVector[i] *= hacd::HaF32 (2.0f); 
 					InternalSphere::Statistics (*this, eigen, scaleVector, vertex, index, indexCount, stride);
 					i = -1;
 					k ++;
@@ -496,11 +495,11 @@ void dgSphere::SetDimensions (
    InternalSphere::BoundingBox (*this, vertex, stride, index, indexCount, min, max);
 
 	dgVector massCenter (max + min);
-	massCenter = massCenter.Scale (dgFloat32(0.5f));
+	massCenter = massCenter.Scale (hacd::HaF32(0.5f));
 	m_posit = TransformVector (massCenter);
 
 	dgVector dim (max - min);
-	dim = dim.Scale (dgFloat32(0.5f));
+	dim = dim.Scale (hacd::HaF32(0.5f));
 	SetDimensions (dim.m_x + InternalSphere::SPHERE_TOL, 
 				   dim.m_y + InternalSphere::SPHERE_TOL, 
 				   dim.m_z + InternalSphere::SPHERE_TOL);
@@ -531,15 +530,15 @@ dgSphere::dgSphere (
 	right = up * front;
 
 	dgVector Step (Dir.Scale(0.5));
-	size.m_x = (dgFloat32)(dgSphere.size.m_x * dgAbsf (right % dgSphere.right) +
+	size.m_x = (hacd::HaF32)(dgSphere.size.m_x * dgAbsf (right % dgSphere.right) +
 						 dgSphere.size.m_y * dgAbsf (right % dgSphere.up) +
 						 dgSphere.size.m_z * dgAbsf (right % dgSphere.front));
 
-	size.m_y = (dgFloat32)(dgSphere.size.m_x * dgAbsf (up % dgSphere.right) +
+	size.m_y = (hacd::HaF32)(dgSphere.size.m_x * dgAbsf (up % dgSphere.right) +
 						  dgSphere.size.m_y * dgAbsf (up % dgSphere.up) +
 						  dgSphere.size.m_z * dgAbsf (up % dgSphere.front));
 
-	size.m_z = (dgFloat32)(sqrt (Step % Step) +
+	size.m_z = (hacd::HaF32)(sqrt (Step % Step) +
 							dgSphere.size.m_x * dgAbsf (front % dgSphere.right) +
 							dgSphere.size.m_y * dgAbsf (front % dgSphere.up) +
 							dgSphere.size.m_z * dgAbsf (front % dgSphere.front));
@@ -551,7 +550,7 @@ dgSphere::dgSphere (
 
 bool dgSphere::dgSphere_Overlap_Test (const dgSphere &dgSphere)
 {
-	dgFloat64 R;
+	hacd::HaF64 R;
 	dgVector Dir (dgSphere.posit - posit);
 
   	R = size.m_x * dgAbsf (right % Dir) + dgSphere.size.m_x * dgAbsf (dgSphere.right % Dir) + 
@@ -611,13 +610,13 @@ void dgSphere::Swept_Volume (
 	dgVector &min, 
 	dgVector &max)
 {
-	dgFloat32 w;
-	dgFloat32 h;
-	dgFloat32 b;
+	hacd::HaF32 w;
+	hacd::HaF32 h;
+	hacd::HaF32 b;
 
-	w = (dgFloat32)(size.m_x * dgAbsf(right.m_x) + size.m_y * dgAbsf(up.m_x) + size.m_z * dgAbsf(front.m_x));  
-	h = (dgFloat32)(size.m_x * dgAbsf(right.m_y) + size.m_y * dgAbsf(up.m_y) + size.m_z * dgAbsf(front.m_y));  
-	b = (dgFloat32)(size.m_x * dgAbsf(right.m_z) + size.m_y * dgAbsf(up.m_z) + size.m_z * dgAbsf(front.m_z));  
+	w = (hacd::HaF32)(size.m_x * dgAbsf(right.m_x) + size.m_y * dgAbsf(up.m_x) + size.m_z * dgAbsf(front.m_x));  
+	h = (hacd::HaF32)(size.m_x * dgAbsf(right.m_y) + size.m_y * dgAbsf(up.m_y) + size.m_z * dgAbsf(front.m_y));  
+	b = (hacd::HaF32)(size.m_x * dgAbsf(right.m_z) + size.m_y * dgAbsf(up.m_z) + size.m_z * dgAbsf(front.m_z));  
 
 	min.m_x = posit.m_x - w;
 	min.m_y = posit.m_y - h;
@@ -631,12 +630,12 @@ void dgSphere::Swept_Volume (
 
 
 /*
-dgInt32 dgSphere::FrontTest (
+hacd::HaI32 dgSphere::FrontTest (
 	const dgMatrix &matrix, 
 	const dgPlane* plane) const
 {
-	dgFloat32 R;
-	dgFloat32 dR;
+	hacd::HaF32 R;
+	hacd::HaF32 dR;
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
@@ -650,10 +649,10 @@ dgInt32 dgSphere::FrontTest (
 	return InternalSphere::CodeTbl[flag0.i | flag1.i];
 }
 
-dgInt32 dgSphere::RearTest (const dgMatrix &matrix, const dgPlane* plane) const
+hacd::HaI32 dgSphere::RearTest (const dgMatrix &matrix, const dgPlane* plane) const
 {
-	dgFloat32 R;
-	dgFloat32 dR;
+	hacd::HaF32 R;
+	hacd::HaF32 dR;
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
@@ -668,10 +667,10 @@ dgInt32 dgSphere::RearTest (const dgMatrix &matrix, const dgPlane* plane) const
 }
 
 
-dgInt32 dgSphere::LeftTest (const dgMatrix &matrix, const dgPlane* plane) const
+hacd::HaI32 dgSphere::LeftTest (const dgMatrix &matrix, const dgPlane* plane) const
 {
-	dgFloat32 R;
-	dgFloat32 dR;
+	hacd::HaF32 R;
+	hacd::HaF32 dR;
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
@@ -687,10 +686,10 @@ dgInt32 dgSphere::LeftTest (const dgMatrix &matrix, const dgPlane* plane) const
 	return InternalSphere::CodeTbl[flag0.i | flag1.i];
 }
 
-dgInt32 dgSphere::RightTest (const dgMatrix &matrix, const dgPlane* plane) const
+hacd::HaI32 dgSphere::RightTest (const dgMatrix &matrix, const dgPlane* plane) const
 {
-	dgFloat32 R;
-	dgFloat32 dR;
+	hacd::HaF32 R;
+	hacd::HaF32 dR;
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
@@ -706,10 +705,10 @@ dgInt32 dgSphere::RightTest (const dgMatrix &matrix, const dgPlane* plane) const
 	return InternalSphere::CodeTbl[flag0.i | flag1.i];
 }
 
-dgInt32 dgSphere::BottomTest (const dgMatrix &matrix, const dgPlane* plane) const
+hacd::HaI32 dgSphere::BottomTest (const dgMatrix &matrix, const dgPlane* plane) const
 {
-	dgFloat32 R;
-	dgFloat32 dR;
+	hacd::HaF32 R;
+	hacd::HaF32 dR;
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
@@ -727,10 +726,10 @@ dgInt32 dgSphere::BottomTest (const dgMatrix &matrix, const dgPlane* plane) cons
 	return InternalSphere::CodeTbl[flag0.i | flag1.i];
 }
 
-dgInt32 dgSphere::TopTest (const dgMatrix &matrix, const dgPlane* plane) const
+hacd::HaI32 dgSphere::TopTest (const dgMatrix &matrix, const dgPlane* plane) const
 {
-	dgFloat32 R;
-	dgFloat32 dR;
+	hacd::HaF32 R;
+	hacd::HaF32 dR;
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
@@ -749,12 +748,12 @@ dgInt32 dgSphere::TopTest (const dgMatrix &matrix, const dgPlane* plane) const
 
 
 
-dgInt32 dgSphere::VisibilityTestLow (
+hacd::HaI32 dgSphere::VisibilityTestLow (
 	const dgCamera* camera,
 	const dgMatrix& matrix) const
 {
-	dgInt32 i;
-	dgInt32 code;
+	hacd::HaI32 i;
+	hacd::HaI32 code;
 	const dgPlane* planes;
 	const dgPlane* guardPlanes;
 
@@ -776,7 +775,7 @@ dgInt32 dgSphere::VisibilityTestLow (
 				code = 0;
 				for (i = 0; i < 6; i ++) {
 					code |= (this->*planeTestArray[i]) (matrix, guardPlanes);
-					_ASSERTE (code >= 0);
+					HACD_ASSERT (code >= 0);
 					if (code) {
 						return code;
 					}
@@ -789,13 +788,13 @@ dgInt32 dgSphere::VisibilityTestLow (
 }
 
 
-dgInt32 dgSphere::VisibilityTest (const dgCamera* camera) const
+hacd::HaI32 dgSphere::VisibilityTest (const dgCamera* camera) const
 {
 	dgMatrix viewMatrix (*this * camera->GetViewMatrix());
 	return VisibilityTestLow (camera, viewMatrix);
 }
 
-dgInt32 dgSphere::VisibilityTest (const dgCamera* camera, const dgMatrix &worldMatrix) const 
+hacd::HaI32 dgSphere::VisibilityTest (const dgCamera* camera, const dgMatrix &worldMatrix) const 
 {
 	dgMatrix viewMatrix (*this * worldMatrix * camera->GetViewMatrix());
 	return VisibilityTestLow (camera, viewMatrix);
@@ -804,18 +803,18 @@ dgInt32 dgSphere::VisibilityTest (const dgCamera* camera, const dgMatrix &worldM
 void dgSphere::Render (
 	const dgCamera* camera, 
 	const dgMatrix &worldMatrix, 
-	dgUnsigned32 rgb) const
+	hacd::HaU32 rgb) const
 {
-	dgInt32 i;
+	hacd::HaI32 i;
 	struct ColorVertex
 	{
-		dgFloat32 m_x;
-		dgFloat32 m_y;
-		dgFloat32 m_z;
+		hacd::HaF32 m_x;
+		hacd::HaF32 m_y;
+		hacd::HaF32 m_z;
 		dgColor m_color;
 	};
 
-	dgUnsigned32 index [][2] = {
+	hacd::HaU32 index [][2] = {
 		{0, 4}, {1, 5}, {2, 6}, {3, 7},
 		{0, 1}, {4, 5}, {7, 6}, {3, 2},
 		{1, 2}, {5, 6}, {4, 7}, {0, 3},
@@ -866,7 +865,7 @@ void dgSphere::Render (
 
 	dgRenderDescriptorParams param;
 	param.m_indexCount = 0;
-	param.m_vertexCount = sizeof (index) / sizeof (dgInt32); 
+	param.m_vertexCount = sizeof (index) / sizeof (hacd::HaI32); 
 	param.m_descType = dgDynamicVertex;
 	param.m_primitiveType = RENDER_LINELIST;
 	param.m_vertexFlags = VERTEX_ENABLE_XYZ | COLOR_ENABLE;
@@ -880,7 +879,7 @@ void dgSphere::Render (
 
   	dgVertexRecord vertexRecord (desc.LockVertex());
 	ptr = (ColorVertex*) vertexRecord.vertex.ptr;
-	for (i = 0; i < (sizeof (index) / (2 * sizeof (dgUnsigned32))); i ++) {
+	for (i = 0; i < (sizeof (index) / (2 * sizeof (hacd::HaU32))); i ++) {
 		 ptr[0] = box[index[i][0]]; 
 		 ptr[1] = box[index[i][1]]; 
 		 ptr += 2;

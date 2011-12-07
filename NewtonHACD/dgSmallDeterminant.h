@@ -25,9 +25,9 @@
 #include "dgTypes.h"
 
 class dgGoogol;
-dgFloat64 Determinant2x2 (const dgFloat64 matrix[2][2], dgFloat64* const error);
-dgFloat64 Determinant3x3 (const dgFloat64 matrix[3][3], dgFloat64* const error);
-dgFloat64 Determinant4x4 (const dgFloat64 matrix[4][4], dgFloat64* const error);
+hacd::HaF64 Determinant2x2 (const hacd::HaF64 matrix[2][2], hacd::HaF64* const error);
+hacd::HaF64 Determinant3x3 (const hacd::HaF64 matrix[3][3], hacd::HaF64* const error);
+hacd::HaF64 Determinant4x4 (const hacd::HaF64 matrix[4][4], hacd::HaF64* const error);
 
 
 dgGoogol Determinant2x2 (const dgGoogol matrix[2][2]);
