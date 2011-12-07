@@ -22,10 +22,7 @@
 #ifndef __dgTree__
 #define __dgTree__
 
-#include "dgRef.h"
-#include "dgMemory.h"
-
-
+#include "dgTypes.h"
 
 // Note: this is a low level class for dgTree use only
 // unpredictable result will happen if you attempt to manipulate
@@ -810,6 +807,7 @@ void dgTree<OBJECT, KEY>::SwapInfo (dgTree<OBJECT, KEY>& tree)
 	Swap (m_head, tree.m_head);
 	Swap (m_count, tree.m_count);
 }
+
 
 #endif
 

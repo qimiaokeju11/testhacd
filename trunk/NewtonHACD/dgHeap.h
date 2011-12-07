@@ -27,8 +27,7 @@
 #ifndef __dgHeapBase__
 #define __dgHeapBase__
 
-//#include "dgStdafx.h"
-#include "dgMemory.h"
+#include "dgTypes.h"
 
 
 //#define DG_HEAP_SANITY_CHECK
@@ -519,7 +518,6 @@ void dgUpHeap<OBJECT,KEY>::Pop ()
 	HACD_ASSERT (SanityCheck());
 #endif
 }
-
 
 #endif
 

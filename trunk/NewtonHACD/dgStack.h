@@ -22,7 +22,7 @@
 #ifndef __dgStack__
 #define __dgStack__
 
-#include "dgMemory.h"
+#include "dgTypes.h"
 
 class dgStackBase
 {

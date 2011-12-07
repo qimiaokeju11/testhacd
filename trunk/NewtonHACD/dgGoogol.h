@@ -23,8 +23,6 @@
 #define __dgGoogol__
 
 
-//#include "dgStdafx.h"
-#include "dgMemory.h"
 #include "dgArray.h"
 #include "dgVector.h"
 
