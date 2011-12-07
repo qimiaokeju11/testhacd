@@ -22,10 +22,12 @@
 #include "dgMeshEffect.h"
 #include "dgConvexHull3d.h"
 #include "dgStack.h"
+#include <string.h>
 
+#pragma warning(disable:4100)
 
 // create a convex hull
-dgMeshEffect::dgMeshEffect (const dgFloat64* const vertexCloud, dgInt32 count, dgInt32 strideInByte, dgFloat64 distTol)
+dgMeshEffect::dgMeshEffect (const hacd::HaF64* const vertexCloud, hacd::HaI32 count, hacd::HaI32 strideInByte, hacd::HaF64 distTol)
 	:dgPolyhedra()
 {
 	Init(true);
@@ -33,28 +35,28 @@ dgMeshEffect::dgMeshEffect (const dgFloat64* const vertexCloud, dgInt32 count, d
 		dgConvexHull3d convexHull (vertexCloud, strideInByte, count, distTol);
 		if (convexHull.GetCount()) {
 
-			dgInt32 vertexCount = convexHull.GetVertexCount();
+			hacd::HaI32 vertexCount = convexHull.GetVertexCount();
 			dgStack<dgVector> pointsPool (convexHull.GetVertexCount());
 			dgVector* const points = &pointsPool[0];
-			for (dgInt32 i = 0; i < vertexCount; i ++) {
+			for (hacd::HaI32 i = 0; i < vertexCount; i ++) {
 				points[i] = convexHull.GetVertex(i);
 			}
-			dgVector uv(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-			dgVector normal (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+			dgVector uv(hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
+			dgVector normal (hacd::HaF32 (0.0f), hacd::HaF32 (1.0f), hacd::HaF32 (0.0f), hacd::HaF32 (0.0f));
 
-			dgInt32 triangleCount = convexHull.GetCount();
-			dgStack<dgInt32> faceCountPool (triangleCount);
-			dgStack<dgInt32> materialsPool (triangleCount);
-			dgStack<dgInt32> vertexIndexListPool (triangleCount * 3);
-			dgStack<dgInt32> normalIndexListPool (triangleCount * 3);
+			hacd::HaI32 triangleCount = convexHull.GetCount();
+			dgStack<hacd::HaI32> faceCountPool (triangleCount);
+			dgStack<hacd::HaI32> materialsPool (triangleCount);
+			dgStack<hacd::HaI32> vertexIndexListPool (triangleCount * 3);
+			dgStack<hacd::HaI32> normalIndexListPool (triangleCount * 3);
 
 
-			memset (&materialsPool[0], 0, triangleCount * sizeof (dgInt32));
-			memset (&normalIndexListPool[0], 0, 3 * triangleCount * sizeof (dgInt32));
+			memset (&materialsPool[0], 0, triangleCount * sizeof (hacd::HaI32));
+			memset (&normalIndexListPool[0], 0, 3 * triangleCount * sizeof (hacd::HaI32));
 
-			dgInt32 index = 0;
-			dgInt32* const faceCount = &faceCountPool[0];
-			dgInt32* const vertexIndexList = &vertexIndexListPool[0];
+			hacd::HaI32 index = 0;
+			hacd::HaI32* const faceCount = &faceCountPool[0];
+			hacd::HaI32* const vertexIndexList = &vertexIndexListPool[0];
 			for (dgConvexHull3d::dgListNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
 				dgConvexHull3DFace& face = faceNode->GetInfo();
 				faceCount[index] = 3;
@@ -81,8 +83,8 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 	class dgIndexMapPair
 	{
 		public:
-		dgInt32 m_meshIndex;
-		dgInt32 m_convexIndex;
+		hacd::HaI32 m_meshIndex;
+		hacd::HaI32 m_convexIndex;
 	};
 
 	class dgMissingEdges: public dgList<dgPolyhedra::dgTreeNode*> 
@@ -115,11 +117,11 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		}
 	};
 
-	class dgEdgeMap: public dgTree<dgEdgeSharedTetras, dgUnsigned64>
+	class dgEdgeMap: public dgTree<dgEdgeSharedTetras, hacd::HaU64>
 	{
 		public:
 		dgEdgeMap()
-			:dgTree<dgEdgeSharedTetras, dgUnsigned64>()
+			:dgTree<dgEdgeSharedTetras, hacd::HaU64>()
 		{
 		}
 
@@ -133,11 +135,11 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		}
 	};
 
-	class dgVertexMap: public dgTree<dgEdgeSharedTetras, dgInt32>
+	class dgVertexMap: public dgTree<dgEdgeSharedTetras, hacd::HaI32>
 	{
 		public:
 		dgVertexMap()
-			:dgTree<dgEdgeSharedTetras, dgInt32>()
+			:dgTree<dgEdgeSharedTetras, hacd::HaI32>()
 		{
 		}
 
@@ -160,7 +162,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		dgEdgeFaceKey ()
 		{}
 
-		dgEdgeFaceKey (dgInt32 i0, dgInt32 i1, dgInt32 i2)
+		dgEdgeFaceKey (hacd::HaI32 i0, hacd::HaI32 i1, hacd::HaI32 i2)
 		{
 			m_index[0] = i0;
 			m_index[1] = i1;
@@ -173,9 +175,9 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 			}
 		}
 
-		dgInt32 Compared (const dgEdgeFaceKey& key) const 
+		hacd::HaI32 Compared (const dgEdgeFaceKey& key) const 
 		{
-			for (dgInt32 i = 0; i < 3; i ++) {
+			for (hacd::HaI32 i = 0; i < 3; i ++) {
 				if (m_index[i] < key.m_index[i]) {
 					return -1;
 				} else if (m_index[i] > key.m_index[i]) {
@@ -197,7 +199,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		}
 
 
-		dgInt32 m_index[3];
+		hacd::HaI32 m_index[3];
 
 	};
 
@@ -226,7 +228,7 @@ public:
 		if (GetCount()) {
 
 			#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-			dgUnsigned32 controlWorld = dgControlFP (0xffffffff, 0);
+			hacd::HaU32 controlWorld = dgControlFP (0xffffffff, 0);
 			dgControlFP (_PC_53, _MCW_PC);
 			#endif
 
@@ -252,14 +254,14 @@ public:
 	{
 	}
 
-	dgUnsigned64 GetKey (dgInt32 i0, dgInt32 i1) const
+	hacd::HaU64 GetKey (hacd::HaI32 i0, hacd::HaI32 i1) const
 	{
-		return (i1 > i0) ?  (dgUnsigned64 (i1) << 32) + i0 : (dgUnsigned64 (i0) << 32) + i1;
+		return (i1 > i0) ?  (hacd::HaU64 (i1) << 32) + i0 : (hacd::HaU64 (i0) << 32) + i1;
 	}
 
-	void InsertNewEdgeNode (dgInt32 i0, dgInt32 i1, dgListNode* const node)
+	void InsertNewEdgeNode (hacd::HaI32 i0, hacd::HaI32 i1, dgListNode* const node)
 	{
-		dgUnsigned64 key = GetKey (i1, i0);
+		hacd::HaU64 key = GetKey (i1, i0);
 
 		dgEdgeMap::dgTreeNode* edgeNode = m_edgeMap.Find(key);
 		if (!edgeNode) {
@@ -270,16 +272,16 @@ public:
 
 		#ifdef _DEBUG
 			for (dgEdgeSharedTetras::dgListNode* ptr = header.GetFirst(); ptr; ptr = ptr->GetNext()) {
-				_ASSERTE (ptr->GetInfo() != node);
+				HACD_ASSERT (ptr->GetInfo() != node);
 			}
 		#endif
 
 		header.Append(node);
 	}
 
-	void RemoveEdgeNode(dgInt32 i0, dgInt32 i1, dgListNode* const node)
+	void RemoveEdgeNode(hacd::HaI32 i0, hacd::HaI32 i1, dgListNode* const node)
 	{
-		dgUnsigned64 key = GetKey (i0, i1);
+		hacd::HaU64 key = GetKey (i0, i1);
 
 		dgEdgeMap::dgTreeNode* const edgeNode = m_edgeMap.Find(key);
 		if (edgeNode) {
@@ -292,8 +294,8 @@ public:
 						m_edgeMap.Remove(edgeNode);
 					}
 
-//					dgInt32 index0 = GetVertexIndex(i0);
-//					dgInt32 index1 = GetVertexIndex(i1);
+//					hacd::HaI32 index0 = GetVertexIndex(i0);
+//					hacd::HaI32 index1 = GetVertexIndex(i1);
 //					dgPolyhedra::dgTreeNode* const edgeNode = m_mesh->FindEdgeNode(index0, index1);
 //					if(edgeNode) {
 //						m_missinEdges.Append(edgeNode);
@@ -306,7 +308,7 @@ public:
 	}
 
 
-	void InsertNewVertexNode (dgInt32 index, dgListNode* const node)
+	void InsertNewVertexNode (hacd::HaI32 index, dgListNode* const node)
 	{
 		dgVertexMap::dgTreeNode* vertexNode = m_vertexMap.Find(index);
 		if (!vertexNode) {
@@ -317,17 +319,17 @@ public:
 
 		#ifdef _DEBUG
 			for (dgEdgeSharedTetras::dgListNode* ptr = header.GetFirst(); ptr; ptr = ptr->GetNext()) {
-				_ASSERTE (ptr->GetInfo() != node);
+				HACD_ASSERT (ptr->GetInfo() != node);
 			}
 		#endif
 
 		header.Append(node);
 	}
 
-	void RemoveNewVertexNode (dgInt32 index, dgListNode* const node)
+	void RemoveNewVertexNode (hacd::HaI32 index, dgListNode* const node)
 	{
 		dgVertexMap::dgTreeNode* vertexNode = m_vertexMap.Find(index);
-		_ASSERTE (vertexNode);
+		HACD_ASSERT (vertexNode);
 		dgEdgeSharedTetras& header = vertexNode->GetInfo();
 
 		for (dgEdgeSharedTetras::dgListNode* ptr = header.GetFirst(); ptr; ptr = ptr->GetNext()) {
@@ -336,7 +338,7 @@ public:
 				break;
 			}
 		}
-		_ASSERTE (header.GetCount());
+		HACD_ASSERT (header.GetCount());
 
 	}
 	
@@ -346,15 +348,15 @@ public:
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		if (GetTetraVolume (tetra) < 0.0f) {
 			const dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[0];
-			for (dgInt32 i = 0; i < 3; i ++) {
-				dgInt32 i0 = face.m_otherVertex;
-				dgInt32 i1 = face.m_index[i];
+			for (hacd::HaI32 i = 0; i < 3; i ++) {
+				hacd::HaI32 i0 = face.m_otherVertex;
+				hacd::HaI32 i1 = face.m_index[i];
 				InsertNewEdgeNode (i0, i1, node);
 			}
 
-			dgInt32 i0 = face.m_index[2];
-			for (dgInt32 i = 0; i < 3; i ++) {
-				dgInt32 i1 = face.m_index[i];
+			hacd::HaI32 i0 = face.m_index[2];
+			for (hacd::HaI32 i = 0; i < 3; i ++) {
+				hacd::HaI32 i1 = face.m_index[i];
 				InsertNewEdgeNode (i0, i1, node);
 				InsertNewVertexNode (i0, node);
 				i0 = i1;
@@ -367,15 +369,15 @@ public:
 	{
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		const dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[0];
-		for (dgInt32 i = 0; i < 3; i ++) {
-			dgInt32 i0 = face.m_otherVertex;
-			dgInt32 i1 = face.m_index[i];
+		for (hacd::HaI32 i = 0; i < 3; i ++) {
+			hacd::HaI32 i0 = face.m_otherVertex;
+			hacd::HaI32 i1 = face.m_index[i];
 			RemoveEdgeNode(i0, i1, node);
 		}
 
-		dgInt32 i0 = face.m_index[2];
-		for (dgInt32 i = 0; i < 3; i ++) {
-			dgInt32 i1 = face.m_index[i];
+		hacd::HaI32 i0 = face.m_index[2];
+		for (hacd::HaI32 i = 0; i < 3; i ++) {
+			hacd::HaI32 i1 = face.m_index[i];
 			RemoveEdgeNode(i0, i1, node);
 			RemoveNewVertexNode(i0, node);
 			i0 = i1;
@@ -385,7 +387,7 @@ public:
 	}
 
 
-	dgListNode* AddFace (dgInt32 i0, dgInt32 i1, dgInt32 i2, dgInt32 i3)
+	dgListNode* AddFace (hacd::HaI32 i0, hacd::HaI32 i1, hacd::HaI32 i2, hacd::HaI32 i3)
 	{
 		dgListNode* const faceNode = dgDelaunayTetrahedralization::AddFace(i0, i1, i2, i3);
 		AddEdgesAndFaces (faceNode);
@@ -398,12 +400,12 @@ public:
 		RemoveEdgesAndFaces (node);
 
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
-		for (dgInt32 i= 0; i < 4; i ++) {
+		for (hacd::HaI32 i= 0; i < 4; i ++) {
 			const dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
 			dgListNode* const twinNode = face.m_twin;
 			if (twinNode) {
 				dgConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();
-				for (dgInt32 i = 0; i < 4; i ++) {
+				for (hacd::HaI32 i = 0; i < 4; i ++) {
 					if (twinTetra->m_faces[i].m_twin == node) {
 						twinTetra->m_faces[i].m_twin = NULL;
 					}
@@ -424,7 +426,7 @@ public:
 	}
 
 
-	static dgInt32 ConvexCompareIndex(const dgIndexMapPair* const  A, const dgIndexMapPair* const B, void* const context)
+	static hacd::HaI32 ConvexCompareIndex(const dgIndexMapPair* const  A, const dgIndexMapPair* const B, void* const context)
 	{
 		if (A->m_meshIndex > B->m_meshIndex) {
 			return 1;
@@ -439,7 +441,7 @@ public:
 		// make a index map to quickly find vertex mapping form the mesh to the delaunay tetrahedron
 		m_indexMap[GetVertexCount()].m_meshIndex = 0;
 		dgIndexMapPair* const indexMap = &m_indexMap[0];
-		for (dgInt32 i = 0; i < GetVertexCount(); i ++) {
+		for (hacd::HaI32 i = 0; i < GetVertexCount(); i ++) {
 			indexMap[i].m_convexIndex = i;
 			indexMap[i].m_meshIndex = GetVertexIndex(i);
 		}
@@ -450,59 +452,59 @@ public:
 	bool SanityPointInTetra (dgConvexHull4dTetraherum* const tetra, const dgBigVector& vertex) const 
 	{
 
-		for (dgInt32 i = 0; i < 4; i ++) {
+		for (hacd::HaI32 i = 0; i < 4; i ++) {
 			const dgBigVector& p0 = m_points[tetra->m_faces[i].m_index[0]];
 			const dgBigVector& p1 = m_points[tetra->m_faces[i].m_index[1]];
 			const dgBigVector& p2 = m_points[tetra->m_faces[i].m_index[2]];
 			dgBigPlane plane (p0, p1, p2);
-			dgFloat64 dist = plane.Evalue(vertex);
-			if (dist > dgFloat64 (1.0e-12f)) {
+			hacd::HaF64 dist = plane.Evalue(vertex);
+			if (dist > hacd::HaF64 (1.0e-12f)) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	dgInt32 ReplaceFaceNodes (dgListNode* const faceNode, dgInt32 faceIndex, const dgBigVector& vertex)
+	hacd::HaI32 ReplaceFaceNodes (dgListNode* const faceNode, hacd::HaI32 faceIndex, const dgBigVector& vertex)
 	{
 		dgConvexHull4dTetraherum* const tetra = &faceNode->GetInfo();
 		dgListNode* const neighborghNode = tetra->m_faces[faceIndex].m_twin;
-		_ASSERTE (neighborghNode);
+		HACD_ASSERT (neighborghNode);
 
 		dgConvexHull4dTetraherum* const neighborghTetra = &neighborghNode->GetInfo();
 
-		dgInt32 vertexIndex = m_count;
+		hacd::HaI32 vertexIndex = m_count;
 		m_points[vertexIndex] = vertex;
 		m_points[vertexIndex].m_index = vertexIndex;
 		m_count ++;
 
-		_ASSERTE (SanityPointInTetra (tetra, vertex));
-		_ASSERTE (SanityPointInTetra (neighborghTetra, vertex));
+		HACD_ASSERT (SanityPointInTetra (tetra, vertex));
+		HACD_ASSERT (SanityPointInTetra (neighborghTetra, vertex));
 
-		dgInt32 mark = IncMark();
+		hacd::HaI32 mark = IncMark();
 		tetra->SetMark(mark);
 		neighborghTetra->SetMark(mark);
 
-		dgInt32 deletedCount = 2;
+		hacd::HaI32 deletedCount = 2;
 		dgListNode* deletedNodes[2];
 		deletedNodes[0] = faceNode;
 		deletedNodes[1] = neighborghNode;
 
-		dgInt32 perimeterCount = 0;
+		hacd::HaI32 perimeterCount = 0;
 		dgListNode* perimeter[16];
-		for (dgInt32 i = 0; i < deletedCount; i ++) {
+		for (hacd::HaI32 i = 0; i < deletedCount; i ++) {
 			dgListNode* const deleteTetraNode = deletedNodes[i];
 
 			dgConvexHull4dTetraherum* const deletedTetra = &deleteTetraNode->GetInfo();
-			_ASSERTE (deletedTetra->GetMark() == mark);
+			HACD_ASSERT (deletedTetra->GetMark() == mark);
 
-			for (dgInt32 i = 0; i < 4; i ++) {
+			for (hacd::HaI32 i = 0; i < 4; i ++) {
 				dgListNode* const twinNode = deletedTetra->m_faces[i].m_twin;
 				dgConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();
-				_ASSERTE (twinTetra);
+				HACD_ASSERT (twinTetra);
 
 				if (twinTetra->GetMark() != mark) {
-					dgInt32 index = 0;
+					hacd::HaI32 index = 0;
 					for (index = 0; index < perimeterCount; index ++) {
 						if (perimeter[index] == twinNode) {
 							break;
@@ -517,13 +519,13 @@ public:
 			}
 		}
 
-		dgInt32 coneListCount = 0;
+		hacd::HaI32 coneListCount = 0;
 		dgListNode* coneList[32];
-		for (dgInt32 i = 0; i < perimeterCount; i ++) {
+		for (hacd::HaI32 i = 0; i < perimeterCount; i ++) {
 			dgListNode* const perimeterNode = perimeter[i];
 			dgConvexHull4dTetraherum* const perimeterTetra = &perimeterNode->GetInfo();
 
-			for (dgInt32 i = 0; i < 4; i ++) {
+			for (hacd::HaI32 i = 0; i < 4; i ++) {
 				dgConvexHull4dTetraherum::dgTetrahedrumFace* const perimeterFace = &perimeterTetra->m_faces[i];
 				if (perimeterFace->m_twin->GetInfo().GetMark() == mark) {
 
@@ -541,13 +543,13 @@ public:
 
 		for (int i = 0; i < (coneListCount - 1); i ++) {
 			dgListNode* const coneNodeA = coneList[i];
-			for (dgInt32 j = i + 1; j < coneListCount; j ++) {
+			for (hacd::HaI32 j = i + 1; j < coneListCount; j ++) {
 				dgListNode* const coneNodeB = coneList[j];
 				LinkSibling (coneNodeA, coneNodeB);
 			}
 		}
 
-		for (dgInt32 i = 0; i < deletedCount; i ++) {
+		for (hacd::HaI32 i = 0; i < deletedCount; i ++) {
 			//dgListNode* const node = deleteNode->GetInfo();
 			dgListNode* const deleteTetraNode = deletedNodes[i];
 			DeleteFace (deleteTetraNode); 
@@ -563,7 +565,7 @@ public:
 		// split every missing edge at the center and add the two half to the triangulation
 		// keep doing it until all edge are present in the triangulation.
 
-		dgInt32 mark = m_mesh->IncLRU();
+		hacd::HaI32 mark = m_mesh->IncLRU();
 
 		// create a list all all the edge that are in the mesh but that do not appear in the delaunay tetrahedron 
 		const dgIndexMapPair* const indexMap = &m_indexMap[0];
@@ -575,9 +577,9 @@ public:
 				edge->m_mark = mark;
 				edge->m_twin->m_mark = mark;
 
-				dgInt32 i0 = indexMap[edge->m_incidentVertex].m_convexIndex;
-				dgInt32 i1 = indexMap[edge->m_twin->m_incidentVertex].m_convexIndex;
-				dgUnsigned64 key = GetKey (i0, i1);
+				hacd::HaI32 i0 = indexMap[edge->m_incidentVertex].m_convexIndex;
+				hacd::HaI32 i1 = indexMap[edge->m_twin->m_incidentVertex].m_convexIndex;
+				hacd::HaU64 key = GetKey (i0, i1);
 				dgEdgeMap::dgTreeNode* const edgeNode = m_edgeMap.Find(key);
 				if (!edgeNode) {
 					m_missinEdges.Append(iter.GetNode());
@@ -593,16 +595,16 @@ public:
 			dgMissingEdges::dgListNode* missingEdgeNode = m_missinEdges.GetFirst();
 			dgEdge* missingEdge = &missingEdgeNode->GetInfo()->GetInfo();
 
-			dgInt32 k0 = missingEdge->m_incidentVertex;
-			dgInt32 k1 = missingEdge->m_twin->m_incidentVertex;
-			dgInt32 i0 = indexMap[k0].m_convexIndex;
-			dgInt32 i1 = indexMap[k1].m_convexIndex;
+			hacd::HaI32 k0 = missingEdge->m_incidentVertex;
+			hacd::HaI32 k1 = missingEdge->m_twin->m_incidentVertex;
+			hacd::HaI32 i0 = indexMap[k0].m_convexIndex;
+			hacd::HaI32 i1 = indexMap[k1].m_convexIndex;
 
 			m_missinEdges.Remove(missingEdgeNode);
-			dgUnsigned64 key = GetKey (i0, i1);
+			hacd::HaU64 key = GetKey (i0, i1);
 			if (!m_edgeMap.Find(key)) {
 				dgVertexMap::dgTreeNode* const vertexNode = m_vertexMap.Find(i0);
-				_ASSERTE (vertexNode);
+				HACD_ASSERT (vertexNode);
 				const dgEdgeSharedTetras& tetraMap = vertexNode->GetInfo();
 
 				const dgBigVector& p0 = GetVertex(i0);
@@ -611,28 +613,28 @@ public:
 				for (dgEdgeSharedTetras::dgListNode* node = tetraMap.GetFirst(); node; node = node->GetNext()) {
 					dgListNode* const tetraNode = node->GetInfo();
 					dgConvexHull4dTetraherum* const tetra = &tetraNode->GetInfo();
-					dgInt32 faceIndex = -1;
-					for (dgInt32 i = 0; i < 4; i ++) {
+					hacd::HaI32 faceIndex = -1;
+					for (hacd::HaI32 i = 0; i < 4; i ++) {
 						if (tetra->m_faces[i].m_otherVertex == i0) {
 							faceIndex = i;	
 						}
 					}
-					_ASSERTE (faceIndex != -1);
+					HACD_ASSERT (faceIndex != -1);
 
 					const dgBigVector& A = GetVertex(tetra->m_faces[faceIndex].m_index[0]);
 					const dgBigVector& B = GetVertex(tetra->m_faces[faceIndex].m_index[1]);
 					const dgBigVector& C = GetVertex(tetra->m_faces[faceIndex].m_index[2]);
 					dgBigVector baricentric (LineTriangleIntersection (p0, p1, A, B, C));
-					if (baricentric.m_w == dgFloat64 (0.0f)) {
-						_ASSERTE ((baricentric.m_x > dgFloat64 (0.0f)) && (baricentric.m_y > dgFloat64 (0.0f)) && (baricentric.m_z > dgFloat64 (0.0f)));
+					if (baricentric.m_w == hacd::HaF64 (0.0f)) {
+						HACD_ASSERT ((baricentric.m_x > hacd::HaF64 (0.0f)) && (baricentric.m_y > hacd::HaF64 (0.0f)) && (baricentric.m_z > hacd::HaF64 (0.0f)));
 						dgBigVector point (A.Scale4 (baricentric.m_x) + B.Scale4 (baricentric.m_y) + C.Scale4 (baricentric.m_z));
-						dgInt32 index = ReplaceFaceNodes(tetraNode, faceIndex, point);
+						hacd::HaI32 index = ReplaceFaceNodes(tetraNode, faceIndex, point);
 						
 
 						dgBigVector pp0 (point - p0);
 						dgBigVector p1p0 (p1 - p0);
-						dgFloat64 spliteParam = (pp0 % p1p0) / (p1p0 % p1p0);
-						dgEdge* const newEdge = m_mesh->InsertEdgeVertex (missingEdge, dgFloat32 (spliteParam));
+						hacd::HaF64 spliteParam = (pp0 % p1p0) / (p1p0 % p1p0);
+						dgEdge* const newEdge = m_mesh->InsertEdgeVertex (missingEdge, hacd::HaF32 (spliteParam));
 
 						indexMap[newEdge->m_twin->m_incidentVertex].m_convexIndex = index;
 
@@ -640,10 +642,10 @@ public:
 						i1 = indexMap[newEdge->m_next->m_twin->m_incidentVertex].m_convexIndex;
 						key = GetKey (i0, i1);
 						if (!m_edgeMap.Find(key)) {
-							dgInt32 index0 = GetVertexIndex(i0);
-							dgInt32 index1 = GetVertexIndex(i1);
+							hacd::HaI32 index0 = GetVertexIndex(i0);
+							hacd::HaI32 index1 = GetVertexIndex(i1);
 							dgPolyhedra::dgTreeNode* const edgeNode = m_mesh->FindEdgeNode(index0, index1);
-							_ASSERTE (edgeNode);
+							HACD_ASSERT (edgeNode);
 							m_missinEdges.Addtop(edgeNode);
 						}
 
@@ -652,7 +654,7 @@ public:
 						break;
 					}
 				}
-				_ASSERTE (edgeFound);
+				HACD_ASSERT (edgeFound);
 			} 
 		}
 	}
@@ -660,11 +662,11 @@ public:
 /*
 	void RemoveDegeneratedTetras ()
 	{
-		dgInt32 mark = m_mesh->IncLRU(); 
+		hacd::HaI32 mark = m_mesh->IncLRU(); 
 		dgPolyhedra::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			dgEdge* const faceEdge = &iter.GetNode()->GetInfo();
-			dgInt32 count = 0; 
+			hacd::HaI32 count = 0; 
 			dgEdge* ptr = faceEdge;
 			do {
 				count ++;
@@ -675,9 +677,9 @@ public:
 			if (count > 3) {
 				dgEdge* ptr = faceEdge;
 				do {
-					dgInt32 k0 = m_indexMap[ptr->m_incidentVertex].m_convexIndex;
-					dgInt32 k1 = m_indexMap[ptr->m_next->m_incidentVertex].m_convexIndex;
-					dgUnsigned64 key = GetKey (k0, k1);
+					hacd::HaI32 k0 = m_indexMap[ptr->m_incidentVertex].m_convexIndex;
+					hacd::HaI32 k1 = m_indexMap[ptr->m_next->m_incidentVertex].m_convexIndex;
+					hacd::HaU64 key = GetKey (k0, k1);
 					dgEdgeMap::dgTreeNode* const edgeNode = m_edgeMap.Find(key);
 					if (edgeNode) {
 						dgEdgeSharedTetras& header = edgeNode->GetInfo();
@@ -685,16 +687,16 @@ public:
 							dgListNode* const tetraNode = ptr1->GetInfo();
 							dgConvexHull4dTetraherum* const tetra = &tetraNode->GetInfo();
 							const dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[0];
-							dgInt32 index[4];
+							hacd::HaI32 index[4];
 							index[0] = GetVertexIndex(face.m_index[0]);
 							index[1] = GetVertexIndex(face.m_index[1]);
 							index[2] = GetVertexIndex(face.m_index[2]);
 							index[3] = GetVertexIndex(face.m_otherVertex);
 
-							dgInt32 duplicates = 0;
+							hacd::HaI32 duplicates = 0;
 							dgEdge* ptr3 = faceEdge;
 							do {
-								for (dgInt32 i = 0; i < 4; i ++) {
+								for (hacd::HaI32 i = 0; i < 4; i ++) {
 									duplicates += (ptr3->m_incidentVertex == index[i]) ? 1 : 0;
 								}
 								ptr3 = ptr3->m_next;
@@ -713,38 +715,38 @@ public:
 	}
 */
 
-	bool MatchFace (dgMeshEffect& mesh, dgEdge* const faceEdge, dgInt32 tetraMark) const
+	bool MatchFace (dgMeshEffect& mesh, dgEdge* const faceEdge, hacd::HaI32 tetraMark) const
 	{
-		dgInt32 k0 = m_indexMap[faceEdge->m_incidentVertex].m_convexIndex;
-		dgInt32 k1 = m_indexMap[faceEdge->m_next->m_incidentVertex].m_convexIndex;
-		dgUnsigned64 key = GetKey (k0, k1);
+		hacd::HaI32 k0 = m_indexMap[faceEdge->m_incidentVertex].m_convexIndex;
+		hacd::HaI32 k1 = m_indexMap[faceEdge->m_next->m_incidentVertex].m_convexIndex;
+		hacd::HaU64 key = GetKey (k0, k1);
 		dgEdgeMap::dgTreeNode* const edgeNode = m_edgeMap.Find(key);
 
-		_ASSERTE (edgeNode);
+		HACD_ASSERT (edgeNode);
 		dgEdgeSharedTetras& header = edgeNode->GetInfo();
 		for (dgEdgeSharedTetras::dgListNode* ptr = header.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			dgListNode* const tetraNode = ptr->GetInfo();
 			dgConvexHull4dTetraherum* const tetra = &tetraNode->GetInfo();
-			for (dgInt32 i = 0; i < 4; i ++) {
+			for (hacd::HaI32 i = 0; i < 4; i ++) {
 				dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
-				dgInt32 i0 = face.m_index[0];
-				dgInt32 i1 = face.m_index[1];
-				dgInt32 i2 = face.m_index[2];
+				hacd::HaI32 i0 = face.m_index[0];
+				hacd::HaI32 i1 = face.m_index[1];
+				hacd::HaI32 i2 = face.m_index[2];
 
 				if (((i0 == k0) && (i1 == k1)) || ((i1 == k0) && (i2 == k1)) || ((i2 == k0) && (i0 == k1))) {
-					dgInt32 index[3];
+					hacd::HaI32 index[3];
 
 					index[0] = GetVertexIndex (i0);
 					index[1] = GetVertexIndex (i1);
 					index[2] = GetVertexIndex (i2);
 					while (index[0] != faceEdge->m_incidentVertex) {
-						dgInt32 tmp = index[0];
+						hacd::HaI32 tmp = index[0];
 						index[0] = index[1];
 						index[1] = index[2];
 						index[2] = tmp;
 					}
-					_ASSERTE (index[0] == faceEdge->m_incidentVertex);
-					_ASSERTE (index[1] == faceEdge->m_next->m_incidentVertex);
+					HACD_ASSERT (index[0] == faceEdge->m_incidentVertex);
+					HACD_ASSERT (index[1] == faceEdge->m_next->m_incidentVertex);
 
 					dgEdge* nextEdge = faceEdge->m_next->m_next;
 					do {
@@ -757,22 +759,22 @@ public:
 					if (nextEdge != faceEdge) {
 						if (nextEdge->m_prev != faceEdge->m_next) {
 							dgEdge* const edge = mesh.ConectVertex(faceEdge->m_next, nextEdge);
-							_ASSERTE (edge);
-							_ASSERTE (edge->m_next);
-							_ASSERTE (edge->m_prev);
-							_ASSERTE (edge->m_twin->m_next);
-							_ASSERTE (edge->m_twin->m_prev);
-							_ASSERTE (faceEdge->m_next == edge->m_twin);
+							HACD_ASSERT (edge);
+							HACD_ASSERT (edge->m_next);
+							HACD_ASSERT (edge->m_prev);
+							HACD_ASSERT (edge->m_twin->m_next);
+							HACD_ASSERT (edge->m_twin->m_prev);
+							HACD_ASSERT (faceEdge->m_next == edge->m_twin);
 						}
 						if (nextEdge->m_next != faceEdge) {
 #ifdef	_DEBUG
 							dgEdge* const edge = mesh.ConectVertex(faceEdge, nextEdge);
-							_ASSERTE (edge);
-							_ASSERTE (edge->m_next);
-							_ASSERTE (edge->m_prev);
-							_ASSERTE (edge->m_twin->m_next);
-							_ASSERTE (edge->m_twin->m_prev);
-							_ASSERTE (faceEdge->m_prev == edge);
+							HACD_ASSERT (edge);
+							HACD_ASSERT (edge->m_next);
+							HACD_ASSERT (edge->m_prev);
+							HACD_ASSERT (edge->m_twin->m_next);
+							HACD_ASSERT (edge->m_twin->m_prev);
+							HACD_ASSERT (faceEdge->m_prev == edge);
 #else
 							mesh.ConectVertex(faceEdge, nextEdge);
 #endif
@@ -792,10 +794,10 @@ public:
 	}
 
 
-	void RecoverFace (dgMeshEffect& mesh, dgEdge* const face, dgInt32 faceMark, dgInt32 tetraMark, dgTree<dgEdge*, dgEdge*>& edgeInconflict) const
+	void RecoverFace (dgMeshEffect& mesh, dgEdge* const face, hacd::HaI32 faceMark, hacd::HaI32 tetraMark, dgTree<dgEdge*, dgEdge*>& edgeInconflict) const
 	{
-		dgInt32 count = 0;
-		dgInt32 perimeterCount = 0;
+		hacd::HaI32 count = 0;
+		hacd::HaI32 perimeterCount = 0;
 		dgEdge* edgeArray[1024];
 		dgEdge* perimterEdges[1024 + 1];
 
@@ -804,7 +806,7 @@ public:
 			edgeArray[count] = ptr;
 			perimterEdges[count] = ptr;
 			count ++;
-			_ASSERTE (count < dgInt32 (sizeof (edgeArray) / sizeof (edgeArray[0])));
+			HACD_ASSERT (count < hacd::HaI32 (sizeof (edgeArray) / sizeof (edgeArray[0])));
 			ptr = ptr->m_next;
 		} while (ptr != face);
 		perimeterCount = count;
@@ -816,12 +818,12 @@ public:
 			dgEdge* const triangleFace = edgeArray[count];
 			bool state = MatchFace (mesh, triangleFace, tetraMark);
 			if (state) {
-				_ASSERTE (triangleFace == triangleFace->m_next->m_next->m_next);
+				HACD_ASSERT (triangleFace == triangleFace->m_next->m_next->m_next);
 				triangleFace->m_mark = faceMark;
 				dgEdge* ptr = triangleFace->m_next; 
 				do {
 					ptr->m_mark = faceMark;
-					for (dgInt32 i = 0; i < count; i ++) {
+					for (hacd::HaI32 i = 0; i < count; i ++) {
 						if (ptr == edgeArray[i]) {
 							edgeArray[i] = edgeArray[count - 1];
 							i --;
@@ -834,12 +836,12 @@ public:
 			}
 		}
 
-		_ASSERTE (count == 0);
-		for (dgInt32 i = 1; i <= perimeterCount; i ++) {
+		HACD_ASSERT (count == 0);
+		for (hacd::HaI32 i = 1; i <= perimeterCount; i ++) {
 			dgEdge* const last = perimterEdges[i - 1];
 			for (dgEdge* edge = perimterEdges[i]->m_prev; edge != last; edge = edge->m_twin->m_prev) {
 				if (edge->m_mark != faceMark) {
-					dgInt32 index = 0;
+					hacd::HaI32 index = 0;
 					for (index = 0; index < count; index ++) {
 						if ((edgeArray[index] == edge) || (edgeArray[index] == edge->m_twin)) {
 							break;
@@ -859,12 +861,12 @@ public:
 				dgEdge* const triangleFace = edgeArray[count];
 				bool state = MatchFace (mesh, triangleFace, tetraMark);
 				if (state) {
-					_ASSERTE (triangleFace == triangleFace->m_next->m_next->m_next);
+					HACD_ASSERT (triangleFace == triangleFace->m_next->m_next->m_next);
 					triangleFace->m_mark = faceMark;
 					dgEdge* ptr = triangleFace->m_next; 
 					do {
 						ptr->m_mark = faceMark;
-						for (dgInt32 i = 0; i < count; i ++) {
+						for (hacd::HaI32 i = 0; i < count; i ++) {
 							if (ptr == edgeArray[i]) {
 								edgeArray[i] = edgeArray[count - 1];
 								i --;
@@ -877,12 +879,12 @@ public:
 				}
 			}
 
-			_ASSERTE (count == 0);
-			for (dgInt32 i = 0; i < perimeterCount; i ++) {
+			HACD_ASSERT (count == 0);
+			for (hacd::HaI32 i = 0; i < perimeterCount; i ++) {
 				dgEdge* const edge = perimterEdges[i];
 				if (edge->m_mark != faceMark) {
 					dgEdge* const borderEdge = m_mesh->FindEdge(edge->m_incidentVertex, edge->m_twin->m_incidentVertex);
-					_ASSERTE (borderEdge);
+					HACD_ASSERT (borderEdge);
 					if (!(edgeInconflict.Find(borderEdge) || edgeInconflict.Find(borderEdge->m_twin))) {
 						edgeInconflict.Insert(borderEdge, borderEdge);
 					}
@@ -890,7 +892,7 @@ public:
 				edge->m_mark = faceMark;
 			}
 
-			for (dgInt32 i = 1; i <= perimeterCount; i ++) {
+			for (hacd::HaI32 i = 1; i <= perimeterCount; i ++) {
 				const dgEdge* const last = perimterEdges[i - 1];
 				for (dgEdge* edge = perimterEdges[i]->m_prev; edge != last; edge = edge->m_twin->m_prev) {
 					if (edge->m_mark != faceMark) {
@@ -901,15 +903,15 @@ public:
 						for (dgEdge* ptr = edge; !begin; ptr = ptr->m_next->m_twin) {
 							begin = m_mesh->FindEdge(ptr->m_next->m_incidentVertex, ptr->m_next->m_twin->m_incidentVertex);
 						}
-						_ASSERTE (begin);
+						HACD_ASSERT (begin);
 
 						dgEdge* end = NULL;
 						for (dgEdge* ptr = edge->m_twin; !end; ptr = ptr->m_next->m_twin) {
 							end = m_mesh->FindEdge(ptr->m_next->m_incidentVertex, ptr->m_next->m_twin->m_incidentVertex);
 						}
-						_ASSERTE (end);
+						HACD_ASSERT (end);
 						dgEdge* const newEdge = m_mesh->ConectVertex(end, begin);
-						_ASSERTE (!edgeInconflict.Find(newEdge));
+						HACD_ASSERT (!edgeInconflict.Find(newEdge));
 						edgeInconflict.Insert(newEdge, newEdge);
 					}
 				}
@@ -925,7 +927,7 @@ public:
 //		dgIndexMapPair* const indexMap = &m_indexMap[0];
 		do {
 			dgMeshEffect tmpMesh (*m_mesh);
-			dgInt32 mark = m_mesh->IncLRU(); 
+			hacd::HaI32 mark = m_mesh->IncLRU(); 
 
 			dgTree<dgEdge*, dgEdge*> edgeInconflict(GetAllocator());
 			dgMeshEffect::Iterator iter(tmpMesh);
@@ -939,7 +941,7 @@ public:
 			// if there are missing sub faces then we must recover those by insertion point on the sub edges of the missing faces
 			allFaceFound = true;
 			if (edgeInconflict.GetCount()) {
-				_ASSERTE (0);
+				HACD_ASSERT (0);
 /*
 				allFaceFound = false;
 
@@ -947,19 +949,19 @@ public:
 				for (iter.Begin(); iter; iter ++) {
 					dgEdge* const missingEdge = iter.GetNode()->GetInfo();
 
-					dgInt32 k0 = missingEdge->m_incidentVertex;
-					dgInt32 k1 = missingEdge->m_twin->m_incidentVertex;
-					dgInt32 i0 = indexMap[k0].m_convexIndex;
-					dgInt32 i1 = indexMap[k1].m_convexIndex;
+					hacd::HaI32 k0 = missingEdge->m_incidentVertex;
+					hacd::HaI32 k1 = missingEdge->m_twin->m_incidentVertex;
+					hacd::HaI32 i0 = indexMap[k0].m_convexIndex;
+					hacd::HaI32 i1 = indexMap[k1].m_convexIndex;
 
 					const dgBigVector& p0 = GetVertex(i0);
 					const dgBigVector& p1 = GetVertex(i1);
-					dgFloat32 spliteParam = dgFloat32 (0.5f);
+					hacd::HaF32 spliteParam = hacd::HaF32 (0.5f);
 
 					dgEdge* const newEdge = m_mesh->InsertEdgeVertex (missingEdge, spliteParam);
 					dgBigVector p (p1.Add4(p0).Scale4 (spliteParam));
-					dgInt32 index = AddVertex(p);
-					_ASSERTE (index != -1);
+					hacd::HaI32 index = AddVertex(p);
+					HACD_ASSERT (index != -1);
 					indexMap[newEdge->m_twin->m_incidentVertex].m_convexIndex = index;
 				}
 				RecoverEdges ();
@@ -967,20 +969,20 @@ public:
 			}
 #ifdef _DEBUG
 			if (allFaceFound) {
-//				_ASSERTE (0);
+//				HACD_ASSERT (0);
 /*
 				dgFaceKeyMap faceMap (GetAllocator());
 				for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
 					dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
-					for (dgInt32 i = 0; i < 4; i ++) {
+					for (hacd::HaI32 i = 0; i < 4; i ++) {
 						dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
 						dgEdgeFaceKey key (face.m_index[0], face.m_index[1], face.m_index[2]);
-						_ASSERTE (!faceMap.Find(key));
+						HACD_ASSERT (!faceMap.Find(key));
 						faceMap.Insert (node, key);
 					}
 				}
 
-				dgInt32 mark = tmpMesh.IncLRU(); 
+				hacd::HaI32 mark = tmpMesh.IncLRU(); 
 				for (iter.Begin(); iter; iter ++) {
 					dgEdge* const face = &iter.GetNode()->GetInfo();
 					if (face->m_mark != mark){
@@ -990,7 +992,7 @@ public:
 							ptr = ptr->m_next;
 						} while (ptr != face);
 						dgEdgeFaceKey key (face->m_incidentVertex, face->m_next->m_incidentVertex, face->m_next->m_next->m_incidentVertex);
-						_ASSERTE (faceMap.Find(key));
+						HACD_ASSERT (faceMap.Find(key));
 					}
 				}
 */
@@ -1009,9 +1011,9 @@ public:
 //		RemoveDegeneratedTetras ();
 
 
-		//dgInt32 tetraMark = 1;
-		dgInt32 tetraMark = IncMark();
-		dgInt32 mark = m_mesh->IncLRU(); 
+		//hacd::HaI32 tetraMark = 1;
+		hacd::HaI32 tetraMark = IncMark();
+		hacd::HaI32 mark = m_mesh->IncLRU(); 
 
 		dgTree<dgEdge*, dgEdge*> edgeInconflict(GetAllocator());
 		dgMeshEffect::Iterator iter(*m_mesh);
@@ -1034,9 +1036,9 @@ public:
 		for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
 			dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 			if (tetra->GetMark() == tetraMark) {
-				dgInt32 stack = 0;
+				hacd::HaI32 stack = 0;
 				dgConvexHull4dTetraherum* stackPool[1024 * 4];
-				for (dgInt32 i = 0; i < 4; i ++) {
+				for (hacd::HaI32 i = 0; i < 4; i ++) {
 					dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
 					if (face.m_twin && (face.m_twin->GetInfo().GetMark() != tetraMark)) {
 						stackPool[stack] = &face.m_twin->GetInfo();
@@ -1048,12 +1050,12 @@ public:
 					stack --;
 					dgConvexHull4dTetraherum* const skinTetra = stackPool[stack];
 					skinTetra->SetMark (tetraMark);
-					for (dgInt32 i = 0; i < 4; i ++) {
+					for (hacd::HaI32 i = 0; i < 4; i ++) {
 						dgConvexHull4dTetraherum::dgTetrahedrumFace& face = skinTetra->m_faces[i];
 						if (face.m_twin && (face.m_twin->GetInfo().GetMark() != tetraMark)) {
 							stackPool[stack] = &face.m_twin->GetInfo();
 							stack ++;
-							_ASSERTE (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+							HACD_ASSERT (stack < hacd::HaI32 (sizeof (stackPool) / sizeof (stackPool[0])));
 						}
 					}
 				}
@@ -1089,8 +1091,8 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 	class dgIndexMapPair
 	{
 		public:
-		dgInt32 m_meshIndex;
-		dgInt32 m_convexIndex;
+		hacd::HaI32 m_meshIndex;
+		hacd::HaI32 m_convexIndex;
 	};
 
 	class dgMissingEdges: public dgList<dgPolyhedra::dgTreeNode*> 
@@ -1123,11 +1125,11 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		}
 	};
 
-	class dgEdgeMap: public dgTree<dgEdgeSharedTetras, dgUnsigned64>
+	class dgEdgeMap: public dgTree<dgEdgeSharedTetras, hacd::HaU64>
 	{
 		public:
 		dgEdgeMap()
-			:dgTree<dgEdgeSharedTetras, dgUnsigned64>()
+			:dgTree<dgEdgeSharedTetras, hacd::HaU64>()
 		{
 		}
 
@@ -1148,7 +1150,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		dgEdgeFaceKey ()
 		{}
 
-		dgEdgeFaceKey (dgInt32 i0, dgInt32 i1, dgInt32 i2)
+		dgEdgeFaceKey (hacd::HaI32 i0, hacd::HaI32 i1, hacd::HaI32 i2)
 		{
 			m_index[0] = i0;
 			m_index[1] = i1;
@@ -1161,9 +1163,9 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 			}
 		}
 
-		dgInt32 Compared (const dgEdgeFaceKey& key) const 
+		hacd::HaI32 Compared (const dgEdgeFaceKey& key) const 
 		{
-			for (dgInt32 i = 0; i < 3; i ++) {
+			for (hacd::HaI32 i = 0; i < 3; i ++) {
 				if (m_index[i] < key.m_index[i]) {
 					return -1;
 				} else if (m_index[i] > key.m_index[i]) {
@@ -1185,7 +1187,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		}
 
 
-		dgInt32 m_index[3];
+		hacd::HaI32 m_index[3];
 
 	};
 
@@ -1241,7 +1243,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		// split every missing edge at the center and add the two half to the triangulation
 		// keep doing it until all edge are present in the triangulation.
 
-		dgInt32 mark = m_mesh->IncLRU();
+		hacd::HaI32 mark = m_mesh->IncLRU();
 
 		// create a list all all the edge that are in the mesh but that do not appear in the delaunay tetrahedron 
 		const dgIndexMapPair* const indexMap = &m_indexMap[0];
@@ -1252,9 +1254,9 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 				edge->m_mark = mark;
 				edge->m_twin->m_mark = mark;
 
-				dgInt32 i0 = indexMap[edge->m_incidentVertex].m_convexIndex;
-				dgInt32 i1 = indexMap[edge->m_twin->m_incidentVertex].m_convexIndex;
-				dgUnsigned64 key = GetKey (i0, i1);
+				hacd::HaI32 i0 = indexMap[edge->m_incidentVertex].m_convexIndex;
+				hacd::HaI32 i1 = indexMap[edge->m_twin->m_incidentVertex].m_convexIndex;
+				hacd::HaU64 key = GetKey (i0, i1);
 				dgEdgeMap::dgTreeNode* const edgeNode = m_edgeMap.Find(key);
 				if (!edgeNode) {
 					m_missinEdges.Append(iter.GetNode());
@@ -1268,36 +1270,36 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 			dgMissingEdges::dgListNode* missingEdgeNode = m_missinEdges.GetFirst();
 			dgEdge* missingEdge = &missingEdgeNode->GetInfo()->GetInfo();
 
-			dgInt32 k0 = missingEdge->m_incidentVertex;
-			dgInt32 k1 = missingEdge->m_twin->m_incidentVertex;
-			dgInt32 i0 = indexMap[k0].m_convexIndex;
-			dgInt32 i1 = indexMap[k1].m_convexIndex;
+			hacd::HaI32 k0 = missingEdge->m_incidentVertex;
+			hacd::HaI32 k1 = missingEdge->m_twin->m_incidentVertex;
+			hacd::HaI32 i0 = indexMap[k0].m_convexIndex;
+			hacd::HaI32 i1 = indexMap[k1].m_convexIndex;
 
 			m_missinEdges.Remove(missingEdgeNode);
-			dgUnsigned64 key = GetKey (i0, i1);
+			hacd::HaU64 key = GetKey (i0, i1);
 			if (!m_edgeMap.Find(key)) {
 				const dgBigVector& p0 = GetVertex(i0);
 				const dgBigVector& p1 = GetVertex(i1);
-				dgFloat64 spliteParam = dgFloat64 (0.5f);
-				dgEdge* const newEdge = m_mesh->InsertEdgeVertex (missingEdge, dgFloat32 (spliteParam));
+				hacd::HaF64 spliteParam = hacd::HaF64 (0.5f);
+				dgEdge* const newEdge = m_mesh->InsertEdgeVertex (missingEdge, hacd::HaF32 (spliteParam));
 				newEdge->m_mark = mark;
 				newEdge->m_next->m_mark = mark;
 				newEdge->m_twin->m_mark = mark;
 				newEdge->m_twin->m_prev->m_mark = mark;
 
 				dgBigVector p (p1.Add4(p0).Scale4 (spliteParam));
-				dgInt32 index = AddVertex(p);
-				_ASSERTE (index != -1);
+				hacd::HaI32 index = AddVertex(p);
+				HACD_ASSERT (index != -1);
 				indexMap[newEdge->m_twin->m_incidentVertex].m_convexIndex = index;
 
 				i0 = indexMap[newEdge->m_incidentVertex].m_convexIndex;
 				i1 = indexMap[newEdge->m_twin->m_incidentVertex].m_convexIndex;
 				key = GetKey (i0, i1);
 				if (!m_edgeMap.Find(key)) {
-					dgInt32 index0 = GetVertexIndex(i0);
-					dgInt32 index1 = GetVertexIndex(i1);
+					hacd::HaI32 index0 = GetVertexIndex(i0);
+					hacd::HaI32 index1 = GetVertexIndex(i1);
 					dgPolyhedra::dgTreeNode* const edgeNode = m_mesh->FindEdgeNode(index0, index1);
-					_ASSERTE (edgeNode);
+					HACD_ASSERT (edgeNode);
 					m_missinEdges.Append(edgeNode);
 				}
 
@@ -1305,10 +1307,10 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 				i1 = indexMap[newEdge->m_next->m_twin->m_incidentVertex].m_convexIndex;
 				key = GetKey (i0, i1);
 				if (!m_edgeMap.Find(key)) {
-					dgInt32 index0 = GetVertexIndex(i0);
-					dgInt32 index1 = GetVertexIndex(i1);
+					hacd::HaI32 index0 = GetVertexIndex(i0);
+					hacd::HaI32 index1 = GetVertexIndex(i1);
 					dgPolyhedra::dgTreeNode* const edgeNode = m_mesh->FindEdgeNode(index0, index1);
-					_ASSERTE (edgeNode);
+					HACD_ASSERT (edgeNode);
 					m_missinEdges.Append(edgeNode);
 				}
 			} 
@@ -1317,11 +1319,11 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 
 	void RemoveDegeneratedTetras ()
 	{
-		dgInt32 mark = m_mesh->IncLRU(); 
+		hacd::HaI32 mark = m_mesh->IncLRU(); 
 		dgPolyhedra::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			dgEdge* const faceEdge = &iter.GetNode()->GetInfo();
-			dgInt32 count = 0; 
+			hacd::HaI32 count = 0; 
 			dgEdge* ptr = faceEdge;
 			do {
 				count ++;
@@ -1332,9 +1334,9 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 			if (count > 3) {
 				dgEdge* ptr = faceEdge;
 				do {
-					dgInt32 k0 = m_indexMap[ptr->m_incidentVertex].m_convexIndex;
-					dgInt32 k1 = m_indexMap[ptr->m_next->m_incidentVertex].m_convexIndex;
-					dgUnsigned64 key = GetKey (k0, k1);
+					hacd::HaI32 k0 = m_indexMap[ptr->m_incidentVertex].m_convexIndex;
+					hacd::HaI32 k1 = m_indexMap[ptr->m_next->m_incidentVertex].m_convexIndex;
+					hacd::HaU64 key = GetKey (k0, k1);
 					dgEdgeMap::dgTreeNode* const edgeNode = m_edgeMap.Find(key);
 					if (edgeNode) {
 						dgEdgeSharedTetras& header = edgeNode->GetInfo();
@@ -1342,16 +1344,16 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 							dgListNode* const tetraNode = ptr1->GetInfo();
 							dgConvexHull4dTetraherum* const tetra = &tetraNode->GetInfo();
 							const dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[0];
-							dgInt32 index[4];
+							hacd::HaI32 index[4];
 							index[0] = GetVertexIndex(face.m_index[0]);
 							index[1] = GetVertexIndex(face.m_index[1]);
 							index[2] = GetVertexIndex(face.m_index[2]);
 							index[3] = GetVertexIndex(face.m_otherVertex);
 
-							dgInt32 duplicates = 0;
+							hacd::HaI32 duplicates = 0;
 							dgEdge* ptr3 = faceEdge;
 							do {
-								for (dgInt32 i = 0; i < 4; i ++) {
+								for (hacd::HaI32 i = 0; i < 4; i ++) {
 									duplicates += (ptr3->m_incidentVertex == index[i]) ? 1 : 0;
 								}
 								ptr3 = ptr3->m_next;
@@ -1370,38 +1372,38 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 	}
 
 
-	bool MatchFace (dgMeshEffect& mesh, dgEdge* const faceEdge, dgInt32 tetraMark) const
+	bool MatchFace (dgMeshEffect& mesh, dgEdge* const faceEdge, hacd::HaI32 tetraMark) const
 	{
-		dgInt32 k0 = m_indexMap[faceEdge->m_incidentVertex].m_convexIndex;
-		dgInt32 k1 = m_indexMap[faceEdge->m_next->m_incidentVertex].m_convexIndex;
-		dgUnsigned64 key = GetKey (k0, k1);
+		hacd::HaI32 k0 = m_indexMap[faceEdge->m_incidentVertex].m_convexIndex;
+		hacd::HaI32 k1 = m_indexMap[faceEdge->m_next->m_incidentVertex].m_convexIndex;
+		hacd::HaU64 key = GetKey (k0, k1);
 		dgEdgeMap::dgTreeNode* const edgeNode = m_edgeMap.Find(key);
 
-		_ASSERTE (edgeNode);
+		HACD_ASSERT (edgeNode);
 		dgEdgeSharedTetras& header = edgeNode->GetInfo();
 		for (dgEdgeSharedTetras::dgListNode* ptr = header.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			dgListNode* const tetraNode = ptr->GetInfo();
 			dgConvexHull4dTetraherum* const tetra = &tetraNode->GetInfo();
-			for (dgInt32 i = 0; i < 4; i ++) {
+			for (hacd::HaI32 i = 0; i < 4; i ++) {
 				dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
-				dgInt32 i0 = face.m_index[0];
-				dgInt32 i1 = face.m_index[1];
-				dgInt32 i2 = face.m_index[2];
+				hacd::HaI32 i0 = face.m_index[0];
+				hacd::HaI32 i1 = face.m_index[1];
+				hacd::HaI32 i2 = face.m_index[2];
 
 				if (((i0 == k0) && (i1 == k1)) || ((i1 == k0) && (i2 == k1)) || ((i2 == k0) && (i0 == k1))) {
-					dgInt32 index[3];
+					hacd::HaI32 index[3];
 
 					index[0] = GetVertexIndex (i0);
 					index[1] = GetVertexIndex (i1);
 					index[2] = GetVertexIndex (i2);
 					while (index[0] != faceEdge->m_incidentVertex) {
-						dgInt32 tmp = index[0];
+						hacd::HaI32 tmp = index[0];
 						index[0] = index[1];
 						index[1] = index[2];
 						index[2] = tmp;
 					}
-					_ASSERTE (index[0] == faceEdge->m_incidentVertex);
-					_ASSERTE (index[1] == faceEdge->m_next->m_incidentVertex);
+					HACD_ASSERT (index[0] == faceEdge->m_incidentVertex);
+					HACD_ASSERT (index[1] == faceEdge->m_next->m_incidentVertex);
 
 					dgEdge* nextEdge = faceEdge->m_next->m_next;
 					do {
@@ -1416,24 +1418,24 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 							#ifdef _DEBUG
 								if (nextEdge->m_prev != faceEdge->m_next) {
 									dgEdge* const edge = mesh.ConectVertex(faceEdge->m_next, nextEdge);
-									_ASSERTE (edge);
-									_ASSERTE (edge->m_next);
-									_ASSERTE (edge->m_prev);
-									_ASSERTE (edge->m_twin->m_next);
-									_ASSERTE (edge->m_twin->m_prev);
-									_ASSERTE (faceEdge->m_next == edge->m_twin);
+									HACD_ASSERT (edge);
+									HACD_ASSERT (edge->m_next);
+									HACD_ASSERT (edge->m_prev);
+									HACD_ASSERT (edge->m_twin->m_next);
+									HACD_ASSERT (edge->m_twin->m_prev);
+									HACD_ASSERT (faceEdge->m_next == edge->m_twin);
 								}
 							#endif
 						#endif
 						if (nextEdge->m_next != faceEdge) {
 							#ifdef	_DEBUG
 								dgEdge* const edge = mesh.ConectVertex(faceEdge, nextEdge);
-								_ASSERTE (edge);
-								_ASSERTE (edge->m_next);
-								_ASSERTE (edge->m_prev);
-								_ASSERTE (edge->m_twin->m_next);
-								_ASSERTE (edge->m_twin->m_prev);
-								_ASSERTE (faceEdge->m_prev == edge);
+								HACD_ASSERT (edge);
+								HACD_ASSERT (edge->m_next);
+								HACD_ASSERT (edge->m_prev);
+								HACD_ASSERT (edge->m_twin->m_next);
+								HACD_ASSERT (edge->m_twin->m_prev);
+								HACD_ASSERT (faceEdge->m_prev == edge);
 							#else
 								mesh.ConectVertex(faceEdge, nextEdge);
 							#endif
@@ -1452,10 +1454,10 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		return false;
 	}
 
-	void RecoverFace (dgMeshEffect& mesh, dgEdge* const face, dgInt32 faceMark, dgInt32 tetraMark, dgTree<dgEdge*, dgEdge*>& edgeInconflict) const
+	void RecoverFace (dgMeshEffect& mesh, dgEdge* const face, hacd::HaI32 faceMark, hacd::HaI32 tetraMark, dgTree<dgEdge*, dgEdge*>& edgeInconflict) const
 	{
-		dgInt32 count = 0;
-		dgInt32 perimeterCount = 0;
+		hacd::HaI32 count = 0;
+		hacd::HaI32 perimeterCount = 0;
 		dgEdge* edgeArray[1024];
 		dgEdge* perimterEdges[1024 + 1];
 
@@ -1464,7 +1466,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 			edgeArray[count] = ptr;
 			perimterEdges[count] = ptr;
 			count ++;
-			_ASSERTE (count < dgInt32 (sizeof (edgeArray) / sizeof (edgeArray[0])));
+			HACD_ASSERT (count < hacd::HaI32 (sizeof (edgeArray) / sizeof (edgeArray[0])));
 			ptr = ptr->m_next;
 		} while (ptr != face);
 		perimeterCount = count;
@@ -1476,12 +1478,12 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 			dgEdge* const triangleFace = edgeArray[count];
 			bool state = MatchFace (mesh, triangleFace, tetraMark);
 			if (state) {
-				_ASSERTE (triangleFace == triangleFace->m_next->m_next->m_next);
+				HACD_ASSERT (triangleFace == triangleFace->m_next->m_next->m_next);
 				triangleFace->m_mark = faceMark;
 				dgEdge* ptr = triangleFace->m_next; 
 				do {
 					ptr->m_mark = faceMark;
-					for (dgInt32 i = 0; i < count; i ++) {
+					for (hacd::HaI32 i = 0; i < count; i ++) {
 						if (ptr == edgeArray[i]) {
 							edgeArray[i] = edgeArray[count - 1];
 							i --;
@@ -1494,12 +1496,12 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 			}
 		}
 		
-		_ASSERTE (count == 0);
-		for (dgInt32 i = 1; i <= perimeterCount; i ++) {
+		HACD_ASSERT (count == 0);
+		for (hacd::HaI32 i = 1; i <= perimeterCount; i ++) {
 			dgEdge* const last = perimterEdges[i - 1];
 			for (dgEdge* edge = perimterEdges[i]->m_prev; edge != last; edge = edge->m_twin->m_prev) {
 				if (edge->m_mark != faceMark) {
-					dgInt32 index = 0;
+					hacd::HaI32 index = 0;
 					for (index = 0; index < count; index ++) {
 						if ((edgeArray[index] == edge) || (edgeArray[index] == edge->m_twin)) {
 							break;
@@ -1519,12 +1521,12 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 				dgEdge* const triangleFace = edgeArray[count];
 				bool state = MatchFace (mesh, triangleFace, tetraMark);
 				if (state) {
-					_ASSERTE (triangleFace == triangleFace->m_next->m_next->m_next);
+					HACD_ASSERT (triangleFace == triangleFace->m_next->m_next->m_next);
 					triangleFace->m_mark = faceMark;
 					dgEdge* ptr = triangleFace->m_next; 
 					do {
 						ptr->m_mark = faceMark;
-						for (dgInt32 i = 0; i < count; i ++) {
+						for (hacd::HaI32 i = 0; i < count; i ++) {
 							if (ptr == edgeArray[i]) {
 								edgeArray[i] = edgeArray[count - 1];
 								i --;
@@ -1537,12 +1539,12 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 				}
 			}
 
-			_ASSERTE (count == 0);
-			for (dgInt32 i = 0; i < perimeterCount; i ++) {
+			HACD_ASSERT (count == 0);
+			for (hacd::HaI32 i = 0; i < perimeterCount; i ++) {
 				dgEdge* const edge = perimterEdges[i];
 				if (edge->m_mark != faceMark) {
 					dgEdge* const borderEdge = m_mesh->FindEdge(edge->m_incidentVertex, edge->m_twin->m_incidentVertex);
-					_ASSERTE (borderEdge);
+					HACD_ASSERT (borderEdge);
 					if (!(edgeInconflict.Find(borderEdge) || edgeInconflict.Find(borderEdge->m_twin))) {
 						edgeInconflict.Insert(borderEdge, borderEdge);
 					}
@@ -1550,7 +1552,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 				edge->m_mark = faceMark;
 			}
 			
-			for (dgInt32 i = 1; i <= perimeterCount; i ++) {
+			for (hacd::HaI32 i = 1; i <= perimeterCount; i ++) {
 				const dgEdge* const last = perimterEdges[i - 1];
 				for (dgEdge* edge = perimterEdges[i]->m_prev; edge != last; edge = edge->m_twin->m_prev) {
 					if (edge->m_mark != faceMark) {
@@ -1561,15 +1563,15 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 						for (dgEdge* ptr = edge; !begin; ptr = ptr->m_next->m_twin) {
 							begin = m_mesh->FindEdge(ptr->m_next->m_incidentVertex, ptr->m_next->m_twin->m_incidentVertex);
 						}
-						_ASSERTE (begin);
+						HACD_ASSERT (begin);
 
 						dgEdge* end = NULL;
 						for (dgEdge* ptr = edge->m_twin; !end; ptr = ptr->m_next->m_twin) {
 							end = m_mesh->FindEdge(ptr->m_next->m_incidentVertex, ptr->m_next->m_twin->m_incidentVertex);
 						}
-						_ASSERTE (end);
+						HACD_ASSERT (end);
 						dgEdge* const newEdge = m_mesh->ConectVertex(end, begin);
-						_ASSERTE (!edgeInconflict.Find(newEdge));
+						HACD_ASSERT (!edgeInconflict.Find(newEdge));
 						edgeInconflict.Insert(newEdge, newEdge);
 					}
 				}
@@ -1578,7 +1580,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 	}
 
 
-	static dgInt32 ConvexCompareIndex(const dgIndexMapPair* const  A, const dgIndexMapPair* const B, void* const context)
+	static hacd::HaI32 ConvexCompareIndex(const dgIndexMapPair* const  A, const dgIndexMapPair* const B, void* const context)
 	{
 		if (A->m_meshIndex > B->m_meshIndex) {
 			return 1;
@@ -1593,21 +1595,21 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		// make a index map to quickly find vertex mapping form the mesh to the delaunay tetrahedron
 		m_indexMap[GetVertexCount()].m_meshIndex = 0;
 		dgIndexMapPair* const indexMap = &m_indexMap[0];
-		for (dgInt32 i = 0; i < GetVertexCount(); i ++) {
+		for (hacd::HaI32 i = 0; i < GetVertexCount(); i ++) {
 			indexMap[i].m_convexIndex = i;
 			indexMap[i].m_meshIndex = GetVertexIndex(i);
 		}
 		dgSort(indexMap, GetVertexCount(), ConvexCompareIndex);
 	}
 
-	dgUnsigned64 GetKey (dgInt32 i0, dgInt32 i1) const
+	hacd::HaU64 GetKey (hacd::HaI32 i0, hacd::HaI32 i1) const
 	{
-		return (i1 > i0) ?  (dgUnsigned64 (i1) << 32) + i0 : (dgUnsigned64 (i0) << 32) + i1;
+		return (i1 > i0) ?  (hacd::HaU64 (i1) << 32) + i0 : (hacd::HaU64 (i0) << 32) + i1;
 	}
 
-	void InsertNewNode (dgInt32 i0, dgInt32 i1, dgListNode* const node)
+	void InsertNewNode (hacd::HaI32 i0, hacd::HaI32 i1, dgListNode* const node)
 	{
-		dgUnsigned64 key = GetKey (i1, i0);
+		hacd::HaU64 key = GetKey (i1, i0);
 
 		dgEdgeMap::dgTreeNode* edgeNode = m_edgeMap.Find(key);
 		if (!edgeNode) {
@@ -1618,7 +1620,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 
 		#ifdef _DEBUG
 		for (dgEdgeSharedTetras::dgListNode* ptr = header.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			_ASSERTE (ptr->GetInfo() != node);
+			HACD_ASSERT (ptr->GetInfo() != node);
 		}
 		#endif
 		header.Append(node);
@@ -1627,27 +1629,27 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 	void AddEdges (dgListNode* const node) 
 	{
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
-		dgFloat64 volume = GetTetraVolume (tetra);
-		if (volume < dgFloat64 (0.0f)) {
+		hacd::HaF64 volume = GetTetraVolume (tetra);
+		if (volume < hacd::HaF64 (0.0f)) {
 			const dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[0];
-			for (dgInt32 i = 0; i < 3; i ++) {
-				dgInt32 i0 = face.m_otherVertex;
-				dgInt32 i1 = face.m_index[i];
+			for (hacd::HaI32 i = 0; i < 3; i ++) {
+				hacd::HaI32 i0 = face.m_otherVertex;
+				hacd::HaI32 i1 = face.m_index[i];
 				InsertNewNode (i0, i1, node);
 			}
 
-			dgInt32 i0 = face.m_index[2];
-			for (dgInt32 i = 0; i < 3; i ++) {
-				dgInt32 i1 = face.m_index[i];
+			hacd::HaI32 i0 = face.m_index[2];
+			for (hacd::HaI32 i = 0; i < 3; i ++) {
+				hacd::HaI32 i1 = face.m_index[i];
 				InsertNewNode (i0, i1, node);
 				i0 = i1;
 			}
 		}
 	}
 
-	void RemoveNode(dgInt32 i0, dgInt32 i1, dgListNode* const node)
+	void RemoveNode(hacd::HaI32 i0, hacd::HaI32 i1, dgListNode* const node)
 	{
-		dgUnsigned64 key = GetKey (i0, i1);
+		hacd::HaU64 key = GetKey (i0, i1);
 
 		dgEdgeMap::dgTreeNode* const edgeNode = m_edgeMap.Find(key);
 		if (edgeNode) {
@@ -1660,8 +1662,8 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 						m_edgeMap.Remove(edgeNode);
 					}
 
-					dgInt32 index0 = GetVertexIndex(i0);
-					dgInt32 index1 = GetVertexIndex(i1);
+					hacd::HaI32 index0 = GetVertexIndex(i0);
+					hacd::HaI32 index1 = GetVertexIndex(i1);
 					dgPolyhedra::dgTreeNode* const edgeNode = m_mesh->FindEdgeNode(index0, index1);
 					if(edgeNode) {
 						m_missinEdges.Append(edgeNode);
@@ -1676,21 +1678,21 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 	{
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		const dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[0];
-		for (dgInt32 i = 0; i < 3; i ++) {
-			dgInt32 i0 = face.m_otherVertex;
-			dgInt32 i1 = face.m_index[i];
+		for (hacd::HaI32 i = 0; i < 3; i ++) {
+			hacd::HaI32 i0 = face.m_otherVertex;
+			hacd::HaI32 i1 = face.m_index[i];
 			RemoveNode(i0, i1, node);
 		}
 
-		dgInt32 i0 = face.m_index[2];
-		for (dgInt32 i = 0; i < 3; i ++) {
-			dgInt32 i1 = face.m_index[i];
+		hacd::HaI32 i0 = face.m_index[2];
+		for (hacd::HaI32 i = 0; i < 3; i ++) {
+			hacd::HaI32 i1 = face.m_index[i];
 			RemoveNode(i0, i1, node);
 			i0 = i1;
 		}
 	}
 
-	dgListNode* AddFace (dgInt32 i0, dgInt32 i1, dgInt32 i2, dgInt32 i3)
+	dgListNode* AddFace (hacd::HaI32 i0, hacd::HaI32 i1, hacd::HaI32 i2, hacd::HaI32 i3)
 	{
 		dgListNode* const face = dgDelaunayTetrahedralization::AddFace(i0, i1, i2, i3);
 		AddEdges(face);
@@ -1702,12 +1704,12 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		RemoveEdges (node);
 
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
-		for (dgInt32 i= 0; i < 4; i ++) {
+		for (hacd::HaI32 i= 0; i < 4; i ++) {
 			const dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
 			dgListNode* const twinNode = face.m_twin;
 			if (twinNode) {
 				dgConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();
-				for (dgInt32 i = 0; i < 4; i ++) {
+				for (hacd::HaI32 i = 0; i < 4; i ++) {
 					if (twinTetra->m_faces[i].m_twin == node) {
 						twinTetra->m_faces[i].m_twin = NULL;
 					}
@@ -1729,7 +1731,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		dgIndexMapPair* const indexMap = &m_indexMap[0];
 		do {
 			dgMeshEffect tmpMesh (*m_mesh);
-			dgInt32 mark = m_mesh->IncLRU(); 
+			hacd::HaI32 mark = m_mesh->IncLRU(); 
 
 			dgTree<dgEdge*, dgEdge*> edgeInconflict(GetAllocator());
 			dgMeshEffect::Iterator iter(tmpMesh);
@@ -1749,19 +1751,19 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 				for (iter.Begin(); iter; iter ++) {
 					dgEdge* const missingEdge = iter.GetNode()->GetInfo();
 
-					dgInt32 k0 = missingEdge->m_incidentVertex;
-					dgInt32 k1 = missingEdge->m_twin->m_incidentVertex;
-					dgInt32 i0 = indexMap[k0].m_convexIndex;
-					dgInt32 i1 = indexMap[k1].m_convexIndex;
+					hacd::HaI32 k0 = missingEdge->m_incidentVertex;
+					hacd::HaI32 k1 = missingEdge->m_twin->m_incidentVertex;
+					hacd::HaI32 i0 = indexMap[k0].m_convexIndex;
+					hacd::HaI32 i1 = indexMap[k1].m_convexIndex;
 
 					const dgBigVector& p0 = GetVertex(i0);
 					const dgBigVector& p1 = GetVertex(i1);
-					dgFloat32 spliteParam = dgFloat32 (0.5f);
+					hacd::HaF32 spliteParam = hacd::HaF32 (0.5f);
 
 					dgEdge* const newEdge = m_mesh->InsertEdgeVertex (missingEdge, spliteParam);
 					dgBigVector p (p1.Add4(p0).Scale4 (spliteParam));
-					dgInt32 index = AddVertex(p);
-					_ASSERTE (index != -1);
+					hacd::HaI32 index = AddVertex(p);
+					HACD_ASSERT (index != -1);
 					indexMap[newEdge->m_twin->m_incidentVertex].m_convexIndex = index;
 				}
 				RecoverEdges ();
@@ -1772,15 +1774,15 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 				dgFaceKeyMap faceMap (GetAllocator());
 				for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
 					dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
-					for (dgInt32 i = 0; i < 4; i ++) {
+					for (hacd::HaI32 i = 0; i < 4; i ++) {
 						dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
 						dgEdgeFaceKey key (face.m_index[0], face.m_index[1], face.m_index[2]);
-						_ASSERTE (!faceMap.Find(key));
+						HACD_ASSERT (!faceMap.Find(key));
 						faceMap.Insert (node, key);
 					}
 				}
 
-				dgInt32 mark = tmpMesh.IncLRU(); 
+				hacd::HaI32 mark = tmpMesh.IncLRU(); 
 				for (iter.Begin(); iter; iter ++) {
 					dgEdge* const face = &iter.GetNode()->GetInfo();
 					if (face->m_mark != mark){
@@ -1790,7 +1792,7 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 							ptr = ptr->m_next;
 						} while (ptr != face);
 						dgEdgeFaceKey key (face->m_incidentVertex, face->m_next->m_incidentVertex, face->m_next->m_next->m_incidentVertex);
-						_ASSERTE (faceMap.Find(key));
+						HACD_ASSERT (faceMap.Find(key));
 					}
 				}
 			}
@@ -1808,9 +1810,9 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		RemoveDegeneratedTetras ();
 
 
-		//dgInt32 tetraMark = 1;
-		dgInt32 tetraMark = IncMark();
-		dgInt32 mark = m_mesh->IncLRU(); 
+		//hacd::HaI32 tetraMark = 1;
+		hacd::HaI32 tetraMark = IncMark();
+		hacd::HaI32 mark = m_mesh->IncLRU(); 
 
 		dgTree<dgEdge*, dgEdge*> edgeInconflict(GetAllocator());
 		dgMeshEffect::Iterator iter(*m_mesh);
@@ -1833,9 +1835,9 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 		for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
 			dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 			if (tetra->GetMark() == tetraMark) {
-				dgInt32 stack = 0;
+				hacd::HaI32 stack = 0;
 				dgConvexHull4dTetraherum* stackPool[1024 * 4];
-				for (dgInt32 i = 0; i < 4; i ++) {
+				for (hacd::HaI32 i = 0; i < 4; i ++) {
 					dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
 					if (face.m_twin && (face.m_twin->GetInfo().GetMark() != tetraMark)) {
 						stackPool[stack] = &face.m_twin->GetInfo();
@@ -1847,12 +1849,12 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 					stack --;
 					dgConvexHull4dTetraherum* const skinTetra = stackPool[stack];
 					skinTetra->SetMark (tetraMark);
-					for (dgInt32 i = 0; i < 4; i ++) {
+					for (hacd::HaI32 i = 0; i < 4; i ++) {
 						dgConvexHull4dTetraherum::dgTetrahedrumFace& face = skinTetra->m_faces[i];
 						if (face.m_twin && (face.m_twin->GetInfo().GetMark() != tetraMark)) {
 							stackPool[stack] = &face.m_twin->GetInfo();
 							stack ++;
-							_ASSERTE (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+							HACD_ASSERT (stack < hacd::HaI32 (sizeof (stackPool) / sizeof (stackPool[0])));
 						}
 					}
 				}
@@ -1881,14 +1883,14 @@ class Tetrahedralization: public dgDelaunayTetrahedralization
 
 #endif
 
-dgMeshEffect* dgMeshEffect::CreateDelanayTretrahedralization (dgInt32 interionMaterial, dgMatrix& matrix) const
+dgMeshEffect* dgMeshEffect::CreateDelanayTretrahedralization (hacd::HaI32 interionMaterial, dgMatrix& matrix) const
 {
-	_ASSERTE (0);
+	HACD_ASSERT (0);
 	return NULL;
 }
 
 
-dgMeshEffect* dgMeshEffect::CreateVoronoiPartition (dgInt32 pointsCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 interiorMaterial, dgMatrix& textureProjectionMatrix) const
+dgMeshEffect* dgMeshEffect::CreateVoronoiPartition (hacd::HaI32 pointsCount, hacd::HaI32 pointStrideInBytes, const hacd::HaF32* const pointCloud, hacd::HaI32 interiorMaterial, dgMatrix& textureProjectionMatrix) const
 {
 	HACD_ALWAYS_ASSERT(); // not implemented in the reduced source version
 #if 0  // UNUSED
@@ -1896,28 +1898,28 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiPartition (dgInt32 pointsCount, dgInt32
 //return new (GetAllocator()) dgMeshEffect (*this);
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	dgUnsigned32 controlWorld = dgControlFP (0xffffffff, 0);
+	hacd::HaU32 controlWorld = dgControlFP (0xffffffff, 0);
 	dgControlFP (_PC_53, _MCW_PC);
 #endif
 
 	dgMeshEffectSolidTree* const tree = CreateSolidTree();
-	_ASSERTE (tree);
+	HACD_ASSERT (tree);
 
 	dgStack<dgBigVector> buffer(pointsCount);
 	dgBigVector* const pool = &buffer[0];
 
-	dgInt32 count = 0;
-	dgFloat64 quantizeFactor = dgFloat64 (16.0f);
-	dgFloat64 invQuantizeFactor = dgFloat64 (1.0f) / quantizeFactor;
-	dgInt32 stride = pointStrideInBytes / sizeof (dgFloat32); 
-	for (dgInt32 i = 0; i < pointsCount; i ++) {
-		dgFloat64 x = pointCloud[i * stride + 0];
-		dgFloat64 y	= pointCloud[i * stride + 1];
-		dgFloat64 z	= pointCloud[i * stride + 2];
+	hacd::HaI32 count = 0;
+	hacd::HaF64 quantizeFactor = hacd::HaF64 (16.0f);
+	hacd::HaF64 invQuantizeFactor = hacd::HaF64 (1.0f) / quantizeFactor;
+	hacd::HaI32 stride = pointStrideInBytes / sizeof (hacd::HaF32); 
+	for (hacd::HaI32 i = 0; i < pointsCount; i ++) {
+		hacd::HaF64 x = pointCloud[i * stride + 0];
+		hacd::HaF64 y	= pointCloud[i * stride + 1];
+		hacd::HaF64 z	= pointCloud[i * stride + 2];
 		x = floor (x * quantizeFactor) * invQuantizeFactor;
 		y = floor (y * quantizeFactor) * invQuantizeFactor;
 		z = floor (z * quantizeFactor) * invQuantizeFactor;
-		dgBigVector p (x, y, z, dgFloat64 (0.0f));
+		dgBigVector p (x, y, z, hacd::HaF64 (0.0f));
 
 		if (tree->GetPointSide (p) == dgMeshEffectSolidTree::m_solid) {
 			pool[count] = p;
@@ -1925,10 +1927,10 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiPartition (dgInt32 pointsCount, dgInt32
 		}
 	}
 
-	_ASSERTE (count >= 4);
-	dgStack<dgInt32> indexList(count);
-	count = dgVertexListToIndexList(&pool[0].m_x, sizeof (dgBigVector), 3, count, &indexList[0], dgFloat64 (1.0e-5f));	
-	_ASSERTE (count >= 4);
+	HACD_ASSERT (count >= 4);
+	dgStack<hacd::HaI32> indexList(count);
+	count = dgVertexListToIndexList(&pool[0].m_x, sizeof (dgBigVector), 3, count, &indexList[0], hacd::HaF64 (1.0e-5f));	
+	HACD_ASSERT (count >= 4);
 
 	dgDelaunayTetrahedralization delaunayTetrahedras (&pool[0].m_x, count, sizeof (dgBigVector), 0.0f);
 	delaunayTetrahedras.RemoveUpperHull ();
@@ -1937,34 +1939,34 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiPartition (dgInt32 pointsCount, dgInt32
 	dgBigVector maxBox;
 	CalculateAABB (minBox, maxBox);
 	maxBox -= minBox;
-	dgFloat32 bboxDiagnalFactor = 4.0f;
-	dgFloat64 perimeterConvexBound = bboxDiagnalFactor * sqrt(maxBox % maxBox);
+	hacd::HaF32 bboxDiagnalFactor = 4.0f;
+	hacd::HaF64 perimeterConvexBound = bboxDiagnalFactor * sqrt(maxBox % maxBox);
 
-	dgInt32 tetraCount = delaunayTetrahedras.GetCount();
+	hacd::HaI32 tetraCount = delaunayTetrahedras.GetCount();
 	dgStack<dgBigVector> voronoiPoints(tetraCount);
 	dgStack<dgDelaunayTetrahedralization::dgListNode*> tetradrumNode(tetraCount);
-	dgTree<dgList<dgInt32>, dgInt32> delanayNodes ();	
+	dgTree<dgList<hacd::HaI32>, hacd::HaI32> delanayNodes ();	
 
-	dgInt32 index = 0;
+	hacd::HaI32 index = 0;
 	const dgHullVector* const delanayPoints = delaunayTetrahedras.GetHullVertexArray();
 	for (dgDelaunayTetrahedralization::dgListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
 		dgConvexHull4dTetraherum& tetra = node->GetInfo();
 		dgBigVector origin (tetra.CircumSphereCenter (delanayPoints));
-		voronoiPoints[index] = dgBigVector (dgFloat64 (origin.m_x), dgFloat64 (origin.m_y), dgFloat64 (origin.m_z), dgFloat64 (0.0f));
+		voronoiPoints[index] = dgBigVector (hacd::HaF64 (origin.m_x), hacd::HaF64 (origin.m_y), hacd::HaF64 (origin.m_z), hacd::HaF64 (0.0f));
 		tetradrumNode[index] = node;
 
-		for (dgInt32 i = 0; i < 3; i ++) {
-			dgTree<dgList<dgInt32>, dgInt32>::dgTreeNode* header = delanayNodes.Find(tetra.m_faces[0].m_index[i]);
+		for (hacd::HaI32 i = 0; i < 3; i ++) {
+			dgTree<dgList<hacd::HaI32>, hacd::HaI32>::dgTreeNode* header = delanayNodes.Find(tetra.m_faces[0].m_index[i]);
 			if (!header) {
-				dgList<dgInt32> list ();
+				dgList<hacd::HaI32> list ();
 				header = delanayNodes.Insert(list, tetra.m_faces[0].m_index[i]);
 			}
 			header->GetInfo().Append (index);
 		}
 
-		dgTree<dgList<dgInt32>, dgInt32>::dgTreeNode* header = delanayNodes.Find(tetra.m_faces[0].m_otherVertex);
+		dgTree<dgList<hacd::HaI32>, hacd::HaI32>::dgTreeNode* header = delanayNodes.Find(tetra.m_faces[0].m_otherVertex);
 		if (!header) {
-			dgList<dgInt32> list ();
+			dgList<hacd::HaI32> list ();
 			header = delanayNodes.Insert(list, tetra.m_faces[0].m_otherVertex);
 		}
 		header->GetInfo().Append (index);
@@ -1974,61 +1976,61 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiPartition (dgInt32 pointsCount, dgInt32
 
 	dgMeshEffect* const voronoiPartition = HACD_NEW(dgMeshEffect)(true);
 	voronoiPartition->BeginPolygon();
-	dgFloat64 layer = dgFloat64 (0.0f);
+	hacd::HaF64 layer = hacd::HaF64 (0.0f);
 
-	dgTree<dgList<dgInt32>, dgInt32>::Iterator iter (delanayNodes);
+	dgTree<dgList<hacd::HaI32>, hacd::HaI32>::Iterator iter (delanayNodes);
 	for (iter.Begin(); iter; iter ++) {
 
-		dgInt32 count = 0;
+		hacd::HaI32 count = 0;
 		dgBigVector pointArray[256];
-		dgTree<dgList<dgInt32>, dgInt32>::dgTreeNode* const nodeNode = iter.GetNode();
+		dgTree<dgList<hacd::HaI32>, hacd::HaI32>::dgTreeNode* const nodeNode = iter.GetNode();
 
-		dgList<dgInt32>& list = nodeNode->GetInfo();
+		dgList<hacd::HaI32>& list = nodeNode->GetInfo();
 
-		dgInt32 key = nodeNode->GetKey();
+		hacd::HaI32 key = nodeNode->GetKey();
 
-		for (dgList<dgInt32>::dgListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			dgInt32 i = ptr->GetInfo();
+		for (dgList<hacd::HaI32>::dgListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			hacd::HaI32 i = ptr->GetInfo();
 			dgConvexHull4dTetraherum* const tetrahedrum = &tetradrumNode[i]->GetInfo();
-			for (dgInt32 j = 0; j < 4; j ++) {
+			for (hacd::HaI32 j = 0; j < 4; j ++) {
 				if (!tetrahedrum->m_faces[j].m_twin) {
 					if ((tetrahedrum->m_faces[j].m_index[0] == key) || (tetrahedrum->m_faces[j].m_index[1] == key) || (tetrahedrum->m_faces[j].m_index[2] == key)) {
 						dgBigVector p0 (delaunayTetrahedras.GetVertex(tetrahedrum->m_faces[j].m_index[0]));
 						dgBigVector p1 (delaunayTetrahedras.GetVertex(tetrahedrum->m_faces[j].m_index[1]));
 						dgBigVector p2 (delaunayTetrahedras.GetVertex(tetrahedrum->m_faces[j].m_index[2]));
 						dgBigVector n ((p1 - p0) * (p2 - p0));
-						n = n.Scale (dgFloat64 (1.0f) / sqrt(n % n));
-						dgBigVector normal (dgFloat64 (n.m_x), dgFloat64 (n.m_y), dgFloat64  (n.m_z), dgFloat64 (0.0f));
+						n = n.Scale (hacd::HaF64 (1.0f) / sqrt(n % n));
+						dgBigVector normal (hacd::HaF64 (n.m_x), hacd::HaF64 (n.m_y), hacd::HaF64  (n.m_z), hacd::HaF64 (0.0f));
 						pointArray[count] = voronoiPoints[i] + normal.Scale (perimeterConvexBound);
 
 						count ++;
-						_ASSERTE (count < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
+						HACD_ASSERT (count < hacd::HaI32 (sizeof (pointArray) / sizeof (pointArray[0])));
 					}
 				}
 			}
 
 			pointArray[count] = voronoiPoints[i];
 			count ++;
-			_ASSERTE (count < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
+			HACD_ASSERT (count < hacd::HaI32 (sizeof (pointArray) / sizeof (pointArray[0])));
 		}
 
-		dgMeshEffect* const convexMesh = MakeDelanayIntersection (tree, &pointArray[0], count, interiorMaterial, textureProjectionMatrix, dgFloat64 (45.0f * 3.1416f / 180.0f));
+		dgMeshEffect* const convexMesh = MakeDelanayIntersection (tree, &pointArray[0], count, interiorMaterial, textureProjectionMatrix, hacd::HaF64 (45.0f * 3.1416f / 180.0f));
 		if (convexMesh) {
-			for (dgInt32 i = 0; i < convexMesh->m_pointCount; i ++) {
+			for (hacd::HaI32 i = 0; i < convexMesh->m_pointCount; i ++) {
 				convexMesh->m_points[i].m_w = layer;
 			}
-			for (dgInt32 i = 0; i < convexMesh->m_atribCount; i ++) {
+			for (hacd::HaI32 i = 0; i < convexMesh->m_atribCount; i ++) {
 				convexMesh->m_attib[i].m_vertex.m_w = layer;
 			}
 
 			voronoiPartition->MergeFaces(convexMesh);
-			layer += dgFloat64 (1.0f);
+			layer += hacd::HaF64 (1.0f);
 
 			convexMesh->Release();
 		}
 	}
 
-	voronoiPartition->EndPolygon(dgFloat64 (1.0e-5f));
+	voronoiPartition->EndPolygon(hacd::HaF64 (1.0e-5f));
 
 	voronoiPartition->ConvertToPolygons();
 
@@ -2045,17 +2047,17 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiPartition (dgInt32 pointsCount, dgInt32
 
 
 
-dgMeshEffect* dgMeshEffect::MakeDelanayIntersection (dgMeshEffectSolidTree* const tree, dgBigVector* const points, dgInt32 count, dgInt32 materialId, const dgMatrix& textureProjectionMatrix, dgFloat32 normalAngleInRadians) const
+dgMeshEffect* dgMeshEffect::MakeDelanayIntersection (dgMeshEffectSolidTree* const tree, dgBigVector* const points, hacd::HaI32 count, hacd::HaI32 materialId, const dgMatrix& textureProjectionMatrix, hacd::HaF32 normalAngleInRadians) const
 {
-	for (dgInt32 i = 0; i < count; i ++) {
+	for (hacd::HaI32 i = 0; i < count; i ++) {
 		points[i].m_x = QuantizeCordinade(points[i].m_x);
 		points[i].m_y = QuantizeCordinade(points[i].m_y);
 		points[i].m_z = QuantizeCordinade(points[i].m_z);
-		points[i].m_w = dgFloat64 (0.0f);
+		points[i].m_w = hacd::HaF64 (0.0f);
 	}
 
 	dgMeshEffect* intersection = NULL;
-	dgMeshEffect convexMesh (&points[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
+	dgMeshEffect convexMesh (&points[0].m_x, count, sizeof (dgBigVector), hacd::HaF64 (0.0f));
 
 	if (convexMesh.GetCount()) {
 		convexMesh.CalculateNormals(normalAngleInRadians);
@@ -2082,11 +2084,11 @@ intersection =  new (GetAllocator()) dgMeshEffect (convexMesh);
 			}
 
 			if (clipperCoplanar && sourceCoplanar) {
-				sourceCoplanar->FilterCoplanarFaces (clipperCoplanar, dgFloat32 (-1.0f));
+				sourceCoplanar->FilterCoplanarFaces (clipperCoplanar, hacd::HaF32 (-1.0f));
 				result->MergeFaces(sourceCoplanar);
 			}
 
-			result->EndPolygon(dgFloat64 (1.0e-5f));
+			result->EndPolygon(hacd::HaF64 (1.0e-5f));
 			if (!result->GetCount()) {
 				result->Release();
 				result = NULL;
@@ -2101,14 +2103,14 @@ intersection =  new (GetAllocator()) dgMeshEffect (convexMesh);
 #if 0
 	if (intersection) {
 		dgBigVector xxx (0, 0, 0, 0);
-		for (dgInt32 i = 0; i < intersection->m_pointCount; i ++) {
+		for (hacd::HaI32 i = 0; i < intersection->m_pointCount; i ++) {
 			xxx += intersection->m_points[i];
 		}
 		xxx = xxx.Scale (0.5f / intersection->m_pointCount);
-		for (dgInt32 i = 0; i < intersection->m_pointCount; i ++) {
+		for (hacd::HaI32 i = 0; i < intersection->m_pointCount; i ++) {
 			intersection->m_points[i] += xxx;
 		}
-		for (dgInt32 i = 0; i < intersection->m_atribCount; i ++) {
+		for (hacd::HaI32 i = 0; i < intersection->m_atribCount; i ++) {
 			intersection->m_attib[i].m_vertex += xxx;
 		}
 	}

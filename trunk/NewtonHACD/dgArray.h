@@ -33,28 +33,28 @@ template<class T>
 class dgArray
 {
 	public:
-	dgArray (dgInt32 granulatitySize,dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY);
+	dgArray (hacd::HaI32 granulatitySize,hacd::HaI32 aligmentInBytes = DG_MEMORY_GRANULARITY);
 	~dgArray ();
 
 
-	T& operator[] (dgInt32 i);
-	const T& operator[] (dgInt32 i) const;
-	void Resize (dgInt32 size) const;
-	dgInt32 GetBytesCapacity () const;
-	dgInt32 GetElementsCapacity () const; 
+	T& operator[] (hacd::HaI32 i);
+	const T& operator[] (hacd::HaI32 i) const;
+	void Resize (hacd::HaI32 size) const;
+	hacd::HaI32 GetBytesCapacity () const;
+	hacd::HaI32 GetElementsCapacity () const; 
 
-	bool ExpandCapacityIfNeessesary (dgInt32 index, dgInt32 stride) const;
+	bool ExpandCapacityIfNeessesary (hacd::HaI32 index, hacd::HaI32 stride) const;
 
 	private:
-	dgInt32 m_granulatity;
-	dgInt32 m_aligmentInByte;
-	mutable dgInt32 m_maxSize;
+	hacd::HaI32 m_granulatity;
+	hacd::HaI32 m_aligmentInByte;
+	mutable hacd::HaI32 m_maxSize;
 	mutable T *m_array;
 };
 
 
 template<class T>
-dgArray<T>::dgArray (dgInt32 granulatitySize,dgInt32 aligmentInBytes)
+dgArray<T>::dgArray (hacd::HaI32 granulatitySize,hacd::HaI32 aligmentInBytes)
  :m_granulatity(granulatitySize), m_aligmentInByte(aligmentInBytes), m_maxSize(0), m_array(NULL)
 {
 	if (m_aligmentInByte <= 0) {
@@ -73,9 +73,9 @@ dgArray<T>::~dgArray ()
 
 
 template<class T>
-const T& dgArray<T>::operator[] (dgInt32 i) const
+const T& dgArray<T>::operator[] (hacd::HaI32 i) const
 { 
-	_ASSERTE (i >= 0);
+	HACD_ASSERT (i >= 0);
 	while (i >= m_maxSize) {
 		Resize (i);
 	}
@@ -84,9 +84,9 @@ const T& dgArray<T>::operator[] (dgInt32 i) const
 
 
 template<class T>
-T& dgArray<T>::operator[] (dgInt32 i)
+T& dgArray<T>::operator[] (hacd::HaI32 i)
 {
-	_ASSERTE (i >= 0);
+	HACD_ASSERT (i >= 0);
 	while (i >= m_maxSize) {
 		Resize (i);
 	}
@@ -94,27 +94,27 @@ T& dgArray<T>::operator[] (dgInt32 i)
 }
 
 template<class T>
-dgInt32 dgArray<T>::GetElementsCapacity () const
+hacd::HaI32 dgArray<T>::GetElementsCapacity () const
 {
 	return m_maxSize;
 }
 
 
 template<class T>
-dgInt32 dgArray<T>::GetBytesCapacity () const
+hacd::HaI32 dgArray<T>::GetBytesCapacity () const
 {
-	return  m_maxSize * dgInt32 (sizeof (T));
+	return  m_maxSize * hacd::HaI32 (sizeof (T));
 }
 
 
 template<class T>
-void dgArray<T>::Resize (dgInt32 size) const
+void dgArray<T>::Resize (hacd::HaI32 size) const
 {
 	if (size >= m_maxSize) {
 		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
-		T* const newArray = (T*) HACD_ALLOC_ALIGNED(dgInt32 (sizeof (T) * size), m_aligmentInByte);
+		T* const newArray = (T*) HACD_ALLOC_ALIGNED(hacd::HaI32 (sizeof (T) * size), m_aligmentInByte);
 		if (m_array) {
-			for (dgInt32 i = 0; i < m_maxSize; i ++) {
+			for (hacd::HaI32 i = 0; i < m_maxSize; i ++) {
 				newArray[i]	= m_array[i];
 			}
 			HACD_FREE(m_array);
@@ -123,9 +123,9 @@ void dgArray<T>::Resize (dgInt32 size) const
 		m_maxSize = size;
 	} else if (size < m_maxSize) {
 		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
-		T* const newArray = (T*) HACD_ALLOC_ALIGNED(dgInt32 (sizeof (T) * size), m_aligmentInByte);
+		T* const newArray = (T*) HACD_ALLOC_ALIGNED(hacd::HaI32 (sizeof (T) * size), m_aligmentInByte);
 		if (m_array) {
-			for (dgInt32 i = 0; i < size; i ++) {
+			for (hacd::HaI32 i = 0; i < size; i ++) {
 				newArray[i]	= m_array[i];
 			}
 			HACD_FREE(m_array);
@@ -136,10 +136,10 @@ void dgArray<T>::Resize (dgInt32 size) const
 }
 
 template<class T>
-bool dgArray<T>::ExpandCapacityIfNeessesary (dgInt32 index, dgInt32 stride) const
+bool dgArray<T>::ExpandCapacityIfNeessesary (hacd::HaI32 index, hacd::HaI32 stride) const
 {
 	bool ret = false;
-	dgInt32 size = (index + 1) * stride;
+	hacd::HaI32 size = (index + 1) * stride;
 	while (size >= m_maxSize) {
 		ret = true;
 		Resize (m_maxSize * 2);

@@ -24,18 +24,18 @@
 
 #include "dgTypes.h"
 
-const dgFloat64 fRandom = (dgFloat64 (1.0) / dgFloat64 ((dgUnsigned32)(0xffffffff))); 
+const hacd::HaF64 fRandom = (hacd::HaF64 (1.0) / hacd::HaF64 ((hacd::HaU32)(0xffffffff))); 
 
 // return a random number between 0 and 0xffffffff;
-dgUnsigned32 dgApi dgRandom();
+hacd::HaU32 dgApi dgRandom();
 
-inline dgFloat32 dgfRandom()
+inline hacd::HaF32 dgfRandom()
 {
-	return (dgFloat32) (dgRandom() * fRandom);
+	return (hacd::HaF32) (dgRandom() * fRandom);
 }
 
 
-void dgApi dgRandomize (dgUnsigned32 Seed);
+void dgApi dgRandomize (hacd::HaU32 Seed);
 
 #endif
 

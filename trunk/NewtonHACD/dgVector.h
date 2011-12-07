@@ -22,8 +22,6 @@
 #ifndef __dgVector__
 #define __dgVector__
 
-//#include "dgStdafx.h"
-#include "dgDebug.h"
 #include "dgMemory.h"
 
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
@@ -39,8 +37,8 @@ class dgTemplateVector
 	dgTemplateVector Scale (T s) const;
 	dgTemplateVector Scale4 (T s) const;
 
-	T& operator[] (dgInt32 i);
-	const T& operator[] (dgInt32 i) const;
+	T& operator[] (hacd::HaI32 i);
+	const T& operator[] (hacd::HaI32 i) const;
 
 	dgTemplateVector operator+ (const dgTemplateVector &A) const; 
 	dgTemplateVector operator- (const dgTemplateVector &A) const; 
@@ -81,33 +79,31 @@ class dgTemplateVector
 
 class dgBigVector;
 
-DG_MSC_VECTOR_ALIGMENT
-class dgVector: public dgTemplateVector<dgFloat32>
+class dgVector: public dgTemplateVector<hacd::HaF32>
 {
 	public:
 	dgVector();
 
-	dgVector (const dgTemplateVector<dgFloat32>& v);
-	dgVector (const dgFloat32 *ptr);
-	dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w); 
+	dgVector (const dgTemplateVector<hacd::HaF32>& v);
+	dgVector (const hacd::HaF32 *ptr);
+	dgVector (hacd::HaF32 x, hacd::HaF32 y, hacd::HaF32 z, hacd::HaF32 w); 
          dgVector (const dgBigVector& copy); 
 
 
-}DG_GCC_VECTOR_ALIGMENT;
+};
 
-DG_MSC_VECTOR_ALIGMENT
-class dgBigVector: public dgTemplateVector<dgFloat64>
+class dgBigVector: public dgTemplateVector<hacd::HaF64>
 {
 	public:
 	dgBigVector();
 	dgBigVector (const dgVector& v);
-	dgBigVector (const dgTemplateVector<dgFloat64>& v);
-	dgBigVector (const dgFloat32 *ptr);
+	dgBigVector (const dgTemplateVector<hacd::HaF64>& v);
+	dgBigVector (const hacd::HaF32 *ptr);
 #ifndef __USE_DOUBLE_PRECISION__
-	dgBigVector (const dgFloat64 *ptr);
+	dgBigVector (const hacd::HaF64 *ptr);
 #endif
-	dgBigVector (dgFloat64 x, dgFloat64 y, dgFloat64 z, dgFloat64 w); 
-}DG_GCC_VECTOR_ALIGMENT;
+	dgBigVector (hacd::HaF64 x, hacd::HaF64 y, hacd::HaF64 z, hacd::HaF64 w); 
+};
 
 
 
@@ -120,7 +116,7 @@ template<class T>
 dgTemplateVector<T>::dgTemplateVector (const T *ptr)
 	:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (0.0f)
 {
-//	_ASSERTE (dgCheckVector ((*this)));
+//	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
 template<class T>
@@ -131,18 +127,18 @@ dgTemplateVector<T>::dgTemplateVector (T x, T y, T z, T w)
 
 
 template<class T>
-T& dgTemplateVector<T>::operator[] (dgInt32 i)
+T& dgTemplateVector<T>::operator[] (hacd::HaI32 i)
 {
-	_ASSERTE (i < 4);
-	_ASSERTE (i >= 0);
+	HACD_ASSERT (i < 4);
+	HACD_ASSERT (i >= 0);
 	return (&m_x)[i];
 }	
 
 template<class T>
-const T& dgTemplateVector<T>::operator[] (dgInt32 i) const
+const T& dgTemplateVector<T>::operator[] (hacd::HaI32 i) const
 {
-	_ASSERTE (i < 4);
-	_ASSERTE (i >= 0);
+	HACD_ASSERT (i < 4);
+	HACD_ASSERT (i >= 0);
 	return (&m_x)[i];
 }
 
@@ -171,7 +167,7 @@ dgTemplateVector<T>& dgTemplateVector<T>::operator+= (const dgTemplateVector<T> 
 	m_x += A.m_x;
 	m_y += A.m_y;
 	m_z += A.m_z;
-//	_ASSERTE (dgCheckVector ((*this)));
+//	HACD_ASSERT (dgCheckVector ((*this)));
 	return *this;
 }
 
@@ -187,7 +183,7 @@ dgTemplateVector<T>& dgTemplateVector<T>::operator-= (const dgTemplateVector<T> 
 	m_x -= A.m_x;
 	m_y -= A.m_y;
 	m_z -= A.m_z;
-//	_ASSERTE (dgCheckVector ((*this)));
+//	HACD_ASSERT (dgCheckVector ((*this)));
 	return *this;
 }
 
@@ -234,7 +230,7 @@ dgTemplateVector<T> dgTemplateVector<T>::CrossProduct4 (const dgTemplateVector &
 	T array[4][4];
 
 	const dgTemplateVector<T>& me = *this;
-	for (dgInt32 i = 0; i < 4; i ++) {
+	for (hacd::HaI32 i = 0; i < 4; i ++) {
 		array[0][i] = me[i];
 		array[1][i] = A[i];
 		array[2][i] = B[i];
@@ -243,11 +239,11 @@ dgTemplateVector<T> dgTemplateVector<T>::CrossProduct4 (const dgTemplateVector &
 	
 	dgTemplateVector<T> normal;
 	T sign = T (-1.0f);
-	for (dgInt32 i = 0; i < 4; i ++)  {
+	for (hacd::HaI32 i = 0; i < 4; i ++)  {
 		
-		for (dgInt32 j = 0; j < 3; j ++) {
-			dgInt32 k0 = 0;
-			for (dgInt32 k = 0; k < 4; k ++) {
+		for (hacd::HaI32 j = 0; j < 3; j ++) {
+			hacd::HaI32 k0 = 0;
+			for (hacd::HaI32 k = 0; k < 4; k ++) {
 				if (k != i) {
 					cofactor[j][k0] = array[j][k];
 					k0 ++;
@@ -282,71 +278,71 @@ dgTemplateVector<T> dgTemplateVector<T>::CompProduct4 (const dgTemplateVector<T>
 
 
 
-DG_INLINE dgVector::dgVector()
-	:dgTemplateVector<dgFloat32>()
+HACD_INLINE dgVector::dgVector()
+	:dgTemplateVector<hacd::HaF32>()
 {
 }
 
-DG_INLINE dgVector::dgVector (const dgTemplateVector<dgFloat32>& v)
-	:dgTemplateVector<dgFloat32>(v)
+HACD_INLINE dgVector::dgVector (const dgTemplateVector<hacd::HaF32>& v)
+	:dgTemplateVector<hacd::HaF32>(v)
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
-DG_INLINE dgVector::dgVector (const dgFloat32 *ptr)
-	:dgTemplateVector<dgFloat32>(ptr)
+HACD_INLINE dgVector::dgVector (const hacd::HaF32 *ptr)
+	:dgTemplateVector<hacd::HaF32>(ptr)
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
-DG_INLINE dgVector::dgVector (const dgBigVector& copy)
-	:dgTemplateVector<dgFloat32>(dgFloat32 (copy.m_x), dgFloat32 (copy.m_y), dgFloat32 (copy.m_z), dgFloat32 (copy.m_w))
+HACD_INLINE dgVector::dgVector (const dgBigVector& copy)
+	:dgTemplateVector<hacd::HaF32>(hacd::HaF32 (copy.m_x), hacd::HaF32 (copy.m_y), hacd::HaF32 (copy.m_z), hacd::HaF32 (copy.m_w))
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
 
-DG_INLINE dgVector::dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w) 
-	:dgTemplateVector<dgFloat32>(x, y, z, w)
+HACD_INLINE dgVector::dgVector (hacd::HaF32 x, hacd::HaF32 y, hacd::HaF32 z, hacd::HaF32 w) 
+	:dgTemplateVector<hacd::HaF32>(x, y, z, w)
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
-DG_INLINE dgBigVector::dgBigVector()
-	:dgTemplateVector<dgFloat64>()
+HACD_INLINE dgBigVector::dgBigVector()
+	:dgTemplateVector<hacd::HaF64>()
 {
 }
 
-DG_INLINE dgBigVector::dgBigVector (const dgVector& v)
-	:dgTemplateVector<dgFloat64>(v.m_x, v.m_y, v.m_z, v.m_w)
+HACD_INLINE dgBigVector::dgBigVector (const dgVector& v)
+	:dgTemplateVector<hacd::HaF64>(v.m_x, v.m_y, v.m_z, v.m_w)
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
-DG_INLINE dgBigVector::dgBigVector (const dgTemplateVector<dgFloat64>& v)
-	:dgTemplateVector<dgFloat64>(v)
+HACD_INLINE dgBigVector::dgBigVector (const dgTemplateVector<hacd::HaF64>& v)
+	:dgTemplateVector<hacd::HaF64>(v)
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
-DG_INLINE dgBigVector::dgBigVector (const dgFloat32 *ptr)
-	:dgTemplateVector<dgFloat64>(ptr[0], ptr[1], ptr[2], dgFloat64 (0.0f))
+HACD_INLINE dgBigVector::dgBigVector (const hacd::HaF32 *ptr)
+	:dgTemplateVector<hacd::HaF64>(ptr[0], ptr[1], ptr[2], hacd::HaF64 (0.0f))
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
 #ifndef __USE_DOUBLE_PRECISION__
-DG_INLINE dgBigVector::dgBigVector (const dgFloat64 *ptr)
-	:dgTemplateVector<dgFloat64>(ptr)
+HACD_INLINE dgBigVector::dgBigVector (const hacd::HaF64 *ptr)
+	:dgTemplateVector<hacd::HaF64>(ptr)
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 #endif
 
-DG_INLINE dgBigVector::dgBigVector (dgFloat64 x, dgFloat64 y, dgFloat64 z, dgFloat64 w) 
-	:dgTemplateVector<dgFloat64>(x, y, z, w)
+HACD_INLINE dgBigVector::dgBigVector (hacd::HaF64 x, hacd::HaF64 y, hacd::HaF64 z, hacd::HaF64 w) 
+	:dgTemplateVector<hacd::HaF64>(x, y, z, w)
 {
-	_ASSERTE (dgCheckVector ((*this)));
+	HACD_ASSERT (dgCheckVector ((*this)));
 }
 
 

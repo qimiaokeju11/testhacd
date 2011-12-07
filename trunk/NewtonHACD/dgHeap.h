@@ -48,23 +48,23 @@ class dgHeapBase
 		}
 	};
 
-	dgHeapBase (dgInt32 maxElements);
-	dgHeapBase (const void * const buffer, dgInt32 sizeInBytes);
+	dgHeapBase (hacd::HaI32 maxElements);
+	dgHeapBase (const void * const buffer, hacd::HaI32 sizeInBytes);
 	~dgHeapBase ();
 	
 	public:
 
 	void Flush (); 
 	KEY MaxValue() const; 
-	KEY Value(dgInt32 i = 0) const;
-	dgInt32 GetCount() const;
-	dgInt32 GetMaxCount() const;
-	const OBJECT& operator[] (dgInt32 i) const;
-	dgInt32 Find (OBJECT &obj);
-	dgInt32 Find (KEY key);
+	KEY Value(hacd::HaI32 i = 0) const;
+	hacd::HaI32 GetCount() const;
+	hacd::HaI32 GetMaxCount() const;
+	const OBJECT& operator[] (hacd::HaI32 i) const;
+	hacd::HaI32 Find (OBJECT &obj);
+	hacd::HaI32 Find (KEY key);
 
-	dgInt32 m_curCount;
-	dgInt32 m_maxCount;
+	hacd::HaI32 m_curCount;
+	hacd::HaI32 m_maxCount;
 	RECORD *m_pool;
 };
 
@@ -72,13 +72,13 @@ template <class OBJECT, class KEY>
 class dgDownHeap: public dgHeapBase<OBJECT, KEY>
 {
 	public:
-	dgDownHeap (dgInt32 maxElements);
-	dgDownHeap (const void * const buffer, dgInt32 sizeInBytes);
+	dgDownHeap (hacd::HaI32 maxElements);
+	dgDownHeap (const void * const buffer, hacd::HaI32 sizeInBytes);
 
 	void Pop ();
 	void Push (OBJECT &obj, KEY key);
 	void Sort ();
-	void Remove (dgInt32 Index);
+	void Remove (hacd::HaI32 Index);
 
 #ifdef DG_HEAP_SANITY_CHECK
 	bool SanityCheck();
@@ -89,13 +89,13 @@ template <class OBJECT, class KEY>
 class dgUpHeap: public dgHeapBase<OBJECT, KEY>
 {
 	public:
-	dgUpHeap (dgInt32 maxElements);
-	dgUpHeap (const void * const buffer, dgInt32 sizeInBytes);
+	dgUpHeap (hacd::HaI32 maxElements);
+	dgUpHeap (const void * const buffer, hacd::HaI32 sizeInBytes);
 
 	void Pop ();
 	void Push (OBJECT &obj, KEY key);
 	void Sort ();
-	void Remove (dgInt32 Index);
+	void Remove (hacd::HaI32 Index);
 
 #ifdef DG_HEAP_SANITY_CHECK
 	bool SanityCheck();
@@ -105,7 +105,7 @@ class dgUpHeap: public dgHeapBase<OBJECT, KEY>
 
 
 template <class OBJECT, class KEY>
-dgHeapBase<OBJECT,KEY>::dgHeapBase (dgInt32 maxElements)
+dgHeapBase<OBJECT,KEY>::dgHeapBase (hacd::HaI32 maxElements)
 {
 	m_pool = (RECORD *)HACD_ALLOC(maxElements * sizeof (RECORD));
 	m_maxCount = maxElements;
@@ -113,10 +113,10 @@ dgHeapBase<OBJECT,KEY>::dgHeapBase (dgInt32 maxElements)
 }
 
 template <class OBJECT, class KEY>
-dgHeapBase<OBJECT,KEY>::dgHeapBase (const void * const buffer, dgInt32 sizeInBytes)
+dgHeapBase<OBJECT,KEY>::dgHeapBase (const void * const buffer, hacd::HaI32 sizeInBytes)
 {
 	m_pool = (RECORD *) buffer;
-	m_maxCount = dgInt32 (sizeInBytes / sizeof (RECORD));
+	m_maxCount = hacd::HaI32 (sizeInBytes / sizeof (RECORD));
 	Flush();
 }
 
@@ -128,14 +128,14 @@ dgHeapBase<OBJECT,KEY>::~dgHeapBase ()
 
 
 template <class OBJECT, class KEY>
-KEY dgHeapBase<OBJECT,KEY>::Value(dgInt32 i) const
+KEY dgHeapBase<OBJECT,KEY>::Value(hacd::HaI32 i) const
 {
 	return m_pool[i].m_key;
 }
 
 
 template <class OBJECT, class KEY>
-dgInt32 dgHeapBase<OBJECT,KEY>::GetCount() const
+hacd::HaI32 dgHeapBase<OBJECT,KEY>::GetCount() const
 { 
 	return m_curCount;
 }
@@ -160,22 +160,22 @@ KEY dgHeapBase<OBJECT,KEY>::MaxValue() const
 
 
 template <class OBJECT, class KEY>
-dgInt32 dgHeapBase<OBJECT,KEY>::GetMaxCount() const
+hacd::HaI32 dgHeapBase<OBJECT,KEY>::GetMaxCount() const
 { 
 	return m_maxCount;
 }
 
 
 template <class OBJECT, class KEY>
-dgInt32 dgHeapBase<OBJECT,KEY>::Find (OBJECT &obj)
+hacd::HaI32 dgHeapBase<OBJECT,KEY>::Find (OBJECT &obj)
 {
 	// For now let perform a linear search
 	// this is efficient if the size of the heap is small
 	// ex: m_curCount < 32
 	// this will be change to a binary search in the heap should the 
 	// the size of the heap get larger than 32
-	//	_ASSERTE (m_curCount <= 32);
-	for (dgInt32 i = 0; i < m_curCount; i ++) {
+	//	HACD_ASSERT (m_curCount <= 32);
+	for (hacd::HaI32 i = 0; i < m_curCount; i ++) {
 		if (m_pool[i].obj == obj) {
 			return i;
 		}
@@ -185,13 +185,13 @@ dgInt32 dgHeapBase<OBJECT,KEY>::Find (OBJECT &obj)
 
 
 template <class OBJECT, class KEY>
-dgInt32 dgHeapBase<OBJECT,KEY>::Find (KEY key)
+hacd::HaI32 dgHeapBase<OBJECT,KEY>::Find (KEY key)
 {
 	// ex: m_curCount < 32
 	// this will be change to a binary search in the heap shoud the 
 	// the size of the heap get larger than 32
-	_ASSERTE (m_curCount <= 32);
-	for (dgInt32 i = 0; i < m_curCount; i ++)	{
+	HACD_ASSERT (m_curCount <= 32);
+	for (hacd::HaI32 i = 0; i < m_curCount; i ++)	{
 		if (m_pool[i].m_key == key) {
 			return i;
 		}
@@ -201,9 +201,9 @@ dgInt32 dgHeapBase<OBJECT,KEY>::Find (KEY key)
 
 
 template <class OBJECT, class KEY>
-const OBJECT& dgHeapBase<OBJECT,KEY>::operator[] (dgInt32 i) const
+const OBJECT& dgHeapBase<OBJECT,KEY>::operator[] (hacd::HaI32 i) const
 { 
-	_ASSERTE (i<= m_curCount);
+	HACD_ASSERT (i<= m_curCount);
 	return m_pool[i].m_obj;
 }
 
@@ -214,13 +214,13 @@ const OBJECT& dgHeapBase<OBJECT,KEY>::operator[] (dgInt32 i) const
 //
 // **************************************************************************
 template <class OBJECT, class KEY>
-dgDownHeap<OBJECT,KEY>::dgDownHeap (dgInt32 maxElements)
+dgDownHeap<OBJECT,KEY>::dgDownHeap (hacd::HaI32 maxElements)
 	:dgHeapBase<OBJECT, KEY> (maxElements)
 {
 }
 
 template <class OBJECT, class KEY>
-dgDownHeap<OBJECT,KEY>::dgDownHeap (const void * const buffer, dgInt32 sizeInBytes)
+dgDownHeap<OBJECT,KEY>::dgDownHeap (const void * const buffer, hacd::HaI32 sizeInBytes)
 	:dgHeapBase<OBJECT, KEY> (buffer, sizeInBytes)
 {
 }
@@ -229,13 +229,13 @@ dgDownHeap<OBJECT,KEY>::dgDownHeap (const void * const buffer, dgInt32 sizeInByt
 template <class OBJECT, class KEY>
 void dgDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 {
-	dgInt32 i;
-	dgInt32 j;
+	hacd::HaI32 i;
+	hacd::HaI32 j;
 #ifdef _DEBUG
-//	_ASSERTE (m_curCount < m_maxCount);
-	dgInt32 cc = dgHeapBase<OBJECT,KEY>::m_curCount;
-	dgInt32 cm = dgHeapBase<OBJECT,KEY>::m_maxCount;
-	_ASSERTE (cc < cm);
+//	HACD_ASSERT (m_curCount < m_maxCount);
+	hacd::HaI32 cc = dgHeapBase<OBJECT,KEY>::m_curCount;
+	hacd::HaI32 cm = dgHeapBase<OBJECT,KEY>::m_maxCount;
+	HACD_ASSERT (cc < cm);
 #endif
 
 	dgHeapBase<OBJECT,KEY>::m_curCount ++;
@@ -247,21 +247,21 @@ void dgDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 		}
 		dgHeapBase<OBJECT,KEY>::m_pool[i - 1] = dgHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-	_ASSERTE (i);
+	HACD_ASSERT (i);
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
 
 #ifdef DG_HEAP_SANITY_CHECK
-	_ASSERTE (SanityCheck());
+	HACD_ASSERT (SanityCheck());
 #endif
 }
 
 
 template <class OBJECT, class KEY>
-void dgDownHeap<OBJECT,KEY>::Remove (dgInt32 index)
+void dgDownHeap<OBJECT,KEY>::Remove (hacd::HaI32 index)
 {
-	dgInt32 j;
-	dgInt32 k;
+	hacd::HaI32 j;
+	hacd::HaI32 k;
 
 	dgHeapBase<OBJECT,KEY>::m_curCount--;
 	KEY key (dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_key);
@@ -280,7 +280,7 @@ void dgDownHeap<OBJECT,KEY>::Remove (dgInt32 index)
 	dgHeapBase<OBJECT,KEY>::m_pool[k - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
 
 #ifdef DG_HEAP_SANITY_CHECK
-	_ASSERTE (SanityCheck());
+	HACD_ASSERT (SanityCheck());
 #endif
 
 }
@@ -288,8 +288,8 @@ void dgDownHeap<OBJECT,KEY>::Remove (dgInt32 index)
 template <class OBJECT, class KEY>
 void dgDownHeap<OBJECT,KEY>::Pop ()
 {
-	dgInt32 j;
-	dgInt32 k;
+	hacd::HaI32 j;
+	hacd::HaI32 k;
 
 	dgHeapBase<OBJECT,KEY>::m_curCount--;
 	KEY key (dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_key);
@@ -308,7 +308,7 @@ void dgDownHeap<OBJECT,KEY>::Pop ()
 	dgHeapBase<OBJECT,KEY>::m_pool[k - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
 
 #ifdef DG_HEAP_SANITY_CHECK
-	_ASSERTE (SanityCheck());
+	HACD_ASSERT (SanityCheck());
 #endif
 }
 
@@ -318,8 +318,8 @@ template <class OBJECT, class KEY>
 void dgDownHeap<OBJECT,KEY>::Sort ()
 {
 
-	dgInt32 count = dgHeapBase<OBJECT,KEY>::m_curCount;
-	for (dgInt32 i = 1; i < count; i ++) {
+	hacd::HaI32 count = dgHeapBase<OBJECT,KEY>::m_curCount;
+	for (hacd::HaI32 i = 1; i < count; i ++) {
 		KEY key (dgHeapBase<OBJECT,KEY>::m_pool[0].m_key);
 		OBJECT obj (dgHeapBase<OBJECT,KEY>::m_pool[0].m_obj);
 
@@ -330,7 +330,7 @@ void dgDownHeap<OBJECT,KEY>::Sort ()
 	}
 
 	dgHeapBase<OBJECT,KEY>::m_curCount = count;
-	for (dgInt32 i = 0; i < count / 2; i ++) {
+	for (hacd::HaI32 i = 0; i < count / 2; i ++) {
 		KEY key (dgHeapBase<OBJECT,KEY>::m_pool[i].m_key);
 		OBJECT obj (dgHeapBase<OBJECT,KEY>::m_pool[i].m_obj);
 
@@ -341,7 +341,7 @@ void dgDownHeap<OBJECT,KEY>::Sort ()
 		dgHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj = obj;
 	}
 #ifdef DG_HEAP_SANITY_CHECK
-	_ASSERTE (SanityCheck());
+	HACD_ASSERT (SanityCheck());
 #endif
 }
 
@@ -349,7 +349,7 @@ void dgDownHeap<OBJECT,KEY>::Sort ()
 template <class OBJECT, class KEY>
 bool dgDownHeap<OBJECT,KEY>::SanityCheck()
 {
-	for (dgInt32 i = 0; i < dgHeapBase<OBJECT,KEY>::m_curCount / 2; i ++) {
+	for (hacd::HaI32 i = 0; i < dgHeapBase<OBJECT,KEY>::m_curCount / 2; i ++) {
 		if (dgHeapBase<OBJECT,KEY>::m_pool[i].m_key < dgHeapBase<OBJECT,KEY>::m_pool[i * 2 + 1].m_key) {
 			return false;
 		}
@@ -373,13 +373,13 @@ bool dgDownHeap<OBJECT,KEY>::SanityCheck()
 //
 // **************************************************************************
 template <class OBJECT, class KEY>
-dgUpHeap<OBJECT,KEY>::dgUpHeap (dgInt32 maxElements)
+dgUpHeap<OBJECT,KEY>::dgUpHeap (hacd::HaI32 maxElements)
 	:dgHeapBase<OBJECT, KEY> (maxElements)
 {
 }
 
 template <class OBJECT, class KEY>
-dgUpHeap<OBJECT,KEY>::dgUpHeap (const void * const buffer, dgInt32 sizeInBytes)
+dgUpHeap<OBJECT,KEY>::dgUpHeap (const void * const buffer, hacd::HaI32 sizeInBytes)
 	:dgHeapBase<OBJECT, KEY> (buffer, sizeInBytes)
 {
 }
@@ -388,7 +388,7 @@ dgUpHeap<OBJECT,KEY>::dgUpHeap (const void * const buffer, dgInt32 sizeInBytes)
 template <class OBJECT, class KEY>
 bool dgUpHeap<OBJECT,KEY>::SanityCheck()
 {
-	for (dgInt32 i = 0; i < dgHeapBase<OBJECT,KEY>::m_curCount / 2; i ++) {
+	for (hacd::HaI32 i = 0; i < dgHeapBase<OBJECT,KEY>::m_curCount / 2; i ++) {
 		if (dgHeapBase<OBJECT,KEY>::m_pool[i].m_key > dgHeapBase<OBJECT,KEY>::m_pool[i * 2 + 1].m_key) {
 			return false;
 		}
@@ -406,14 +406,14 @@ bool dgUpHeap<OBJECT,KEY>::SanityCheck()
 template <class OBJECT, class KEY>
 void dgUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 {
-	dgInt32 i;
-	dgInt32 j;
+	hacd::HaI32 i;
+	hacd::HaI32 j;
 
 #ifdef _DEBUG
-	//	_ASSERTE (m_curCount < m_maxCount);
-	dgInt32 cc = dgHeapBase<OBJECT,KEY>::m_curCount;
-	dgInt32 cm = dgHeapBase<OBJECT,KEY>::m_maxCount;
-	_ASSERTE (cc < cm);
+	//	HACD_ASSERT (m_curCount < m_maxCount);
+	hacd::HaI32 cc = dgHeapBase<OBJECT,KEY>::m_curCount;
+	hacd::HaI32 cm = dgHeapBase<OBJECT,KEY>::m_maxCount;
+	HACD_ASSERT (cc < cm);
 #endif
 	dgHeapBase<OBJECT,KEY>::m_curCount ++;
 
@@ -424,12 +424,12 @@ void dgUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 		}
 		dgHeapBase<OBJECT,KEY>::m_pool[i - 1] = dgHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-	_ASSERTE (i);
+	HACD_ASSERT (i);
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
 
 #ifdef DG_HEAP_SANITY_CHECK
-	_ASSERTE (SanityCheck());
+	HACD_ASSERT (SanityCheck());
 #endif
 }
 
@@ -437,8 +437,8 @@ void dgUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 template <class OBJECT, class KEY>
 void dgUpHeap<OBJECT,KEY>::Sort ()
 {
-	dgInt32 count = dgHeapBase<OBJECT,KEY>::m_curCount;
-	for (dgInt32 i = 1; i < count; i ++) {
+	hacd::HaI32 count = dgHeapBase<OBJECT,KEY>::m_curCount;
+	for (hacd::HaI32 i = 1; i < count; i ++) {
 		KEY key (dgHeapBase<OBJECT,KEY>::m_pool[0].m_key);
 		OBJECT obj (dgHeapBase<OBJECT,KEY>::m_pool[0].m_obj);
 
@@ -449,7 +449,7 @@ void dgUpHeap<OBJECT,KEY>::Sort ()
 	}
 
 	dgHeapBase<OBJECT,KEY>::m_curCount = count;
-	for (dgInt32 i = 0; i < count / 2; i ++) {
+	for (hacd::HaI32 i = 0; i < count / 2; i ++) {
 		KEY key (dgHeapBase<OBJECT,KEY>::m_pool[i].m_key);
 		OBJECT obj (dgHeapBase<OBJECT,KEY>::m_pool[i].m_obj);
 
@@ -460,16 +460,16 @@ void dgUpHeap<OBJECT,KEY>::Sort ()
 		dgHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj = obj;
 	}
 #ifdef DG_HEAP_SANITY_CHECK
-	_ASSERTE (SanityCheck());
+	HACD_ASSERT (SanityCheck());
 #endif
 }
 
 
 template <class OBJECT, class KEY>
-void dgUpHeap<OBJECT,KEY>::Remove (dgInt32 index)
+void dgUpHeap<OBJECT,KEY>::Remove (hacd::HaI32 index)
 {
-	dgInt32 j;
-	dgInt32 k;
+	hacd::HaI32 j;
+	hacd::HaI32 k;
 
 	dgHeapBase<OBJECT,KEY>::m_curCount--;
 	KEY key (dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_key);
@@ -488,7 +488,7 @@ void dgUpHeap<OBJECT,KEY>::Remove (dgInt32 index)
 	dgHeapBase<OBJECT,KEY>::m_pool[k - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
 
 #ifdef DG_HEAP_SANITY_CHECK
-	_ASSERTE (SanityCheck());
+	HACD_ASSERT (SanityCheck());
 #endif
 }
 
@@ -496,8 +496,8 @@ void dgUpHeap<OBJECT,KEY>::Remove (dgInt32 index)
 template <class OBJECT, class KEY>
 void dgUpHeap<OBJECT,KEY>::Pop ()
 {
-	dgInt32 j;
-	dgInt32 k;
+	hacd::HaI32 j;
+	hacd::HaI32 k;
 
 	dgHeapBase<OBJECT,KEY>::m_curCount--;
 	KEY key (dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_key);
@@ -516,7 +516,7 @@ void dgUpHeap<OBJECT,KEY>::Pop ()
 	dgHeapBase<OBJECT,KEY>::m_pool[k - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
 
 #ifdef DG_HEAP_SANITY_CHECK
-	_ASSERTE (SanityCheck());
+	HACD_ASSERT (SanityCheck());
 #endif
 }
 

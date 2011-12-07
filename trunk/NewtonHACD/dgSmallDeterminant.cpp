@@ -25,10 +25,10 @@
 
 #define Absolute(a)  ((a) >= 0.0 ? (a) : -(a))
 
-dgFloat64 Determinant2x2 (const dgFloat64 matrix[2][2], dgFloat64* const error)
+hacd::HaF64 Determinant2x2 (const hacd::HaF64 matrix[2][2], hacd::HaF64* const error)
 {
-	dgFloat64 a00xa11 = matrix[0][0] * matrix[1][1];
-	dgFloat64 a01xa10 = matrix[0][1] * matrix[1][0];
+	hacd::HaF64 a00xa11 = matrix[0][0] * matrix[1][1];
+	hacd::HaF64 a01xa10 = matrix[0][1] * matrix[1][0];
 	*error = Absolute(a00xa11) + Absolute(a01xa10);
 	return a00xa11 - a01xa10;
 }
@@ -42,16 +42,16 @@ dgGoogol Determinant2x2 (const dgGoogol matrix[2][2])
 
 
 
-dgFloat64 Determinant3x3 (const dgFloat64 matrix[3][3], dgFloat64* const error)
+hacd::HaF64 Determinant3x3 (const hacd::HaF64 matrix[3][3], hacd::HaF64* const error)
 {
-	dgFloat64 sign = dgFloat64 (-1.0f);
-	dgFloat64 det = dgFloat64 (0.0f);
-	dgFloat64 accError = dgFloat64 (0.0f); 
-	for (dgInt32 i = 0; i < 3; i ++)  {
-		dgFloat64 cofactor[2][2];
-		for (dgInt32 j = 0; j < 2; j ++) {
-			dgInt32 k0 = 0;
-			for (dgInt32 k = 0; k < 3; k ++) {
+	hacd::HaF64 sign = hacd::HaF64 (-1.0f);
+	hacd::HaF64 det = hacd::HaF64 (0.0f);
+	hacd::HaF64 accError = hacd::HaF64 (0.0f); 
+	for (hacd::HaI32 i = 0; i < 3; i ++)  {
+		hacd::HaF64 cofactor[2][2];
+		for (hacd::HaI32 j = 0; j < 2; j ++) {
+			hacd::HaI32 k0 = 0;
+			for (hacd::HaI32 k = 0; k < 3; k ++) {
 				if (k != i) {
 					cofactor[j][k0] = matrix[j][k];
 					k0 ++;
@@ -59,11 +59,11 @@ dgFloat64 Determinant3x3 (const dgFloat64 matrix[3][3], dgFloat64* const error)
 			}
 		}
 
-		dgFloat64 parcialError;
-		dgFloat64 minorDet = Determinant2x2 (cofactor, &parcialError);
+		hacd::HaF64 parcialError;
+		hacd::HaF64 minorDet = Determinant2x2 (cofactor, &parcialError);
 		accError += parcialError * Absolute (matrix[2][i]);
 		det += sign * minorDet * matrix[2][i];
-		sign *= dgFloat64 (-1.0f);
+		sign *= hacd::HaF64 (-1.0f);
 	}
 
 	*error = accError;
@@ -72,15 +72,15 @@ dgFloat64 Determinant3x3 (const dgFloat64 matrix[3][3], dgFloat64* const error)
 
 dgGoogol Determinant3x3 (const dgGoogol matrix[3][3])
 {
-	dgGoogol negOne (dgFloat64 (-1.0f));
-	dgGoogol sign (dgFloat64 (-1.0f));
-	dgGoogol det = dgFloat64 (0.0f);
-	for (dgInt32 i = 0; i < 3; i ++)  {
+	dgGoogol negOne (hacd::HaF64 (-1.0f));
+	dgGoogol sign (hacd::HaF64 (-1.0f));
+	dgGoogol det = hacd::HaF64 (0.0f);
+	for (hacd::HaI32 i = 0; i < 3; i ++)  {
 		dgGoogol cofactor[2][2];
 
-		for (dgInt32 j = 0; j < 2; j ++) {
-			dgInt32 k0 = 0;
-			for (dgInt32 k = 0; k < 3; k ++) {
+		for (hacd::HaI32 j = 0; j < 2; j ++) {
+			hacd::HaI32 k0 = 0;
+			for (hacd::HaI32 k = 0; k < 3; k ++) {
 				if (k != i) {
 					cofactor[j][k0] = matrix[j][k];
 					k0 ++;
@@ -96,16 +96,16 @@ dgGoogol Determinant3x3 (const dgGoogol matrix[3][3])
 }
 
 
-dgFloat64 Determinant4x4 (const dgFloat64 matrix[4][4], dgFloat64* const error)
+hacd::HaF64 Determinant4x4 (const hacd::HaF64 matrix[4][4], hacd::HaF64* const error)
 {
-	dgFloat64 sign = dgFloat64 (1.0f);
-	dgFloat64 det = dgFloat64 (0.0f);
-	dgFloat64 accError = dgFloat64 (0.0f); 
-	for (dgInt32 i = 0; i < 4; i ++)  {
-		dgFloat64 cofactor[3][3];
-		for (dgInt32 j = 0; j < 3; j ++) {
-			dgInt32 k0 = 0;
-			for (dgInt32 k = 0; k < 4; k ++) {
+	hacd::HaF64 sign = hacd::HaF64 (1.0f);
+	hacd::HaF64 det = hacd::HaF64 (0.0f);
+	hacd::HaF64 accError = hacd::HaF64 (0.0f); 
+	for (hacd::HaI32 i = 0; i < 4; i ++)  {
+		hacd::HaF64 cofactor[3][3];
+		for (hacd::HaI32 j = 0; j < 3; j ++) {
+			hacd::HaI32 k0 = 0;
+			for (hacd::HaI32 k = 0; k < 4; k ++) {
 				if (k != i) {
 					cofactor[j][k0] = matrix[j][k];
 					k0 ++;
@@ -113,11 +113,11 @@ dgFloat64 Determinant4x4 (const dgFloat64 matrix[4][4], dgFloat64* const error)
 			}
 		}
 
-		dgFloat64 parcialError;
-		dgFloat64 minorDet = Determinant3x3 (cofactor, &parcialError);
+		hacd::HaF64 parcialError;
+		hacd::HaF64 minorDet = Determinant3x3 (cofactor, &parcialError);
 		accError +=  parcialError * Absolute (matrix[3][i]);
 		det += sign * minorDet * matrix[3][i];
-		sign *= dgFloat64 (-1.0f);
+		sign *= hacd::HaF64 (-1.0f);
 	}
 
 	*error = accError;
@@ -127,15 +127,15 @@ dgFloat64 Determinant4x4 (const dgFloat64 matrix[4][4], dgFloat64* const error)
 
 dgGoogol Determinant4x4 (const dgGoogol matrix[4][4])
 {
-	dgGoogol sign = dgFloat64 (1.0f);
-	dgGoogol det = dgFloat64 (0.0f);
-	dgGoogol negOne (dgFloat64 (-1.0f));
-	dgGoogol accError = dgFloat64 (0.0f); 
-	for (dgInt32 i = 0; i < 4; i ++)  {
+	dgGoogol sign = hacd::HaF64 (1.0f);
+	dgGoogol det = hacd::HaF64 (0.0f);
+	dgGoogol negOne (hacd::HaF64 (-1.0f));
+	dgGoogol accError = hacd::HaF64 (0.0f); 
+	for (hacd::HaI32 i = 0; i < 4; i ++)  {
 		dgGoogol  cofactor[3][3];
-		for (dgInt32 j = 0; j < 3; j ++) {
-			dgInt32 k0 = 0;
-			for (dgInt32 k = 0; k < 4; k ++) {
+		for (hacd::HaI32 j = 0; j < 3; j ++) {
+			hacd::HaI32 k0 = 0;
+			for (hacd::HaI32 k = 0; k < 4; k ++) {
 				if (k != i) {
 					cofactor[j][k0] = matrix[j][k];
 					k0 ++;

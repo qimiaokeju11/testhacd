@@ -25,125 +25,123 @@
 //#include "dgStdafx.h"
 #include "dgVector.h"
 
-DG_MSC_VECTOR_ALIGMENT
 class dgPlane: public dgVector
 {
 	public:
 	dgPlane ();
-	dgPlane (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w);
-	dgPlane (const dgVector &normal, dgFloat32 distance); 
+	dgPlane (hacd::HaF32 x, hacd::HaF32 y, hacd::HaF32 z, hacd::HaF32 w);
+	dgPlane (const dgVector &normal, hacd::HaF32 distance); 
 	dgPlane (const dgVector &P0, const dgVector &P1, const dgVector &P2);
-	dgPlane Scale (dgFloat32 s) const;
-	dgFloat32 Evalue (const dgFloat32 *point) const;
-	dgFloat32 Evalue (const dgVector &point) const;
-}DG_GCC_VECTOR_ALIGMENT;
+	dgPlane Scale (hacd::HaF32 s) const;
+	hacd::HaF32 Evalue (const hacd::HaF32 *point) const;
+	hacd::HaF32 Evalue (const dgVector &point) const;
+};
 
-DG_MSC_VECTOR_ALIGMENT
 class dgBigPlane: public dgBigVector
 {
 	public:
 	dgBigPlane ();
-	dgBigPlane (dgFloat64 x, dgFloat64 y, dgFloat64 z, dgFloat64 w);
-	dgBigPlane (const dgBigVector &normal, dgFloat64 distance); 
+	dgBigPlane (hacd::HaF64 x, hacd::HaF64 y, hacd::HaF64 z, hacd::HaF64 w);
+	dgBigPlane (const dgBigVector &normal, hacd::HaF64 distance); 
 	dgBigPlane (const dgBigVector &P0, const dgBigVector &P1, const dgBigVector &P2);
-	dgBigPlane Scale (dgFloat64 s) const;
-	dgFloat64 Evalue (const dgFloat32 *point) const;
+	dgBigPlane Scale (hacd::HaF64 s) const;
+	hacd::HaF64 Evalue (const hacd::HaF32 *point) const;
 #ifndef __USE_DOUBLE_PRECISION__
-	dgFloat64 Evalue (const dgFloat64 *point) const;
+	hacd::HaF64 Evalue (const hacd::HaF64 *point) const;
 #endif
-	dgFloat64 Evalue (const dgVector &point) const;
-	dgFloat64 Evalue (const dgBigVector &point) const;
-}DG_GCC_VECTOR_ALIGMENT;
+	hacd::HaF64 Evalue (const dgVector &point) const;
+	hacd::HaF64 Evalue (const dgBigVector &point) const;
+};
 
 
 
 
-DG_INLINE dgPlane::dgPlane () 
+HACD_INLINE dgPlane::dgPlane () 
 	:dgVector () 
 {
 }
 
-DG_INLINE dgPlane::dgPlane (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w)
+HACD_INLINE dgPlane::dgPlane (hacd::HaF32 x, hacd::HaF32 y, hacd::HaF32 z, hacd::HaF32 w)
 	:dgVector (x, y, z, w) 
 {
 }
 
-DG_INLINE dgPlane::dgPlane (const dgVector &normal, dgFloat32 distance) 
+HACD_INLINE dgPlane::dgPlane (const dgVector &normal, hacd::HaF32 distance) 
 	:dgVector (normal)
 {
 	m_w = distance;
 }
 
-DG_INLINE dgPlane::dgPlane (const dgVector &P0, const dgVector &P1, const dgVector &P2)
+HACD_INLINE dgPlane::dgPlane (const dgVector &P0, const dgVector &P1, const dgVector &P2)
 	:dgVector ((P1 - P0) * (P2 - P0)) 
 {
 	m_w = - (*this % P0);
 }
 
-DG_INLINE dgPlane dgPlane::Scale (dgFloat32 s)	const
+HACD_INLINE dgPlane dgPlane::Scale (hacd::HaF32 s)	const
 {
 	return dgPlane (m_x * s, m_y * s, m_z * s, m_w * s);
 }
 
 
-DG_INLINE dgFloat32 dgPlane::Evalue (const dgFloat32 *point) const
+HACD_INLINE hacd::HaF32 dgPlane::Evalue (const hacd::HaF32 *point) const
 {
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }
 
-DG_INLINE dgFloat32 dgPlane::Evalue (const dgVector &point) const
+HACD_INLINE hacd::HaF32 dgPlane::Evalue (const dgVector &point) const
 {
 	return m_x * point.m_x + m_y * point.m_y + m_z * point.m_z + m_w;
 }
 
 
 
-DG_INLINE dgBigPlane::dgBigPlane () 
+HACD_INLINE dgBigPlane::dgBigPlane () 
 	:dgBigVector () 
 {
 }
 
-DG_INLINE dgBigPlane::dgBigPlane (dgFloat64 x, dgFloat64 y, dgFloat64 z, dgFloat64 w)
+HACD_INLINE dgBigPlane::dgBigPlane (hacd::HaF64 x, hacd::HaF64 y, hacd::HaF64 z, hacd::HaF64 w)
 	:dgBigVector (x, y, z, w) 
 {
 }
 
 
-DG_INLINE dgBigPlane::dgBigPlane (const dgBigVector &normal, dgFloat64 distance) 
+HACD_INLINE dgBigPlane::dgBigPlane (const dgBigVector &normal, hacd::HaF64 distance) 
 	:dgBigVector (normal)
 {
 	m_w = distance;
 }
 
-DG_INLINE dgBigPlane::dgBigPlane (const dgBigVector &P0, const dgBigVector &P1, const dgBigVector &P2)
+HACD_INLINE dgBigPlane::dgBigPlane (const dgBigVector &P0, const dgBigVector &P1, const dgBigVector &P2)
 	:dgBigVector ((P1 - P0) * (P2 - P0)) 
 {
 	m_w = - (*this % P0);
 }
 
-DG_INLINE dgBigPlane dgBigPlane::Scale (dgFloat64 s) const
+HACD_INLINE dgBigPlane dgBigPlane::Scale (hacd::HaF64 s) const
 {
 	return dgBigPlane (m_x * s, m_y * s, m_z * s, m_w * s);
 }
 
-DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat32 *point) const
+HACD_INLINE hacd::HaF64 dgBigPlane::Evalue (const hacd::HaF32 *point) const
 {
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }
 
 #ifndef __USE_DOUBLE_PRECISION__
-DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat64 *point) const
+HACD_INLINE hacd::HaF64 dgBigPlane::Evalue (const hacd::HaF64 *point) const
 {
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }
 #endif
 
-DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgVector &point) const
+HACD_INLINE hacd::HaF64 dgBigPlane::Evalue (const dgVector &point) const
 {
 	return m_x * point.m_x + m_y * point.m_y + m_z * point.m_z + m_w;
 }
 
-DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgBigVector &point) const
+HACD_INLINE hacd::HaF64 dgBigPlane::Evalue (const dgBigVector &point) const
 {
 	return m_x * point.m_x + m_y * point.m_y + m_z * point.m_z + m_w;
 }

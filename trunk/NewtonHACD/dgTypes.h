@@ -22,266 +22,53 @@
 #if !defined(AFX_DGTYPES__42YH_HY78GT_YHJ63Y__INCLUDED_)
 #define AFX_DGTYPES__42YH_HY78GT_YHJ63Y__INCLUDED_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <time.h>
+#include "PlatformConfigHACD.h"
 #include <math.h>
-#include <string.h>
-#include <ctype.h>
-#include <new>
-
-#ifdef WIN32
-
-#ifdef _M_IX86
-#define _WIN_32_VER
-#elif defined(_M_X64)
-#define _WIN_64_VER
-#endif
-
-
-
-#endif
-
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-
-	#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
-	#pragma warning (disable: 4100) //unreferenced formal parameter
-	#pragma warning (disable: 4725) //instruction may be inaccurate on some Pentium
-	#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
-	#pragma warning (disable: 4820) //'4' bytes padding added after data member '_finddata32i64_t::name'
-	#pragma warning (disable: 4514) //'exp_2' : unreferenced inline function has been removed
-	#pragma warning (disable: 4987) //nonstandard extension used: 'throw (...)'
-	#pragma warning (disable: 4710) //'std::_Exception_ptr std::_Exception_ptr::_Current_exception(void)' : function not inlined
-	#pragma warning (disable: 4826) //Conversion from 'void *' to 'dgUnsigned64' is sign-extended. This may cause unexpected runtime behavior.
-	#pragma warning (disable: 4061) //enumerator 'm_convexConvexIntance' in switch of enum 'dgCollisionID' is not explicitly handled by a case label
-	#pragma warning (disable: 4191) //'type cast' : unsafe conversion from 'NewtonWorldRayFilterCallback' to 'OnRayCastAction'
-	#pragma warning (disable: 4711) //function 'float const & __thiscall dgTemplateVector<float>::operator[](int)const ' selected for automatic inline expansion
-
-	#include <io.h> 
-	#include <direct.h> 
-	#include <malloc.h>
-	#include <float.h>
-	#include <stdarg.h>
-	#include <process.h>
-
-	
-
-
-	#if (_MSC_VER >= 1400)
-		#pragma warning (disable: 4996) // '_controlfp' was declared deprecated
-	#else
-		#pragma warning (disable: 4505) //unreferenced local function has been removed
-		#pragma warning (disable: 4514) //function '$E1' selected for automatic inline expansion
-	#endif
-
-	#ifdef _DEBUG
-		#pragma warning (disable: 4127)	//conditional expression is constant
-	#endif
-
-	#pragma warning (push, 3) 
-		#include <windows.h>
-		#include <crtdbg.h>
-//		#include <mmsystem.h>
-	#pragma warning (pop) 
-#endif
-
-
-#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-
-	#include <io.h> 
-	#include <direct.h> 
-	#include <malloc.h>
-	#include <float.h>
-	#include <windows.h>
-	#include <process.h>
-//	#include <mmsystem.h>
-#endif
-
-
-
-
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#if (_MSC_VER >= 1400)
-		#include <intrin.h>
-	#else 
-		#if (_MSC_VER >= 1300)
-			#include <xmmintrin.h>
-		#endif
-	#endif
-#endif
-
-
-
-#ifdef __ppc__
-	#include <vecLib/veclib.h>
-#endif
-
-#if (defined (__i386__) || defined (__x86_64__))
-	#include <xmmintrin.h>
-#endif
-
-
-
-
-#ifdef _LINUX_VER
-	#include <pthread.h>
-	#include <semaphore.h>
-	#include <unistd.h>
-        #include <assert.h>
-#endif
-
-#ifdef _MAC_VER
-	#ifndef _MAC_IPHONE
-		#include <pthread.h>
-		#include <semaphore.h>
-	#endif	
-        
-	#include <unistd.h>
-	#include <libkern/OSAtomic.h>
-	#include <sys/sysctl.h>
-        #include <assert.h> 
-#endif
-
-
-//************************************************************
-#if !(defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#ifdef _DEBUG
-		#define _ASSERTE(x) assert(x)
-	#else 
-		#define _ASSERTE(x)
-	#endif
-#endif
-
-
-#define __USE_CPU_FOUND__
-
-
-#define	DG_MAX_THREADS_HIVE_COUNT		16
-
-#ifdef _DEBUG
-//#define __ENABLE_SANITY_CHECK 
-#endif
-
-
-#ifdef DLL_DECLSPEC
-#undef DLL_DECLSPEC
-#endif
-
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define DG_INLINE __forceinline 
-#else 
-	#define DG_INLINE inline 
-#endif
-
-
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define	DG_MSC_VECTOR_ALIGMENT	__declspec(align(16))
-	#define	DG_GCC_VECTOR_ALIGMENT	
-#else
-	#define	DG_MSC_VECTOR_ALIGMENT
-	#define	DG_GCC_VECTOR_ALIGMENT	__attribute__ ((aligned (16)))
-#endif
-
-
-#define DG_SIMD_WORD_SIZE	dgInt32 (sizeof (simd_128) / sizeof (dgFloat32))
-
-
-
-typedef char dgInt8;
-typedef unsigned char dgUnsigned8;
-
-typedef short dgInt16;
-typedef unsigned short dgUnsigned16;
-
-typedef int dgInt32;
-typedef unsigned dgUnsigned32;
-typedef unsigned int dgUnsigned32;
-
-typedef long long dgInt64;
-typedef unsigned long long dgUnsigned64;
-
-
-typedef double dgFloat64;
-
-#ifdef __USE_DOUBLE_PRECISION__
-	typedef double dgFloat32;
-#else
-	typedef float dgFloat32;
-#endif
-
-
-
-
-
-
+#include <float.h>
 
 class dgTriplex
 {
 	public:
-	dgFloat32 m_x;
-	dgFloat32 m_y;
-	dgFloat32 m_z;
+	hacd::HaF32 m_x;
+	hacd::HaF32 m_y;
+	hacd::HaF32 m_z;
 };
 
 
-#define dgPI			 	dgFloat32 (3.14159f)
-#define dgPI2			 	dgFloat32 (dgPI * 2.0f)
-#define dgEXP			 	dgFloat32 (2.71828f)
-#define dgEPSILON	  	 	dgFloat32 (1.0e-5f)
-#define dgGRAVITY	  	 	dgFloat32 (9.8f)
-#define dgDEG2RAD	  	 	dgFloat32 (dgPI / 180.0f)
-#define dgRAD2DEG	  	 	dgFloat32 (180.0f / dgPI)
-#define dgKMH2MPSEC		 	dgFloat32 (0.278f)
+#define dgPI			 	hacd::HaF32 (3.14159f)
+#define dgPI2			 	hacd::HaF32 (dgPI * 2.0f)
+#define dgEXP			 	hacd::HaF32 (2.71828f)
+#define dgEPSILON	  	 	hacd::HaF32 (1.0e-5f)
+#define dgGRAVITY	  	 	hacd::HaF32 (9.8f)
+#define dgDEG2RAD	  	 	hacd::HaF32 (dgPI / 180.0f)
+#define dgRAD2DEG	  	 	hacd::HaF32 (180.0f / dgPI)
+#define dgKMH2MPSEC		 	hacd::HaF32 (0.278f)
 
 
 class dgVector;
 class dgBigVector;
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define dgApi __cdecl 	
-
-	#ifdef _WIN_64_VER
-		#define dgNaked
-	#else
-		#define dgNaked  __declspec (naked)
-	#endif
-#else
-	#define dgApi 	
-	#define dgNaked  
-#endif
-
-/*
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#ifdef _DEBUG
-		#define dgCheckFloat(x) _finite(x)
-	#else
-		#define dgCheckFloat(x) true
-	#endif
-#else
-	#define dgCheckFloat(x) true
-#endif
-*/
+#define dgApi __cdecl 	
 
 #ifdef _DEBUG
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-		#define dgCheckFloat(x) (_finite(x) && !_isnan(x))
-	#else
-		#define dgCheckFloat(x) (isfinite(x) && !isnan(x))
-	#endif
+#if 1
+#define dgCheckFloat(x) (_finite(x) && !_isnan(x))
+#else
+#define dgCheckFloat(x) (isfinite(x) && !isnan(x))
+#endif
 #endif
 
 
-DG_INLINE dgInt32 exp_2 (dgInt32 x)
+HACD_INLINE hacd::HaI32 exp_2 (hacd::HaI32 x)
 {
-	dgInt32 exp;
+	hacd::HaI32 exp;
 	for (exp = -1; x; x >>= 1) {
 		exp ++;
 	}
 	return exp;
 }
 
-template <class T> DG_INLINE T ClampValue(T val, T min, T max)
+template <class T> HACD_INLINE T ClampValue(T val, T min, T max)
 {
 	if (val < min) {
 		return min;
@@ -292,7 +79,7 @@ template <class T> DG_INLINE T ClampValue(T val, T min, T max)
 	return val;
 }
 
-template <class T> DG_INLINE T GetMin(T A, T B)
+template <class T> HACD_INLINE T GetMin(T A, T B)
 {
 	if (B < A) {
 		A = B;
@@ -300,7 +87,7 @@ template <class T> DG_INLINE T GetMin(T A, T B)
 	return A;
 }
 
-template <class T> DG_INLINE T GetMax(T A, T B)
+template <class T> HACD_INLINE T GetMax(T A, T B)
 {
 	if (B > A) {
 		A = B;
@@ -310,19 +97,19 @@ template <class T> DG_INLINE T GetMax(T A, T B)
 
 
 
-template <class T> DG_INLINE T GetMin(T A, T B, T C)
+template <class T> HACD_INLINE T GetMin(T A, T B, T C)
 {
 	return GetMin(GetMin (A, B), C);
 }
 
 
 
-template <class T> DG_INLINE T GetMax(T A, T B, T C)
+template <class T> HACD_INLINE T GetMax(T A, T B, T C)
 {
 	return GetMax(GetMax (A, B), C);
 }
 
-template <class T> DG_INLINE void Swap(T& A, T& B)
+template <class T> HACD_INLINE void Swap(T& A, T& B)
 {
 	T tmp (A);
 	A = B;
@@ -330,7 +117,7 @@ template <class T> DG_INLINE void Swap(T& A, T& B)
 }	
 
 
-template <class T> DG_INLINE T GetSign(T A)
+template <class T> HACD_INLINE T GetSign(T A)
 {
 	T sign (1.0f);
 	if (A < T (0.0f)) {
@@ -340,14 +127,14 @@ template <class T> DG_INLINE T GetSign(T A)
 }
 
 template <class T> 
-dgInt32 dgBinarySearch (T const* array, dgInt32 elements, dgInt32 entry)
+hacd::HaI32 dgBinarySearch (T const* array, hacd::HaI32 elements, hacd::HaI32 entry)
 {
-	dgInt32 index0;
-	dgInt32 index1;
-	dgInt32 index2;
-	dgInt32 entry0;
-	dgInt32 entry1;
-	dgInt32 entry2;
+	hacd::HaI32 index0;
+	hacd::HaI32 index1;
+	hacd::HaI32 index2;
+	hacd::HaI32 entry0;
+	hacd::HaI32 entry1;
+	hacd::HaI32 entry2;
 
 	index0 = 0;
 	index2 = elements - 1;
@@ -358,8 +145,8 @@ dgInt32 dgBinarySearch (T const* array, dgInt32 elements, dgInt32 entry)
       index1 = (index0 + index2) >> 1;
 		entry1 = array[index1].m_Key;
 		if (entry1 == entry) {
-			_ASSERTE (array[index1].m_Key <= entry);
-			_ASSERTE (array[index1 + 1].m_Key >= entry);
+			HACD_ASSERT (array[index1].m_Key <= entry);
+			HACD_ASSERT (array[index1 + 1].m_Key >= entry);
 			return index1;
 		} else if (entry < entry1) {
 			index2 = index1;
@@ -374,8 +161,8 @@ dgInt32 dgBinarySearch (T const* array, dgInt32 elements, dgInt32 entry)
 		index0 --;
 	}
 
-	_ASSERTE (array[index0].m_Key <= entry);
-	_ASSERTE (array[index0 + 1].m_Key >= entry);
+	HACD_ASSERT (array[index0].m_Key <= entry);
+	HACD_ASSERT (array[index0 + 1].m_Key >= entry);
 	return index0;
 }
 
@@ -383,47 +170,47 @@ dgInt32 dgBinarySearch (T const* array, dgInt32 elements, dgInt32 entry)
 
 
 template <class T> 
-void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 radixPass, 
-				  dgInt32 (*getRadixKey) (const T* const  A, void* const context), void* const context = NULL)
+void dgRadixSort (T* const array, T* const tmpArray, hacd::HaI32 elements, hacd::HaI32 radixPass, 
+				  hacd::HaI32 (*getRadixKey) (const T* const  A, void* const context), void* const context = NULL)
 {
-	dgInt32 scanCount[256]; 
-	dgInt32 histogram[256][4];
+	hacd::HaI32 scanCount[256]; 
+	hacd::HaI32 histogram[256][4];
 
-	_ASSERTE (radixPass >= 1);
-	_ASSERTE (radixPass <= 4);
+	HACD_ASSERT (radixPass >= 1);
+	HACD_ASSERT (radixPass <= 4);
 	
 	memset (histogram, 0, sizeof (histogram));
-	for (dgInt32 i = 0; i < elements; i ++) {
-		dgInt32 key = getRadixKey (&array[i], context);
-		for (dgInt32 j = 0; j < radixPass; j ++) {
-			dgInt32 radix = (key >> (j << 3)) & 0xff;
+	for (hacd::HaI32 i = 0; i < elements; i ++) {
+		hacd::HaI32 key = getRadixKey (&array[i], context);
+		for (hacd::HaI32 j = 0; j < radixPass; j ++) {
+			hacd::HaI32 radix = (key >> (j << 3)) & 0xff;
 			histogram[radix][j] = histogram[radix][j] + 1;
 		}
 	}
 
-	for (dgInt32 radix = 0; radix < radixPass; radix += 2) {
+	for (hacd::HaI32 radix = 0; radix < radixPass; radix += 2) {
 		scanCount[0] = 0;
-		for (dgInt32 i = 1; i < 256; i ++) {
+		for (hacd::HaI32 i = 1; i < 256; i ++) {
 			scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix];
 		}
-		dgInt32 radixShift = radix << 3;
-		for (dgInt32 i = 0; i < elements; i ++) {
-			dgInt32 key = (getRadixKey (&array[i], context) >> radixShift) & 0xff;
-			dgInt32 index = scanCount[key];
+		hacd::HaI32 radixShift = radix << 3;
+		for (hacd::HaI32 i = 0; i < elements; i ++) {
+			hacd::HaI32 key = (getRadixKey (&array[i], context) >> radixShift) & 0xff;
+			hacd::HaI32 index = scanCount[key];
 			tmpArray[index] = array[i];
 			scanCount[key] = index + 1;
 		}
 
 		if ((radix + 1) < radixPass) { 
 			scanCount[0] = 0;
-			for (dgInt32 i = 1; i < 256; i ++) {
+			for (hacd::HaI32 i = 1; i < 256; i ++) {
 				scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix + 1];
 			}
 			
-			dgInt32 radixShift = (radix + 1) << 3;
-			for (dgInt32 i = 0; i < elements; i ++) {
-				dgInt32 key = (getRadixKey (&array[i], context) >> radixShift) & 0xff;
-				dgInt32 index = scanCount[key];
+			hacd::HaI32 radixShift = (radix + 1) << 3;
+			for (hacd::HaI32 i = 0; i < elements; i ++) {
+				hacd::HaI32 key = (getRadixKey (&array[i], context) >> radixShift) & 0xff;
+				hacd::HaI32 index = scanCount[key];
 				array[index] = tmpArray[i];
 				scanCount[key] = index + 1;
 			}
@@ -434,8 +221,8 @@ void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 r
 
 
 #ifdef _DEBUG
-	for (dgInt32 i = 0; i < (elements - 1); i ++) {
-		_ASSERTE (getRadixKey (&array[i], context) <= getRadixKey (&array[i + 1], context));
+	for (hacd::HaI32 i = 0; i < (elements - 1); i ++) {
+		HACD_ASSERT (getRadixKey (&array[i], context) <= getRadixKey (&array[i + 1], context));
 	}
 #endif
 
@@ -443,21 +230,21 @@ void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 r
 
 
 template <class T> 
-void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
+void dgSort (T* const array, hacd::HaI32 elements, hacd::HaI32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
-	dgInt32 stride = 8;
-	dgInt32 stack[1024][2];
+	hacd::HaI32 stride = 8;
+	hacd::HaI32 stack[1024][2];
 
 	stack[0][0] = 0;
 	stack[0][1] = elements - 1;
-	dgInt32 stackIndex = 1;
+	hacd::HaI32 stackIndex = 1;
 	while (stackIndex) {
 		stackIndex --;
-		dgInt32 lo = stack[stackIndex][0];
-		dgInt32 hi = stack[stackIndex][1];
+		hacd::HaI32 lo = stack[stackIndex][0];
+		hacd::HaI32 hi = stack[stackIndex][1];
 		if ((hi - lo) > stride) {
-			dgInt32 i = lo;
-			dgInt32 j = hi;
+			hacd::HaI32 i = lo;
+			hacd::HaI32 j = hi;
 			T val (array[(lo + hi) >> 1]);
 			do {    
 				while (compare (&array[i], &val, context) < 0) i ++;
@@ -482,7 +269,7 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 				stack[stackIndex][1] = j;
 				stackIndex ++;
 			}
-			_ASSERTE (stackIndex < dgInt32 (sizeof (stack) / (2 * sizeof (stack[0][0]))));
+			HACD_ASSERT (stackIndex < hacd::HaI32 (sizeof (stack) / (2 * sizeof (stack[0][0]))));
 		}
 	}
 
@@ -490,7 +277,7 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 	if (elements < stride) {
 		stride = elements;
 	}
-	for (dgInt32 i = 1; i < stride; i ++) {
+	for (hacd::HaI32 i = 1; i < stride; i ++) {
 		if (compare (&array[0], &array[i], context) > 0) {
 			T tmp (array[0]);
 			array[0] = array[i];
@@ -498,41 +285,41 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 		}
 	}
 
-	for (dgInt32 i = 1; i < elements; i ++) {
-		dgInt32 j = i;
+	for (hacd::HaI32 i = 1; i < elements; i ++) {
+		hacd::HaI32 j = i;
 		T tmp (array[i]);
 		//for (; j && (compare (&array[j - 1], &tmp, context) > 0); j --) {
 		for (; compare (&array[j - 1], &tmp, context) > 0; j --) {
-			_ASSERTE (j > 0);
+			HACD_ASSERT (j > 0);
 			array[j] = array[j - 1];
 		}
 		array[j] = tmp;
 	}
 
 #ifdef _DEBUG
-	for (dgInt32 i = 0; i < (elements - 1); i ++) {
-		_ASSERTE (compare (&array[i], &array[i + 1], context) <= 0);
+	for (hacd::HaI32 i = 0; i < (elements - 1); i ++) {
+		HACD_ASSERT (compare (&array[i], &array[i + 1], context) <= 0);
 	}
 #endif
 }
 
 
 template <class T> 
-void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
+void dgSortIndirect (T** const array, hacd::HaI32 elements, hacd::HaI32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
-	dgInt32 stride = 8;
-	dgInt32 stack[1024][2];
+	hacd::HaI32 stride = 8;
+	hacd::HaI32 stack[1024][2];
 
 	stack[0][0] = 0;
 	stack[0][1] = elements - 1;
-	dgInt32 stackIndex = 1;
+	hacd::HaI32 stackIndex = 1;
 	while (stackIndex) {
 		stackIndex --;
-		dgInt32 lo = stack[stackIndex][0];
-		dgInt32 hi = stack[stackIndex][1];
+		hacd::HaI32 lo = stack[stackIndex][0];
+		hacd::HaI32 hi = stack[stackIndex][1];
 		if ((hi - lo) > stride) {
-			dgInt32 i = lo;
-			dgInt32 j = hi;
+			hacd::HaI32 i = lo;
+			hacd::HaI32 j = hi;
 			T* val (array[(lo + hi) >> 1]);
 			do {    
 				while (compare (array[i], val, context) < 0) i ++;
@@ -557,7 +344,7 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 				stack[stackIndex][1] = j;
 				stackIndex ++;
 			}
-			_ASSERTE (stackIndex < dgInt32 (sizeof (stack) / (2 * sizeof (stack[0][0]))));
+			HACD_ASSERT (stackIndex < hacd::HaI32 (sizeof (stack) / (2 * sizeof (stack[0][0]))));
 		}
 	}
 
@@ -565,7 +352,7 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 	if (elements < stride) {
 		stride = elements;
 	}
-	for (dgInt32 i = 1; i < stride; i ++) {
+	for (hacd::HaI32 i = 1; i < stride; i ++) {
 		if (compare (&array[0], &array[i], context) > 0) {
 			T tmp (array[0]);
 			array[0] = array[i];
@@ -573,20 +360,20 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 		}
 	}
 
-	for (dgInt32 i = 1; i < elements; i ++) {
-		dgInt32 j = i;
+	for (hacd::HaI32 i = 1; i < elements; i ++) {
+		hacd::HaI32 j = i;
 		T* tmp (array[i]);
 		//for (; j && (compare (array[j - 1], tmp, context) > 0); j --) {
 		for (; compare (&array[j - 1], &tmp, context) > 0; j --) {
-			_ASSERTE (j > 0);
+			HACD_ASSERT (j > 0);
 			array[j] = array[j - 1];
 		}
 		array[j] = tmp;
 	}
 
 #ifdef _DEBUG
-	for (dgInt32 i = 0; i < (elements - 1); i ++) {
-		_ASSERTE (compare (array[i], array[i + 1], context) <= 0);
+	for (hacd::HaI32 i = 0; i < (elements - 1); i ++) {
+		HACD_ASSERT (compare (array[i], array[i + 1], context) <= 0);
 	}
 #endif
 }
@@ -597,146 +384,108 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 	union dgFloatSign
 	{
 		struct {
-			dgInt32 m_dommy;
-			dgInt32 m_iVal;
+			hacd::HaI32 m_dommy;
+			hacd::HaI32 m_iVal;
 		} m_integer;
-		dgFloat64 m_fVal;
+		hacd::HaF64 m_fVal;
 	};
 #else
 	union dgFloatSign
 	{
 		struct {
-			dgInt32 m_iVal;
+			hacd::HaI32 m_iVal;
 		} m_integer;
-		dgFloat32 m_fVal;
+		hacd::HaF32 m_fVal;
 	};
 #endif
 
 union dgDoubleInt
 {
 	struct {
-		dgInt32 m_intL;
-		dgInt32 m_intH;
-	};
-	dgInt64 m_int;
-	dgFloat64 m_float;
+		hacd::HaI32 m_intL;
+		hacd::HaI32 m_intH;
+	} _dgDoubleInt;
+	hacd::HaI64 m_int;
+	hacd::HaF64 m_float;
 };
 
 
 
-void GetMinMax (dgVector &Min, dgVector &Max, const dgFloat32* const vArray, dgInt32 vCount, dgInt32 StrideInBytes);
-void GetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
+void GetMinMax (dgVector &Min, dgVector &Max, const hacd::HaF32* const vArray, hacd::HaI32 vCount, hacd::HaI32 StrideInBytes);
+void GetMinMax (dgBigVector &Min, dgBigVector &Max, const hacd::HaF64* const vArray, hacd::HaI32 vCount, hacd::HaI32 strideInBytes);
 
-dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes,
-				       dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat32 tolerance = dgEPSILON);
+hacd::HaI32 dgVertexListToIndexList (hacd::HaF32* const vertexList, hacd::HaI32 strideInBytes, hacd::HaI32 floatSizeInBytes,
+				       hacd::HaI32 unsignedSizeInBytes, hacd::HaI32 vertexCount, hacd::HaI32* const indexListOut, hacd::HaF32 tolerance = dgEPSILON);
 
-dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
+hacd::HaI32 dgVertexListToIndexList (hacd::HaF64* const vertexList, hacd::HaI32 strideInBytes, hacd::HaI32 compareCount, hacd::HaI32 vertexCount, hacd::HaI32* const indexListOut, hacd::HaF64 tolerance = dgEPSILON);
 
-
-
-enum dgCpuClass
-{
-	dgNoSimdPresent = 0,
-	dgSimdPresent
-//	dgSimdPresent_3,
-};
 
 
 #define PointerToInt(x) ((size_t)x)
 #define IntToPointer(x) ((void*)(size_t(x)))
 
+#define dgControlFP(x,y) _controlfp(x,y)
 
-#ifdef _WIN_32_VER
-	#define dgControlFP(x,y) _controlfp(x,y)
-#else 
-	#define dgControlFP(x,y) x
-	#define stricmp(x,y) strcasecmp(x,y)
-#endif
-
-DG_INLINE dgFloat32 dgAbsf(dgFloat32 x)
+HACD_INLINE hacd::HaF32 dgAbsf(hacd::HaF32 x)
 {
-#if 0
-	dgDoubleInt val;
-	val.m_float = x;
-	val.m_intH &= ~(dgUnsigned64 (1)<<31);
-	_ASSERTE (val.m_float == fabs (x));
-	return dgFloat32 (val.m_float);
-#else
 	// according to Intel this is better because is doe not read after write
-	return (x >= dgFloat32 (0.0f)) ? x : -x;
-#endif
+	return (x >= hacd::HaF32 (0.0f)) ? x : -x;
 }
 
 
-DG_INLINE dgInt32 dgFastInt (dgFloat64 x)
+HACD_INLINE hacd::HaI32 dgFastInt (hacd::HaF64 x)
 {
-	dgInt32 i = dgInt32 (x);
-	if (dgFloat64 (i) > x) {
+	hacd::HaI32 i = hacd::HaI32 (x);
+	if (hacd::HaF64 (i) > x) {
 		i --;
 	}
 	return i;
 }
 
-DG_INLINE dgInt32 dgFastInt (dgFloat32 x)
+HACD_INLINE hacd::HaI32 dgFastInt (hacd::HaF32 x)
 {
-//#ifdef _MSC_VER
-#if 0
-	volatile dgDoubleInt val;
-	volatile dgDoubleInt round;
-	const dgFloat64 conversionMagicConst = ((dgFloat64 (dgInt64(1)<<52)) * dgFloat64 (1.5f));
-	val.m_float = dgFloat64 (x) + conversionMagicConst; 
-	round.m_float = x - dgFloat64 (val.m_intL);
-	dgInt32 ret = val.m_intL + (round.m_intH >> 31);
-	_ASSERTE (ret == dgInt32 (floor (x)));
-	return ret;
-
-#else
-	dgInt32 i = dgInt32 (x);
-	if (dgFloat32 (i) > x) {
+	hacd::HaI32 i = hacd::HaI32 (x);
+	if (hacd::HaF32 (i) > x) {
 		i --;
 	}
 	return i;
-#endif
 }
 
-DG_INLINE dgFloat32 dgFloor(dgFloat32 x)
+HACD_INLINE hacd::HaF32 dgFloor(hacd::HaF32 x)
 {
 #ifdef _MSC_VER
-	dgFloat32 ret = dgFloat32 (dgFastInt (x));
-	_ASSERTE (ret == floor (x));
+	hacd::HaF32 ret = hacd::HaF32 (dgFastInt (x));
+	HACD_ASSERT (ret == floor (x));
 	return  ret;
 #else 
 	return floor (x);
 #endif
 }
 
-DG_INLINE dgFloat32 dgCeil(dgFloat32 x)
+HACD_INLINE hacd::HaF32 dgCeil(hacd::HaF32 x)
 {
 #ifdef _MSC_VER
-	dgFloat32 ret = dgFloor(x);
+	hacd::HaF32 ret = dgFloor(x);
 	if (ret < x) {
-		ret += dgFloat32 (1.0f);
+		ret += hacd::HaF32 (1.0f);
 	}
-	_ASSERTE (ret == ceil (x));
+	HACD_ASSERT (ret == ceil (x));
 	return  ret;
 #else 
 	return ceil (x);
 #endif
 }
 
-#define dgSqrt(x) dgFloat32 (sqrt(x))	
-#define dgRsqrt(x) (dgFloat32 (1.0f) / dgSqrt(x))		
-#define dgSin(x) dgFloat32 (sin(x))
-#define dgCos(x) dgFloat32 (cos(x))
-#define dgAsin(x) dgFloat32 (asin(x))
-#define dgAcos(x) dgFloat32 (acos(x))
-#define dgAtan2(x,y) dgFloat32 (atan2(x,y))
-#define dgLog(x) dgFloat32 (log(x))
-#define dgPow(x,y) dgFloat32 (pow(x,y))
-#define dgFmod(x,y) dgFloat32 (fmod(x,y))
-
-
-typedef dgUnsigned32 (dgApi *OnGetPerformanceCountCallback) ();
+#define dgSqrt(x) hacd::HaF32 (sqrt(x))	
+#define dgRsqrt(x) (hacd::HaF32 (1.0f) / dgSqrt(x))		
+#define dgSin(x) hacd::HaF32 (sin(x))
+#define dgCos(x) hacd::HaF32 (cos(x))
+#define dgAsin(x) hacd::HaF32 (asin(x))
+#define dgAcos(x) hacd::HaF32 (acos(x))
+#define dgAtan2(x,y) hacd::HaF32 (atan2(x,y))
+#define dgLog(x) hacd::HaF32 (log(x))
+#define dgPow(x,y) hacd::HaF32 (pow(x,y))
+#define dgFmod(x,y) hacd::HaF32 (fmod(x,y))
 
 
 #endif

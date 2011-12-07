@@ -37,11 +37,11 @@ class dgGoogol
 {
 	public:
 	dgGoogol(void);
-	dgGoogol(dgFloat64 value);
+	dgGoogol(hacd::HaF64 value);
 	~dgGoogol(void);
 
-	dgFloat64 GetAproximateValue() const;
-	void InitFloatFloat (dgFloat64 value);
+	hacd::HaF64 GetAproximateValue() const;
+	void InitFloatFloat (hacd::HaF64 value);
 
 	dgGoogol operator+ (const dgGoogol &A) const; 
 	dgGoogol operator- (const dgGoogol &A) const; 
@@ -54,24 +54,23 @@ class dgGoogol
 	dgGoogol Floor () const;
 
 #ifdef _DEBUG
-	void Trace () const;
 	void ToString (char* const string) const;
 #endif
 
 	private:
-	void NegateMantissa (dgUnsigned64* const mantissa) const;
-	void CopySignedMantissa (dgUnsigned64* const mantissa) const;
-	dgInt32 NormalizeMantissa (dgUnsigned64* const mantissa) const;
-	dgUnsigned64 CheckCarrier (dgUnsigned64 a, dgUnsigned64 b) const;
-	void ShiftRightMantissa (dgUnsigned64* const mantissa, dgInt32 bits) const;
+	void NegateMantissa (hacd::HaU64* const mantissa) const;
+	void CopySignedMantissa (hacd::HaU64* const mantissa) const;
+	hacd::HaI32 NormalizeMantissa (hacd::HaU64* const mantissa) const;
+	hacd::HaU64 CheckCarrier (hacd::HaU64 a, hacd::HaU64 b) const;
+	void ShiftRightMantissa (hacd::HaU64* const mantissa, hacd::HaI32 bits) const;
 
-	dgInt32 LeadinZeros (dgUnsigned64 a) const;
-	void ExtendeMultiply (dgUnsigned64 a, dgUnsigned64 b, dgUnsigned64& high, dgUnsigned64& low) const;
-	void ScaleMantissa (dgUnsigned64* const out, dgUnsigned64 scale) const;
+	hacd::HaI32 LeadinZeros (hacd::HaU64 a) const;
+	void ExtendeMultiply (hacd::HaU64 a, hacd::HaU64 b, hacd::HaU64& high, hacd::HaU64& low) const;
+	void ScaleMantissa (hacd::HaU64* const out, hacd::HaU64 scale) const;
 
-	dgInt8 m_sign;
-	dgInt16 m_exponent;
-	dgUnsigned64 m_mantissa[DG_GOOGOL_SIZE];
+	hacd::HaI8 m_sign;
+	hacd::HaI16 m_exponent;
+	hacd::HaU64 m_mantissa[DG_GOOGOL_SIZE];
 };
 
 
@@ -93,7 +92,7 @@ class dgHugeVector: public dgTemplateVector<dgGoogol>
 	{
 	}
 
-	dgHugeVector (dgFloat64 x, dgFloat64 y, dgFloat64 z, dgFloat64 w)
+	dgHugeVector (hacd::HaF64 x, hacd::HaF64 y, hacd::HaF64 z, hacd::HaF64 w)
 		:dgTemplateVector<dgGoogol>(x, y, z, w)
 	{
 	}
@@ -106,16 +105,6 @@ class dgHugeVector: public dgTemplateVector<dgGoogol>
 
 
 
-#ifdef _DEBUG
-	void Trace () const
-	{
-		m_x.Trace();
-		m_y.Trace();
-		m_z.Trace();
-		m_w.Trace();
-		dgTrace (("\n"));
-	}
-#endif
 };
 
 

@@ -46,8 +46,8 @@ public:
 				float normal[3] = { 0,1,0 };
 				float uv[2] = { 0,0 };
 
-				dgInt32 *faceIndexCount = (dgInt32 *)HACD_ALLOC(sizeof(dgInt32)*desc.mTriangleCount);
-				dgInt32 *dummyIndex = (dgInt32 *)HACD_ALLOC(sizeof(dgInt32)*desc.mTriangleCount*3);
+				hacd::HaI32 *faceIndexCount = (hacd::HaI32 *)HACD_ALLOC(sizeof(hacd::HaI32)*desc.mTriangleCount);
+				hacd::HaI32 *dummyIndex = (hacd::HaI32 *)HACD_ALLOC(sizeof(hacd::HaI32)*desc.mTriangleCount*3);
 
 				for (hacd::HaU32 i=0; i<desc.mTriangleCount; i++)
 				{
@@ -58,10 +58,10 @@ public:
 				}
 
 				mesh.BuildFromVertexListIndexList(desc.mTriangleCount,faceIndexCount,dummyIndex,
-					desc.mVertices,sizeof(dgFloat32)*3,(const dgInt32 *const)desc.mIndices,
-					normal,sizeof(dgFloat32)*3,dummyIndex,
-					uv,sizeof(dgFloat32)*2,dummyIndex,
-					uv,sizeof(dgFloat32)*2,dummyIndex);
+					desc.mVertices,sizeof(hacd::HaF32)*3,(const hacd::HaI32 *const)desc.mIndices,
+					normal,sizeof(hacd::HaF32)*3,dummyIndex,
+					uv,sizeof(hacd::HaF32)*2,dummyIndex,
+					uv,sizeof(hacd::HaF32)*2,dummyIndex);
 
 #else
 
@@ -120,7 +120,7 @@ public:
 					polygon[2].m_v1 = 0;
 					polygon[2].m_material = 0;
 	
-					mesh.AddPolygon(3,(const dgFloat64 *)polygon,sizeof(polygon[0]),0);
+					mesh.AddPolygon(3,(const hacd::HaF64 *)polygon,sizeof(polygon[0]),0);
 
 				}
 				mesh.PackVertexArrays();
@@ -176,7 +176,7 @@ public:
 							delete solid;
 							solid = NULL;
 							dgPolyhedra nextSegment;
-							dgInt32 moreSegments = result->GetConectedSurface(nextSegment);
+							hacd::HaI32 moreSegments = result->GetConectedSurface(nextSegment);
 							if ( moreSegments )
 							{
 								solid = HACD_NEW(dgMeshEffect)(nextSegment,*result);
