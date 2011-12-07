@@ -135,13 +135,14 @@ void main(int argc,const char ** argv)
 		printf("Usage: TestHACD <wavefront.obj> (options)\r\n");
 		printf("\r\n");
 		printf("Options:\r\n");
-		printf("-v		: Max Hull Vertices (default 64)\r\n");
-		printf("-c		: Concavity (default 100)\r\n");
-		printf("-m		: Mimimum number of hulls (default 2)\r\n");
+		printf("-v	<count>	: Max Hull Vertices (default 64)\r\n");
+		printf("-c	<concavity>	: Concavity (default 100)\r\n");
+		printf("-m	<count>	: Mimimum number of hulls (default 2)\r\n");
 		printf("-j		: Use Julio Jerez's fast implementation of HACD\r\n");
-		printf("-connect : The connection distance to use (merges discrete sub-meshes).  Default is zero.\r\n");
+		printf("-connect <distance> : The connection distance to use (merges discrete sub-meshes).  Default is zero.\r\n");
 		printf("-constraint : Auto-generates constraints for the output convex hulls.\r\n");
 		printf("-mesh	: Generates an output skeletal mesh with the mesh deformation distance passed. (Not yet implemented)\r\n");
+		printf("-merge <percent> <totalPercent> : Where percent is the merge percentage and totalPercent is the percentage of total volume to merge.\r\n");
 		printf("\r\n");
 		printf("Example: TestHACD hornbug.obj -c 500 -m 5 -connect 10\r\n");
 		printf("\r\n");
@@ -171,6 +172,13 @@ void main(int argc,const char ** argv)
 			{
 				desc.mConnectDistance = getFloatArg(scan+1,argc,argv);
 				scan+=2;
+			}
+			else if ( strcmp(option,"-merge") == 0 )
+			{
+				desc.mMergeHulls			= true;
+				desc.mMergePercentage		= getFloatArg(scan+1,argc,argv);
+				desc.mMergeTotalPercentage	= getFloatArg(scan+2,argc,argv);
+				scan+=3;
 			}
 			else if ( strcmp(option,"-m") == 0 )
 			{
