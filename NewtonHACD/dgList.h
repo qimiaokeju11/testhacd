@@ -22,11 +22,7 @@
 #ifndef __dgList__
 #define __dgList__
 
-//#include "dgStdafx.h"
-#include "dgRef.h"
-#include "dgMemory.h"
-
-
+#include "dgTypes.h"
 
 template<class T>
 class dgList 

@@ -365,27 +365,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\NewtonHACD\dgCollision.h"
-				>
-			</File>
-			<File
 				RelativePath="..\NewtonHACD\dgConvexHull3d.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\NewtonHACD\dgConvexHull3d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\NewtonHACD\dgCRC.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\NewtonHACD\dgCRC.h"
-				>
-			</File>
-			<File
-				RelativePath="..\NewtonHACD\dgFunctions.h"
 				>
 			</File>
 			<File
@@ -410,10 +394,6 @@
 			</File>
 			<File
 				RelativePath="..\NewtonHACD\dgMatrix.h"
-				>
-			</File>
-			<File
-				RelativePath="..\NewtonHACD\dgMemory.h"
 				>
 			</File>
 			<File
@@ -453,27 +433,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\NewtonHACD\dgRandom.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\NewtonHACD\dgRandom.h"
-				>
-			</File>
-			<File
-				RelativePath="..\NewtonHACD\dgRef.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\NewtonHACD\dgRef.h"
-				>
-			</File>
-			<File
 				RelativePath="..\NewtonHACD\dgRefCounter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\NewtonHACD\dgRtti.h"
 				>
 			</File>
 			<File
@@ -528,7 +488,15 @@
 				Name="public"
 				>
 				<File
+					RelativePath="..\MergeHulls\public\ConvexHull.h"
+					>
+				</File>
+				<File
 					RelativePath="..\MergeHulls\public\MergeHulls.h"
+					>
+				</File>
+				<File
+					RelativePath="..\MergeHulls\public\WuQuantizer.h"
 					>
 				</File>
 			</Filter>
@@ -536,7 +504,15 @@
 				Name="src"
 				>
 				<File
+					RelativePath="..\MergeHulls\src\ConvexHull.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\MergeHulls\src\MergeHulls.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\MergeHulls\src\WuQuantizer.cpp"
 					>
 				</File>
 			</Filter>

@@ -21,7 +21,6 @@
 
 #include "dgTypes.h"
 #include "dgVector.h"
-#include "dgMemory.h"
 #include "dgStack.h"
 #include <string.h>
 

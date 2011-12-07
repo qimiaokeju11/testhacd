@@ -34,6 +34,7 @@ class dgTriplex
 	hacd::HaF32 m_z;
 };
 
+#define DG_MEMORY_GRANULARITY 16
 
 #define dgPI			 	hacd::HaF32 (3.14159f)
 #define dgPI2			 	hacd::HaF32 (dgPI * 2.0f)

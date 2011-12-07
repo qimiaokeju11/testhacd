@@ -22,7 +22,7 @@
 #ifndef __dgVector__
 #define __dgVector__
 
-#include "dgMemory.h"
+#include "dgTypes.h"
 
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
 //#define dgCheckVector(x) true

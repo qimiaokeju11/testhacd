@@ -1,5 +1,7 @@
 #include "MergeHulls.h"
 #include "FloatMath.h"
+#include "ConvexHull.h"
+
 #include <string.h>
 
 #pragma warning(disable:4100 4189)
@@ -367,33 +369,26 @@ public:
 		size_t vcount = vc->getVcount();
 		const hacd::HaF32 *vertices = vc->getVerticesFloat();
 
-#if 0 // TODO TODO
 		HullResult hresult;
 		HullLibrary hl;
 		HullDesc   desc;
-
-		desc.SetHullFlag(QF_TRIANGLES);
-
 		desc.mVcount       = (hacd::HaU32)vcount;
 		desc.mVertices     = vertices;
 		desc.mVertexStride = sizeof(hacd::HaF32)*3;
-
 		HullError hret = hl.CreateConvexHull(desc,hresult);
-
 		if ( hret == QE_OK )
 		{
-			hacd::HaF32 combineVolume  = fm_computeMeshVolume( hresult.mOutputVertices, hresult.mNumFaces, hresult.mIndices );
+			hacd::HaF32 combineVolume  = fm_computeMeshVolume( hresult.mOutputVertices, hresult.mNumTriangles, hresult.mIndices );
 			hacd::HaF32 sumVolume      = a->mVolume + b->mVolume;
 
 			hacd::HaF32 percent = (sumVolume*100) / combineVolume;
 
 			if ( percent >= (100.0f-mMergePercent)  )
 			{
-				MyConvexResult cr(hresult.mNumOutputVertices, hresult.mOutputVertices, hresult.mNumFaces, hresult.mIndices);
-				ret = PX_NEW(CHull)(cr);
+				MyConvexResult cr(hresult.mNumOutputVertices, hresult.mOutputVertices, hresult.mNumTriangles, hresult.mIndices);
+				ret = HACD_NEW(CHull)(cr);
 			}
 		}
-#endif
 		fm_releaseVertexIndex(vc);
 		return ret;
 	}
