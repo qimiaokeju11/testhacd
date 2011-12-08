@@ -1,248 +1,125 @@
 #include "MergeHulls.h"
-#include "FloatMath.h"
 #include "ConvexHull.h"
 
 #include <string.h>
+#include <math.h>
+#include <hash_map>
 
-#pragma warning(disable:4100 4189)
+#pragma warning(disable:4100 4189 4996)
 
 using namespace hacd;
 
 namespace HACD
 {
 
-static const HaF32 EPSILON=0.0001f;
+typedef stdext::hash_map< HaU32, HaF32 > TestedMap;
 
-	class ConvexResult
+static HaF32 fm_computeBestFitAABB(HaU32 vcount,const HaF32 *points,HaU32 pstride,HaF32 *bmin,HaF32 *bmax) // returns the diagonal distance
+{
+
+	const HaU8 *source = (const HaU8 *) points;
+
+	bmin[0] = points[0];
+	bmin[1] = points[1];
+	bmin[2] = points[2];
+
+	bmax[0] = points[0];
+	bmax[1] = points[1];
+	bmax[2] = points[2];
+
+
+	for (HaU32 i=1; i<vcount; i++)
 	{
-	public:
-		ConvexResult(void)
-		{
-			mHullVcount = 0;
-			mHullVertices = 0;
-			mHullTcount = 0;
-			mHullIndices = 0;
-		}
+		source+=pstride;
+		const HaF32 *p = (const HaF32 *) source;
 
-		// the convex hull.result
-		hacd::HaU32		   	mHullVcount;			// Number of vertices in this convex hull.
-		hacd::HaF32 			*mHullVertices;			// The array of vertices (x,y,z)(x,y,z)...
-		hacd::HaU32       	mHullTcount;			// The number of triangles int he convex hull
-		hacd::HaU32			*mHullIndices;			// The triangle indices (0,1,2)(3,4,5)...
-		hacd::HaF32           mHullVolume;		    // the volume of the convex hull.
+		if ( p[0] < bmin[0] ) bmin[0] = p[0];
+		if ( p[1] < bmin[1] ) bmin[1] = p[1];
+		if ( p[2] < bmin[2] ) bmin[2] = p[2];
 
-	};
+		if ( p[0] > bmax[0] ) bmax[0] = p[0];
+		if ( p[1] > bmax[1] ) bmax[1] = p[1];
+		if ( p[2] > bmax[2] ) bmax[2] = p[2];
 
-	class MyConvexResult : public ConvexResult, public hacd::UserAllocated
-	{
-	public:
-		MyConvexResult(hacd::HaU32 hvcount,const hacd::HaF32 *hvertices,hacd::HaU32 htcount,const hacd::HaU32 *hindices)
-		{
-			mHullVcount = hvcount;
-			if ( mHullVcount )
-			{
-				mHullVertices = (hacd::HaF32 *)HACD_ALLOC(mHullVcount*sizeof(hacd::HaF32)*3);
-				memcpy(mHullVertices, hvertices, sizeof(hacd::HaF32)*3*mHullVcount );
-			}
-			else
-			{
-				mHullVertices = 0;
-			}
-
-			mHullTcount = htcount;
-
-			if ( mHullTcount )
-			{
-				mHullIndices = (hacd::HaU32 *)HACD_ALLOC(sizeof(hacd::HaU32)*mHullTcount*3);
-				memcpy(mHullIndices,hindices, sizeof(hacd::HaU32)*mHullTcount*3 );
-			}
-			else
-			{
-				mHullIndices = 0;
-			}
-
-		}
-
-		MyConvexResult(const MyConvexResult &r) // copy constructor, perform a deep copy of the data.
-		{
-			mHullVcount = r.mHullVcount;
-			if ( mHullVcount )
-			{
-				mHullVertices = (hacd::HaF32 *)HACD_ALLOC(mHullVcount*sizeof(hacd::HaF32)*3);
-				memcpy(mHullVertices, r.mHullVertices, sizeof(hacd::HaF32)*3*mHullVcount );
-			}
-			else
-			{
-				mHullVertices = 0;
-			}
-			mHullTcount = r.mHullTcount;
-			if ( mHullTcount )
-			{
-				mHullIndices = (hacd::HaU32 *)HACD_ALLOC(sizeof(hacd::HaU32)*mHullTcount*3);
-				memcpy(mHullIndices, r.mHullIndices, sizeof(hacd::HaU32)*mHullTcount*3 );
-			}
-			else
-			{
-				mHullIndices = 0;
-			}
-		}
-
-		~MyConvexResult(void)
-		{
-			HACD_FREE(mHullVertices);
-			HACD_FREE(mHullIndices);
-		}
-
-
-
-
-
-	};
-
-
-	class QuickSortPointers
-	{
-	public:
-		void qsort(void **base,HaI32 num); // perform the qsort.
-	protected:
-		// -1 less, 0 equal, +1 greater.
-		virtual HaI32 compare(void **p1,void **p2) = 0;
-	private:
-		void inline swap(char **a,char **b);
-	};
-
-	void QuickSortPointers::swap(char **a,char **b)
-	{
-		char *tmp;
-
-		if ( a != b )
-		{
-			tmp = *a;
-			*a++ = *b;
-			*b++ = tmp;
-		}
 	}
 
+	HaF32 dx = bmax[0] - bmin[0];
+	HaF32 dy = bmax[1] - bmin[1];
+	HaF32 dz = bmax[2] - bmin[2];
 
-	void QuickSortPointers::qsort(void **b,HaI32 num)
+	return (HaF32) ::sqrtf( dx*dx + dy*dy + dz*dz );
+
+}
+
+
+
+
+static bool fm_intersectAABB(const HaF32 *bmin1,const HaF32 *bmax1,const HaF32 *bmin2,const HaF32 *bmax2)
+{
+	if ((bmin1[0] > bmax2[0]) || (bmin2[0] > bmax1[0])) return false;
+	if ((bmin1[1] > bmax2[1]) || (bmin2[1] > bmax1[1])) return false;
+	if ((bmin1[2] > bmax2[2]) || (bmin2[2] > bmax1[2])) return false;
+	return true;
+}
+
+
+static HACD_INLINE HaF32 det(const HaF32 *p1,const HaF32 *p2,const HaF32 *p3)
+{
+	return  p1[0]*p2[1]*p3[2] + p2[0]*p3[1]*p1[2] + p3[0]*p1[1]*p2[2] -p1[0]*p3[1]*p2[2] - p2[0]*p1[1]*p3[2] - p3[0]*p2[1]*p1[2];
+}
+
+
+static HaF32  fm_computeMeshVolume(const HaF32 *vertices,HaU32 tcount,const HaU32 *indices)
+{
+	HaF32 volume = 0;
+	for (HaU32 i=0; i<tcount; i++,indices+=3)
 	{
-		char *lo,*hi;
-		char *mid;
-		char *bottom, *top;
-		HaI32 size;
-		char *lostk[30], *histk[30];
-		HaI32 stkptr;
-		char **base = (char **)b;
-
-		if (num < 2 ) return;
-
-		stkptr = 0;
-
-		lo = (char *)base;
-		hi = (char *)base + sizeof(char **) * (num-1);
-
-nextone:
-
-		size = (HaI32)(hi - lo) / sizeof(char**) + 1;
-
-		mid = lo + (size / 2) * sizeof(char **);
-		swap((char **)mid,(char **)lo);
-		bottom = lo;
-		top = hi + sizeof(char **);
-
-		for (;;)
-		{
-			do
-			{
-				bottom += sizeof(char **);
-			} while (bottom <= hi && compare((void **)bottom,(void **)lo) <= 0);
-
-			do
-			{
-				top -= sizeof(char **);
-			} while (top > lo && compare((void **)top,(void **)lo) >= 0);
-
-			if (top < bottom) break;
-
-			swap((char **)bottom,(char **)top);
-
-		}
-
-		swap((char **)lo,(char **)top);
-
-		if ( top - 1 - lo >= hi - bottom )
-		{
-			if (lo + sizeof(char **) < top)
-			{
-				lostk[stkptr] = lo;
-				histk[stkptr] = top - sizeof(char **);
-				stkptr++;
-			}
-			if (bottom < hi)
-			{
-				lo = bottom;
-				goto nextone;
-			}
-		}
-		else
-		{
-			if ( bottom < hi )
-			{
-				lostk[stkptr] = bottom;
-				histk[stkptr] = hi;
-				stkptr++;
-			}
-			if (lo + sizeof(char **) < top)
-			{
-				hi = top - sizeof(char **);
-				goto nextone; 					/* do small recursion */
-			}
-		}
-
-		stkptr--;
-
-		if (stkptr >= 0)
-		{
-			lo = lostk[stkptr];
-			hi = histk[stkptr];
-			goto nextone;
-		}
-		return;
+		const HaF32 *p1 = &vertices[ indices[0]*3 ];
+		const HaF32 *p2 = &vertices[ indices[1]*3 ];
+		const HaF32 *p3 = &vertices[ indices[2]*3 ];
+		volume+=det(p1,p2,p3); // compute the volume of the tetrahedran relative to the origin.
 	}
+
+	volume*=(1.0f/6.0f);
+	if ( volume < 0 )
+		volume*=-1;
+	return volume;
+}
+
 
 
 	class CHull : public UserAllocated
 	{
 	public:
-		CHull(const MyConvexResult &result)
+		CHull(HaU32 vcount,const HaF32 *vertices,HaU32 tcount,const HaU32 *indices,HaU32 guid)
 		{
-			mResult = HACD_NEW(MyConvexResult)(result);
-			mVolume = fm_computeMeshVolume( result.mHullVertices, result.mHullTcount, result.mHullIndices );
-
-			mDiagonal = fm_computeBestFitAABB( result.mHullVcount, result.mHullVertices, sizeof(hacd::HaF32)*3, mMin, mMax );
-
+			mGuid = guid;
+			mVertexCount = vcount;
+			mTriangleCount = tcount;
+			mVertices = (HaF32 *)HACD_ALLOC(sizeof(HaF32)*3*vcount);
+			memcpy(mVertices,vertices,sizeof(HaF32)*3*vcount);
+			mIndices = (HaU32 *)HACD_ALLOC(sizeof(HaU32)*3*tcount);
+			memcpy(mIndices,indices,sizeof(HaU32)*3*tcount);
+			mVolume = fm_computeMeshVolume( mVertices, mTriangleCount, mIndices);
+			mDiagonal = fm_computeBestFitAABB( mVertexCount, mVertices, sizeof(hacd::HaF32)*3, mMin, mMax );
 			hacd::HaF32 dx = mMax[0] - mMin[0];
 			hacd::HaF32 dy = mMax[1] - mMin[1];
 			hacd::HaF32 dz = mMax[2] - mMin[2];
-
 			dx*=0.1f; // inflate 1/10th on each edge
 			dy*=0.1f; // inflate 1/10th on each edge
 			dz*=0.1f; // inflate 1/10th on each edge
-
 			mMin[0]-=dx;
 			mMin[1]-=dy;
 			mMin[2]-=dz;
-
 			mMax[0]+=dx;
 			mMax[1]+=dy;
 			mMax[2]+=dz;
-
-
 		}
 
 		~CHull(void)
 		{
-			delete mResult;
+			HACD_FREE(mVertices);
+			HACD_FREE(mIndices);
 		}
 
 		bool overlap(const CHull &h) const
@@ -250,11 +127,34 @@ nextone:
 			return fm_intersectAABB(mMin,mMax, h.mMin, h.mMax );
 		}
 
-		hacd::HaF32          mMin[3];
-		hacd::HaF32          mMax[3];
-		hacd::HaF32          mVolume;
-		hacd::HaF32          mDiagonal; // long edge..
-		MyConvexResult  *mResult;
+		void getCenter(HaF32 *center) const
+		{
+			center[0] = (mMin[0] + mMax[0])*0.5f;
+			center[1] = (mMin[1] + mMax[1])*0.5f;
+			center[2] = (mMin[2] + mMax[2])*0.5f;
+		}
+
+		HaF32 distanceSquared(const CHull &h) const
+		{
+			HaF32 center1[3];
+			HaF32 center2[3];
+			getCenter(center1);
+			h.getCenter(center2);
+			HaF32 dx = center1[0] = center2[0];
+			HaF32 dy = center1[1] = center2[1];
+			HaF32 dz = center1[2] = center2[2];
+			return dx*dx+dy*dy+dz*dz;
+		}
+
+		HaU32			mGuid;
+		hacd::HaF32		mMin[3];
+		hacd::HaF32		mMax[3];
+		hacd::HaF32		mVolume;
+		hacd::HaF32		mDiagonal; // long edge..
+		HaU32			mVertexCount;
+		HaU32			mTriangleCount;
+		HaF32			*mVertices;
+		HaU32			*mIndices;
 	};
 
 	// Usage: std::sort( list.begin(), list.end(), StringSortRef() );
@@ -271,9 +171,8 @@ nextone:
 
 
 typedef STDNAME::vector< CHull * > CHullVector;
-typedef STDNAME::vector<MyConvexResult *> ConvexResultVector;
 
-class MyMergeHullsInterface : public MergeHullsInterface, public hacd::UserAllocated, public QuickSortPointers
+class MyMergeHullsInterface : public MergeHullsInterface, public hacd::UserAllocated
 {
 public:
 	MyMergeHullsInterface(void)
@@ -289,26 +188,49 @@ public:
 	// Merge these input hulls.
 	virtual hacd::HaU32 mergeHulls(const MergeHullVector &inputHulls,
 		MergeHullVector &outputHulls,
-		hacd::HaF32	mergePercentage,
-		hacd::HaF32	mergeTotalVolumePercentage)
+		hacd::HaU32 mergeHullCount)
 	{
-		hacd::HaU32 ret = 0;
-
-		for (MergeHullVector::const_iterator i=inputHulls.begin(); i!=inputHulls.end(); ++i)
+		mGuid = 0;
+		mHasBeenTested.clear();
+		HaU32 maxMergeCount=0;
+		if ( maxMergeCount < inputHulls.size() )
 		{
-			const MergeHull &h = (*i);
-			MyConvexResult result(h.mVertexCount,h.mVertices,h.mTriangleCount,h.mIndices);
-			ConvexDecompResult(result);
+			maxMergeCount = inputHulls.size() - mergeHullCount;
 		}
 
-		while ( combineHulls() ); // keep combinging hulls until I can't combine any more...
+		mTotalVolume = 0;
+		for (HaU32 i=0; i<inputHulls.size(); i++)
+		{
+			const MergeHull &h = inputHulls[i];
+			CHull *ch = HACD_NEW(CHull)(h.mVertexCount,h.mVertices,h.mTriangleCount,h.mIndices,mGuid++);
+			mChulls.push_back(ch);
+			mTotalVolume+=ch->mVolume;
+		}
 
-		return ret;
+		for (HaU32 i=0; i<maxMergeCount; i++)
+		{
+			bool combined = combineHulls(); // mege smallest hulls first, up to the max merge count.
+			if ( !combined ) break;
+		}
+
+		// return results..
+		for (HaU32 i=0; i<mChulls.size(); i++)
+		{
+			CHull *ch = mChulls[i];
+			MergeHull mh;
+			mh.mVertexCount = ch->mVertexCount;
+			mh.mTriangleCount = ch->mTriangleCount;
+			mh.mIndices = ch->mIndices;
+			mh.mVertices = ch->mVertices;
+			outputHulls.push_back(mh);
+		}
+
+		return outputHulls.size();
 	}
 
-	virtual void ConvexDecompResult(MyConvexResult &result)
+	virtual void ConvexDecompResult(hacd::HaU32 hvcount,const hacd::HaF32 *hvertices,hacd::HaU32 htcount,const hacd::HaU32 *hindices)
 	{
-		CHull *ch = HACD_NEW(CHull)(result);
+		CHull *ch = HACD_NEW(CHull)(hvcount,hvertices,htcount,hindices,mGuid++);
 		if ( ch->mVolume > 0.00001f )
 		{
 			mChulls.push_back(ch);
@@ -325,175 +247,171 @@ public:
 		delete this;
 	}
 
-	void getMesh(const MyConvexResult &cr,fm_VertexIndex *vc)
-	{
-		hacd::HaU32 *src = cr.mHullIndices;
-
-		for (hacd::HaU32 i=0; i<cr.mHullTcount; i++)
-		{
-			size_t i1 = *src++;
-			size_t i2 = *src++;
-			size_t i3 = *src++;
-
-			const hacd::HaF32 *p1 = &cr.mHullVertices[i1*3];
-			const hacd::HaF32 *p2 = &cr.mHullVertices[i2*3];
-			const hacd::HaF32 *p3 = &cr.mHullVertices[i3*3];
-			bool newPos;
-			i1 = vc->getIndex(p1,newPos);
-			i2 = vc->getIndex(p2,newPos);
-			i3 = vc->getIndex(p3,newPos);
-		}
-	}
-
-
-
-	CHull * canMerge(CHull *a,CHull *b)
+	HaF32 canMerge(CHull *a,CHull *b)
 	{
 		if ( !a->overlap(*b) ) return 0; // if their AABB's (with a little slop) don't overlap, then return.
 
-		if ( mMergePercent < 0 ) return 0;
-
-		assert( a->mVolume > 0 );
-		assert( b->mVolume > 0 );
-
-		CHull *ret = 0;
-
 		// ok..we are going to combine both meshes into a single mesh
 		// and then we are going to compute the concavity...
+		HaF32 ret = 0;
 
-		fm_VertexIndex *vc = fm_createVertexIndex((hacd::HaF32)EPSILON,false);
-
-		getMesh( *a->mResult, vc);
-		getMesh( *b->mResult, vc);
-
-		size_t vcount = vc->getVcount();
-		const hacd::HaF32 *vertices = vc->getVerticesFloat();
+		HaU32 combinedVertexCount = a->mVertexCount + b->mVertexCount;
+		HaF32 *combinedVertices = (HaF32 *)HACD_ALLOC(combinedVertexCount*sizeof(HaF32)*3);
+		HaF32 *dest = combinedVertices;
+		memcpy(dest,a->mVertices, sizeof(HaF32)*3*a->mVertexCount);
+		dest+=a->mVertexCount*3;
+		memcpy(dest,b->mVertices,sizeof(HaF32)*3*b->mVertexCount);
 
 		HullResult hresult;
 		HullLibrary hl;
 		HullDesc   desc;
-		desc.mVcount       = (hacd::HaU32)vcount;
-		desc.mVertices     = vertices;
+		desc.mVcount       = combinedVertexCount;
+		desc.mVertices     = combinedVertices;
 		desc.mVertexStride = sizeof(hacd::HaF32)*3;
 		HullError hret = hl.CreateConvexHull(desc,hresult);
+		HACD_ASSERT( hret == QE_OK );
 		if ( hret == QE_OK )
 		{
-			hacd::HaF32 combineVolume  = fm_computeMeshVolume( hresult.mOutputVertices, hresult.mNumTriangles, hresult.mIndices );
-			hacd::HaF32 sumVolume      = a->mVolume + b->mVolume;
-
-			hacd::HaF32 percent = (sumVolume*100) / combineVolume;
-
-			if ( percent >= (100.0f-mMergePercent)  )
-			{
-				MyConvexResult cr(hresult.mNumOutputVertices, hresult.mOutputVertices, hresult.mNumTriangles, hresult.mIndices);
-				ret = HACD_NEW(CHull)(cr);
-			}
+			ret  = fm_computeMeshVolume( hresult.mOutputVertices, hresult.mNumTriangles, hresult.mIndices );
 		}
-		fm_releaseVertexIndex(vc);
+		HACD_FREE(combinedVertices);
+		hl.ReleaseResult(hresult);
 		return ret;
 	}
 
-	void sortChulls(CHullVector & hulls)
+
+	CHull * doMerge(CHull *a,CHull *b)
 	{
-		CHull **hptr = &hulls[0];
-		QuickSortPointers::qsort((void **)hptr,hulls.size());
+		CHull *ret = 0;
+		HaU32 combinedVertexCount = a->mVertexCount + b->mVertexCount;
+		HaF32 *combinedVertices = (HaF32 *)HACD_ALLOC(combinedVertexCount*sizeof(HaF32)*3);
+		HaF32 *dest = combinedVertices;
+		memcpy(dest,a->mVertices, sizeof(HaF32)*3*a->mVertexCount);
+		dest+=a->mVertexCount*3;
+		memcpy(dest,b->mVertices,sizeof(HaF32)*3*b->mVertexCount);
+		HullResult hresult;
+		HullLibrary hl;
+		HullDesc   desc;
+		desc.mVcount       = combinedVertexCount;
+		desc.mVertices     = combinedVertices;
+		desc.mVertexStride = sizeof(hacd::HaF32)*3;
+		HullError hret = hl.CreateConvexHull(desc,hresult);
+		HACD_ASSERT( hret == QE_OK );
+		if ( hret == QE_OK )
+		{
+			ret = HACD_NEW(CHull)(hresult.mNumOutputVertices, hresult.mOutputVertices, hresult.mNumTriangles, hresult.mIndices,mGuid++);
+		}
+		HACD_FREE(combinedVertices);
+		hl.ReleaseResult(hresult);
+		return ret;
 	}
 
 	bool combineHulls(void)
 	{
-
 		bool combine = false;
+		// each new convex hull is given a unique guid.
+		// A hash map is used to make sure that no hulls are tested twice.
+		CHullVector output;
+		HaU32 count = mChulls.size();
 
-		sortChulls(mChulls); // sort the convex hulls, largest volume to least...
+		CHull *mergeA = NULL;
+		CHull *mergeB = NULL;
 
-		CHullVector output; // the output hulls...
-
-
-		CHullVector::iterator i;
-
-		for (i=mChulls.begin(); i!=mChulls.end() && !combine; ++i)
 		{
-			CHull *cr = (*i);
-
-			CHullVector::iterator j = i + 1;
-			for (; j!=mChulls.end(); ++j)
+			HaF32 bestVolume = mTotalVolume;
+			for (HaU32 i=0; i<count; i++)
 			{
-				CHull *match = (*j);
-
-				if ( cr != match ) // don't try to merge a hull with itself, that be stoopid
+				CHull *cr = mChulls[i];
+				for (HaU32 j=i+1; j<count; j++)
 				{
-
-					CHull *merge = canMerge(cr,match); // if we can merge these two....
-					if ( !merge )
+					CHull *match = mChulls[j];
+					HaU32 hashIndex;
+					if ( match->mGuid < cr->mGuid )
 					{
-						merge = canMerge(match,cr);
+						hashIndex = (match->mGuid << 16) | cr->mGuid;
 					}
-
-					if ( merge )
+					else
 					{
-						output.push_back(merge);
-						++i;
-						while ( i != mChulls.end() )
+						hashIndex = (cr->mGuid << 16 ) | match->mGuid;
+					}
+					HaF32 combinedVolume;
+					TestedMap::iterator found = mHasBeenTested.find(hashIndex);
+					if ( found == mHasBeenTested.end() )
+					{
+						combinedVolume = canMerge(cr,match);
+						mHasBeenTested[hashIndex] = combinedVolume;
+					}
+					else
+					{
+						combinedVolume = (*found).second;
+					}
+					if ( combinedVolume != 0 )
+					{
+						if ( combinedVolume < bestVolume )
 						{
-							CHull *cr = (*i);
-							if ( cr != match )
-							{
-								output.push_back(cr);
-							}
-							i++;
+							bestVolume = combinedVolume;
+							mergeA = cr;
+							mergeB = match;
 						}
-
-						delete cr;
-						delete match;
-						combine = true;
-						break;
 					}
 				}
 			}
-
-			if ( combine )
-			{
-				break;
-			}
-			else
-			{
-				output.push_back(cr);
-			}
 		}
-
-		if ( combine )
+		if ( mergeA )
 		{
-			mChulls.clear();
+			CHull *merge = doMerge(mergeA,mergeB);
+			if ( merge )
+			{
+				combine = true;
+				output.push_back(merge);
+				for (CHullVector::iterator j=mChulls.begin(); j!=mChulls.end(); ++j)
+				{
+					CHull *h = (*j);
+					if ( h !=mergeA && h != mergeB )
+					{
+						output.push_back(h);
+					}
+				}
+				delete mergeA;
+				delete mergeB;
+			}
 			mChulls = output;
-			output.clear();
+#if 0
+			static HaU32 mergeCount=0;
+			mergeCount++;
+			char scratch[512];
+			sprintf_s(scratch,512,"Merge%03d.obj", mergeCount );
+			FILE *fph = fopen(scratch,"wb");
+			HaU32 baseVertex = 1;
+			for (HaU32 i=0; i<mChulls.size(); i++)
+			{
+				CHull *h = mChulls[i];
+				for (HaU32 i=0; i<h->mVertexCount; i++)
+				{
+					const HaF32 *p = &h->mVertices[i*3];
+					fprintf(fph,"v %0.9f %0.9f %0.9f\r\n", p[0], p[1], p[2] );
+				}
+				for (HaU32 i=0; i<h->mTriangleCount; i++)
+				{
+					HaU32 i1 = h->mIndices[i*3+0];
+					HaU32 i2 = h->mIndices[i*3+1];
+					HaU32 i3 = h->mIndices[i*3+2];
+					fprintf(fph,"f %d %d %d\r\n", i1+baseVertex, i2+baseVertex, i3+baseVertex );
+				}
+				baseVertex+=h->mVertexCount;
+			}
+			fclose(fph);
+#endif
 		}
-
 
 		return combine;
 	}
 
-
-	virtual HaI32 compare(void **p1,void **p2)
-	{
-		CHull **cp1 = (CHull **)p1;
-		CHull **cp2 = (CHull **)p2;
-		CHull *h1 = cp1[0];
-		CHull *h2 = cp2[0];
-
-		if ( h1->mVolume > h2->mVolume )
-			return -1;
-		else if ( h1->mVolume < h2->mVolume )
-			return 1;
-		return 0;
-	}
-
-
-
 private:
-	HaF32				mMergePercent;
+	TestedMap			mHasBeenTested;
+	HaU32				mGuid;
+	HaF32				mTotalVolume;
 	CHullVector			mChulls;
-	ConvexResultVector	mResults;
-
 };
 
 MergeHullsInterface * createMergeHullsInterface(void)

@@ -165,13 +165,16 @@ hacd::HaU32	kmeans_cluster(const Vec *input,
 			}
 		}
 		// If we have fewer output clumps than input clumps so far, then we need to remap the old indices to the new ones.
-		if ( outCount != i || !add ) // we need to remap indices!  everything that was index 'i' now needs to be remapped to 'outCount'
+		if ( outputIndices )
 		{
-			for (hacd::HaU32 j=0; j<inputCount; j++)
+			if ( outCount != i || !add ) // we need to remap indices!  everything that was index 'i' now needs to be remapped to 'outCount'
 			{
-				if ( outputIndices[j] == i )
+				for (hacd::HaU32 j=0; j<inputCount; j++)
 				{
-					outputIndices[j] = remapIndex; //
+					if ( outputIndices[j] == i )
+					{
+						outputIndices[j] = remapIndex; //
+					}
 				}
 			}
 		}

@@ -15,6 +15,7 @@
 
 #pragma warning(disable:4100 4996)
 
+using namespace hacd;
 
 namespace HACD
 {
@@ -43,7 +44,6 @@ public:
 			{
 				dgMeshEffect mesh(true);
 
-#if 1
 				float normal[3] = { 0,1,0 };
 				float uv[2] = { 0,0 };
 
@@ -64,71 +64,8 @@ public:
 					uv,sizeof(hacd::HaF32)*2,dummyIndex,
 					uv,sizeof(hacd::HaF32)*2,dummyIndex);
 
-#else
+				dgMeshEffect *result = mesh.CreateConvexApproximation(desc.mConcavity,desc.mMaxHullCount);
 
-				for (hacd::HaU32 i=0; i<desc.mTriangleCount; i++)
-				{
-
-					hacd::HaU32 i1 = desc.mIndices[i*3+0];
-					hacd::HaU32 i2 = desc.mIndices[i*3+1];
-					hacd::HaU32 i3 = desc.mIndices[i*3+2];
-
-					const hacd::HaF32 *p1 = &desc.mVertices[i1*3];
-					const hacd::HaF32 *p2 = &desc.mVertices[i2*3];
-					const hacd::HaF32 *p3 = &desc.mVertices[i3*3];
-
-					hacd::HaF32 normal[3];
-					hacd::fm_computePlane(p1,p2,p3,normal);
-
-					dgMeshEffect::dgVertexAtribute polygon[3];
-
-					polygon[0].m_vertex.m_x = p1[0];
-					polygon[0].m_vertex.m_y = p1[1];
-					polygon[0].m_vertex.m_z = p1[2];
-					polygon[0].m_vertex.m_w = 0;
-					polygon[0].m_normal_x = normal[0];
-					polygon[0].m_normal_y = normal[1];
-					polygon[0].m_normal_z = normal[2];
-					polygon[0].m_u0 = 0;
-					polygon[0].m_v0 = 0;
-					polygon[0].m_u1 = 0;
-					polygon[0].m_v1 = 0;
-					polygon[0].m_material = 0;
-
-					polygon[1].m_vertex.m_x = p2[0];
-					polygon[1].m_vertex.m_y = p2[1];
-					polygon[1].m_vertex.m_z = p2[2];
-					polygon[1].m_vertex.m_w = 0;
-					polygon[1].m_normal_x = normal[0];
-					polygon[1].m_normal_y = normal[1];
-					polygon[1].m_normal_z = normal[2];
-					polygon[1].m_u0 = 0;
-					polygon[1].m_v0 = 0;
-					polygon[1].m_u1 = 0;
-					polygon[1].m_v1 = 0;
-					polygon[1].m_material = 0;
-
-					polygon[2].m_vertex.m_x = p3[0];
-					polygon[2].m_vertex.m_y = p3[1];
-					polygon[2].m_vertex.m_z = p3[2];
-					polygon[2].m_vertex.m_w = 0;
-					polygon[2].m_normal_x = normal[0];
-					polygon[2].m_normal_y = normal[1];
-					polygon[2].m_normal_z = normal[2];
-					polygon[2].m_u0 = 0;
-					polygon[2].m_v0 = 0;
-					polygon[2].m_u1 = 0;
-					polygon[2].m_v1 = 0;
-					polygon[2].m_material = 0;
-	
-					mesh.AddPolygon(3,(const hacd::HaF64 *)polygon,sizeof(polygon[0]),0);
-
-				}
-				mesh.PackVertexArrays();
-
-#endif
-
-				dgMeshEffect *result = mesh.CreateConvexApproximation(0.2f,32);
 				if ( result )
 				{
 					// now we build hulls for each connected surface...
@@ -240,7 +177,7 @@ public:
 			}
 		}
 
-		if ( ret && desc.mMergeHulls )
+		if ( ret && desc.mMergeHulls && desc.mMergeHullCount < ret )
 		{
 			MergeHullsInterface *mhi = createMergeHullsInterface();
 			if ( mhi )
@@ -257,7 +194,31 @@ public:
 					mh.mIndices = h.mIndices;
 					inputHulls.push_back(mh);
 				}
-				mhi->mergeHulls(inputHulls,outputHulls,desc.mMergePercentage,desc.mMergeTotalPercentage);
+
+				mhi->mergeHulls(inputHulls,outputHulls,desc.mMergeHullCount);
+
+				for (HaU32 i=0; i<ret; i++)
+				{
+					Hull &h = mHulls[i];
+					releaseHull(h);
+				}
+				mHulls.clear();
+
+				for (hacd::HaU32 i=0; i<outputHulls.size(); i++)
+				{
+					Hull h;
+					const MergeHull &mh = outputHulls[i];
+					h.mTriangleCount =  mh.mTriangleCount;
+					h.mVertexCount = mh.mVertexCount;
+					h.mIndices = (HaU32 *)HACD_ALLOC(sizeof(HaU32)*3*h.mTriangleCount);
+					h.mVertices = (HaF32 *)HACD_ALLOC(sizeof(HaF32)*3*h.mVertexCount);
+					memcpy((HaU32 *)h.mIndices,mh.mIndices,sizeof(HaU32)*3*h.mTriangleCount);
+					memcpy((HaF32 *)h.mVertices,mh.mVertices,sizeof(HaF32)*3*h.mVertexCount);
+					mHulls.push_back(h);
+				}
+
+				ret = mHulls.size();
+
 				mhi->release();
 			}
 		}
