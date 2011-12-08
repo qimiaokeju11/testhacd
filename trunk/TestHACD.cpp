@@ -142,7 +142,7 @@ void main(int argc,const char ** argv)
 		printf("-connect <distance> : The connection distance to use (merges discrete sub-meshes).  Default is zero.\r\n");
 		printf("-constraint : Auto-generates constraints for the output convex hulls.\r\n");
 		printf("-mesh	: Generates an output skeletal mesh with the mesh deformation distance passed. (Not yet implemented)\r\n");
-		printf("-merge <percent> <totalPercent> : Where percent is the merge percentage and totalPercent is the percentage of total volume to merge.\r\n");
+		printf("-merge <hullCount>\r\n");
 		printf("\r\n");
 		printf("Example: TestHACD hornbug.obj -c 500 -m 5 -connect 10\r\n");
 		printf("\r\n");
@@ -176,9 +176,8 @@ void main(int argc,const char ** argv)
 			else if ( strcmp(option,"-merge") == 0 )
 			{
 				desc.mMergeHulls			= true;
-				desc.mMergePercentage		= getFloatArg(scan+1,argc,argv);
-				desc.mMergeTotalPercentage	= getFloatArg(scan+2,argc,argv);
-				scan+=3;
+				desc.mMergeHullCount		= getIntArg(scan+1,argc,argv);
+				scan+=2;
 			}
 			else if ( strcmp(option,"-m") == 0 )
 			{
