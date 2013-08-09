@@ -12,6 +12,60 @@
 #include "HACD.h"
 #include "FloatMath.h"
 
+namespace HACD
+{
+	HACD_API *gHACD = NULL;
+};
+
+#define HEADER_VERSION 100
+
+struct HullHeader
+{
+	HullHeader(void)
+	{
+		header[0] = 'H';
+		header[1] = 'A';
+		header[2] = 'C';
+		header[3] = 'D';
+		versionNumber = HEADER_VERSION;
+		hullCount = 0;
+	}
+	unsigned char header[4];
+	hacd::HaU32		versionNumber;
+	hacd::HaU32		hullCount;	// number of convex hulls
+};
+
+// save the convex hull data in binary format
+void saveBin(void)
+{
+	printf("Saving ConvexHulls to 'ConvexDecomposition.bin'\r\n");
+
+	hacd::HaU32 hullCount = HACD::gHACD->getHullCount();
+	printf("Produced %d output convex hulls.\r\n", hullCount );
+	FILE *fph = fopen("ConvexDecomposition.bin", "wb");
+	if ( fph )
+	{
+		HullHeader hh;
+		hh.hullCount = hullCount;
+		for (hacd::HaU32 i=0; i<hullCount; i++)
+		{
+			const HACD::HACD_API::Hull *hull = HACD::gHACD->getHull(i);
+			if ( hull )
+			{
+				fwrite(&hull->mVertexCount, sizeof(hull->mVertexCount), 1, fph );
+				fwrite(&hull->mTriangleCount, sizeof(hull->mTriangleCount), 1, fph );
+				fwrite(hull->mVertices, sizeof(float)*hull->mVertexCount*3, 1, fph );
+				fwrite(hull->mIndices, sizeof(hacd::HaU32)*hull->mTriangleCount*3, 1, fph );
+			}
+		}
+		fclose(fph);
+	}
+	else
+	{
+		printf("Failed to open output file.\r\n");
+	}
+}
+
 #ifdef WIN32
 #define USE_MESH_IMPORT 0
 #endif
@@ -38,10 +92,7 @@ static char * lastSlash(char *path)
 
 #endif
 
-namespace HACD
-{
-	HACD_API *gHACD = NULL;
-};
+
 
 
 float getFloatArg(int arg,int argc,const char **argv)
@@ -313,6 +364,7 @@ void main(int argc,const char ** argv)
 				hacd::HaU32 hullCount = HACD::gHACD->performHACD(desc);
 				if ( hullCount != 0 )
 				{
+					saveBin();
 					printf("Produced %d output convex hulls.\r\n", hullCount );
 					FILE *fph = fopen("ConvexDecomposition.obj", "wb");
 					if ( fph )
