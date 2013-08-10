@@ -47,6 +47,7 @@ void saveBin(void)
 	{
 		HullHeader hh;
 		hh.hullCount = hullCount;
+		fwrite(&hh,sizeof(hh),1,fph );
 		for (hacd::HaU32 i=0; i<hullCount; i++)
 		{
 			const HACD::HACD_API::Hull *hull = HACD::gHACD->getHull(i);
