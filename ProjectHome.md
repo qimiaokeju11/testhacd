@@ -1,0 +1,1 @@
+This project contains a small sample application which demonstrates the usage of Khaled Mamou's excellent Hierarchical Approximate Convex Decomposition library known as 'HACD'.  The original source code has been refactored to remove all use of the STL and also now traps all memory allocations.
